@@ -2,6 +2,11 @@ const STORAGE_KEY = "felipe-figueroa-studio-v1";
 const PROFESSOR_AUTH_KEY = "ff-professor-auth";
 const STUDENT_AUTH_KEY = "ff-student-auth";
 const WORKBOOK_URL = "assets/materials/apostila-facilitando-o-violao.pdf";
+const LESSON_PLANS = [
+  { id:"monthly", name:"Mensal", months:1, lessons:4, total:420, monthly:420, perLesson:105, regular:520, saving:100, badge:"Mais escolhido", featured:true, commitment:"Liberdade para renovar mês a mês" },
+  { id:"quarterly", name:"Trimestral", months:3, lessons:12, total:1170, monthly:390, perLesson:97.5, regular:1260, saving:90, badge:"Economize R$ 90", featured:false, commitment:"3 meses para consolidar sua evolução" },
+  { id:"semester", name:"Semestral", months:6, lessons:24, total:2160, monthly:360, perLesson:90, regular:2520, saving:360, badge:"Melhor valor por aula", featured:false, commitment:"6 meses de acompanhamento consistente" },
+];
 const WORKBOOK_MODULES = [
   { number: "01", title: "Introdução", page: 6, topics: "Instrumento, afinação e conceitos musicais" },
   { number: "02", title: "Fundamentos", page: 17, topics: "Cromatismos, dedilhado e palhetada alternada" },
@@ -225,6 +230,94 @@ function publicPage() {
     </main>`;
 }
 
+function salesPage() {
+  const planBenefits = [
+    "1 aula individual por semana",
+    "Plano de estudo personalizado",
+    "Área do aluno com progresso e agenda",
+    "Exercícios e materiais organizados",
+    "Aulas online gravadas para revisão",
+  ];
+  return `
+    <header class="site-nav sales-nav">
+      <div class="container site-nav-inner">
+        <a class="brand" href="./"><span class="brand-mark" aria-label="Felipe Figueroa"></span><strong>Felipe Figueroa</strong><span>/ aulas</span></a>
+        <nav class="nav-links" aria-label="Navegação da página de aulas">
+          <a href="aulas/#aulas/metodo">Como funciona</a><a href="aulas/#aulas/area">Área do aluno</a><a href="aulas/#aulas/planos">Planos</a><a href="aulas/#aulas/duvidas">Dúvidas</a>
+          <span class="nav-access"><a class="btn btn-outline" href="./">Voltar ao site</a><a class="btn btn-primary" href="aulas/#aulas/planos">Ver valores ${icons.arrow}</a></span>
+        </nav>
+        <div class="nav-mobile-access"><a class="icon-btn" href="./" aria-label="Voltar ao site">${icons.home}</a><a class="icon-btn" href="aulas/#aulas/planos" aria-label="Ver planos">${icons.money}</a></div>
+      </div>
+    </header>
+    <main class="sales-page">
+      <section class="sales-hero">
+        <div class="container sales-hero-grid">
+          <div class="sales-hero-copy">
+            <span class="eyebrow">Aulas individuais · guitarra e violão</span>
+            <h1>Saia do improviso.<br><span>Evolua com direção.</span></h1>
+            <p>Um acompanhamento feito para o seu momento, repertório e objetivos — com experiência real de palco, método claro e tudo organizado para você saber exatamente o que praticar.</p>
+            <div class="sales-hero-actions"><a class="btn btn-primary" href="aulas/#aulas/planos">Escolher meu plano ${icons.arrow}</a><a class="btn btn-outline" href="aulas/#aulas/area">Conhecer a área do aluno ${icons.external}</a></div>
+            <div class="sales-proof"><span>${icons.check} Online ou presencial em Belo Horizonte</span><span>${icons.check} Do iniciante ao avançado</span></div>
+          </div>
+          <aside class="sales-anchor-card">
+            <span class="tag lime">Acompanhamento completo</span>
+            <p>Aula avulsa</p><del>${money(130)}</del>
+            <strong>A partir de ${money(90)}<small>/aula nos planos</small></strong>
+            <ul><li>${icons.check} Aula ao vivo e individual</li><li>${icons.check} Conteúdo sob medida</li><li>${icons.check} Plataforma exclusiva incluída</li></ul>
+            <a href="aulas/#aulas/planos">Compare os planos ${icons.arrow}</a>
+          </aside>
+        </div>
+        <div class="container sales-trust-strip"><div><strong>Desde 2010</strong><span>ensinando e vivendo música</span></div><div><strong>500+</strong><span>alunos no Brasil e exterior</span></div><div><strong>+20</strong><span>artistas e projetos na trajetória</span></div><div><strong>100%</strong><span>do estudo organizado em um só lugar</span></div></div>
+      </section>
+
+      <section class="sales-section sales-method" id="aulas-metodo">
+        <div class="container">
+          <div class="sales-section-head"><span class="eyebrow">Um caminho claro</span><h2>Não é só assistir a uma aula.<br>É ter um plano para evoluir.</h2><p>Cada encontro parte do que você já sabe, identifica os pontos que estão travando sua evolução e transforma isso em prática possível para a sua rotina.</p></div>
+          <div class="method-grid">
+            <article><span>01</span>${icons.music}<h3>Diagnóstico individual</h3><p>Nível, objetivos, referências e dificuldades orientam um plano realmente seu — sem currículo engessado.</p></article>
+            <article><span>02</span>${icons.calendar}<h3>Aula com aplicação</h3><p>Técnica e teoria entram a serviço da música, do repertório e do som que você quer construir.</p></article>
+            <article><span>03</span>${icons.timer}<h3>Prática com direção</h3><p>Você termina cada aula sabendo o que fazer, como fazer e onde concentrar sua energia durante a semana.</p></article>
+            <article><span>04</span>${icons.check}<h3>Progresso acompanhado</h3><p>Conteúdos, exercícios e próximos passos ficam registrados para dar continuidade real ao aprendizado.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="sales-section formats-section">
+        <div class="container format-grid">
+          <article class="format-card online-format"><span class="tag lime">Online · para todo o Brasil</span><h2>A aula termina.<br>A gravação fica.</h2><p>Além do encontro ao vivo e individual, a aula online é gravada e adicionada à sua área para você rever explicações, exemplos e correções quantas vezes quiser.</p><ul><li>${icons.check} Aula ao vivo por videochamada</li><li>${icons.check} Gravação disponível para revisão</li><li>${icons.check} Estude de qualquer lugar</li><li>${icons.check} Mesmo acompanhamento da modalidade presencial</li></ul></article>
+          <article class="format-card"><span class="tag">Presencial · Belo Horizonte</span><h2>Som de perto.<br>Correção em tempo real.</h2><p>Para quem prefere aprender no mesmo ambiente, com observação próxima de postura, técnica, dinâmica e timbre.</p><ul><li>${icons.check} Encontro individual</li><li>${icons.check} Interação direta com o instrumento</li><li>${icons.check} Orientação técnica detalhada</li><li>${icons.check} Material e área do aluno também incluídos</li></ul></article>
+        </div>
+      </section>
+
+      <section class="sales-section portal-showcase" id="aulas-area">
+        <div class="container portal-showcase-grid">
+          <div class="portal-copy"><span class="eyebrow">Sua evolução visível</span><h2>Tudo o que você precisa. Sem mensagens perdidas.</h2><p>Depois de cada aula, sua página é atualizada com o conteúdo estudado, orientações, foco da próxima semana, exercícios e materiais de apoio.</p><div class="portal-benefits"><div>${icons.book}<span><strong>Conteúdo organizado</strong><small>Resumo da aula e próximos passos sempre à mão.</small></span></div><div>${icons.check}<span><strong>Exercícios acompanhados</strong><small>Marque o que concluiu e enxergue seu ritmo de estudo.</small></span></div><div>${icons.calendar}<span><strong>Agenda e materiais</strong><small>Próximas aulas, PDFs, links e ferramentas no mesmo lugar.</small></span></div></div></div>
+          <div class="device-stage" aria-label="Demonstração da área do aluno no computador e no celular">
+            <div class="desktop-device"><div class="device-camera"></div><div class="desktop-screen"><img src="assets/student-area-desktop.png" alt="Área do aluno exibida em um computador" loading="lazy"></div><div class="desktop-stand"></div></div>
+            <div class="phone-device"><div class="phone-speaker"></div><div class="phone-screen"><img src="assets/student-area-mobile.png" alt="Área do aluno exibida em um celular" loading="lazy"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sales-section experience-section">
+        <div class="container experience-grid"><div><span class="eyebrow">Experiência que encurta caminhos</span><h2>Aprenda com quem vive a música dentro e fora da sala.</h2></div><div><p>Felipe Figueroa atua como guitarrista, sideman e professor desde 2010. A vivência em palcos, gravações, direção musical e no acompanhamento de diferentes artistas entra na aula de forma prática: repertório, timbre, escuta, preparação e postura profissional.</p><blockquote>“Meu objetivo não é apenas mostrar o que tocar, mas ajudar você a entender o som, fazer escolhas e se tornar um músico mais independente.”</blockquote><a class="btn btn-outline" href="./">Conheça a trajetória ${icons.arrow}</a></div></div>
+      </section>
+
+      <section class="sales-section pricing-section" id="aulas-planos">
+        <div class="container">
+          <div class="pricing-heading"><div><span class="eyebrow">Planos de acompanhamento</span><h2>Quanto mais consistência,<br>menor o valor por aula.</h2></div><div class="price-anchor"><span>Aula avulsa</span><strong>${money(130)}</strong><small>Use os planos para economizar e manter o ritmo.</small></div></div>
+          <div class="pricing-grid">${LESSON_PLANS.map(plan => `<article class="price-card ${plan.featured ? "featured" : ""}">${plan.featured ? `<span class="popular-flag">${plan.badge}</span>` : `<span class="saving-flag">${plan.badge}</span>`}<div class="price-card-head"><span>Plano</span><h3>${plan.name}</h3><p>${plan.commitment}</p></div><div class="price-block"><del>${money(plan.regular)}</del><strong>${money(plan.monthly)}<small>/mês</small></strong>${plan.months > 1 ? `<span>Total do período: ${money(plan.total)}</span>` : `<span>Renovação mensal</span>`}<em>${money(plan.perLesson)} por aula</em></div><ul>${planBenefits.map(item => `<li>${icons.check}${item}</li>`).join("")}</ul><a class="btn ${plan.featured ? "btn-primary" : "btn-outline"}" href="mailto:contato@felipefigueroa.com.br?subject=${encodeURIComponent(`Quero começar no plano ${plan.name}`)}">Quero o plano ${plan.name.toLowerCase()} ${icons.arrow}</a></article>`).join("")}</div>
+          <div class="payment-bar"><span>Formas de pagamento</span><div><strong>Cartão de crédito</strong><i></i><strong>Pix</strong><i></i><strong>Dinheiro</strong></div><small>Condições e disponibilidade de horários confirmadas no atendimento.</small></div>
+        </div>
+      </section>
+
+      <section class="sales-section faq-section" id="aulas-duvidas"><div class="container faq-grid"><div><span class="eyebrow">Dúvidas frequentes</span><h2>Antes de começar.</h2><p>Se a sua dúvida não estiver aqui, entre em contato e conte um pouco sobre seus objetivos.</p></div><div class="faq-list"><details><summary>As aulas são para iniciantes?</summary><p>Sim. O conteúdo parte do seu nível atual — inclusive do zero — e também atende músicos intermediários e avançados que querem destravar pontos específicos.</p></details><details><summary>Guitarra e violão fazem parte das aulas?</summary><p>Sim. O acompanhamento pode ser direcionado para guitarra, violão ou para a integração dos dois instrumentos, conforme seu objetivo.</p></details><details><summary>Como recebo a gravação da aula online?</summary><p>A gravação é adicionada à sua área do aluno, junto do resumo, exercícios e materiais daquela etapa, para você rever quando precisar.</p></details><details><summary>O presencial acontece onde?</summary><p>As aulas presenciais são realizadas em Belo Horizonte. O endereço e os horários disponíveis são informados no atendimento.</p></details><details><summary>Como funcionam os pagamentos?</summary><p>Você pode pagar por cartão de crédito, Pix ou dinheiro. O plano escolhido e a forma de pagamento são confirmados antes do início.</p></details></div></div></section>
+
+      <section class="sales-final"><div class="container"><span class="eyebrow">Pronto para tocar com mais segurança?</span><h2>Seu próximo nível começa com uma direção clara.</h2><p>Conte onde você está e aonde quer chegar. A partir disso, definimos o melhor formato para você.</p><div><a class="btn btn-primary" href="mailto:contato@felipefigueroa.com.br?subject=${encodeURIComponent("Quero saber mais sobre as aulas")}">Quero falar sobre as aulas ${icons.arrow}</a><a class="btn btn-outline" href="./">Voltar ao site</a></div></div></section>
+      <footer class="sales-footer"><div class="container"><span>© ${new Date().getFullYear()} Felipe Figueroa</span><span>Aulas online e presenciais · Belo Horizonte, MG</span><a href="./#login/aluno">Área do aluno</a></div></footer>
+    </main>`;
+}
+
 function sidebar(active) {
   const items = [
     ["dashboard", "Visão geral", icons.home], ["agenda", "Agenda", icons.calendar], ["alunos", "Alunos", icons.users], ["materiais", "Materiais", icons.book], ["pagamentos", "Pagamentos", icons.money]
@@ -275,7 +368,7 @@ function agendaPage() {
 
 function studentsPage(filter = "") {
   const list = db.students.filter(s => [s.name,s.email,s.instrument,s.studentNumber].join(" ").toLowerCase().includes(filter.toLowerCase()));
-  const rows = list.map(s => `<tr><td><div class="student-name"><span class="mini-avatar">${initials(s.name)}</span><div><strong>${esc(s.name)}</strong><span>Matrícula ${esc(s.studentNumber)} · ${esc(s.email)}</span></div></div></td><td>${esc(s.instrument)} · ${esc(s.level)}</td><td>${esc(s.plan)}</td><td>${paymentTag(s.payment)}</td><td><div class="row-actions"><a class="btn btn-ghost update-student-btn" title="Atualizar conteúdo, exercícios e materiais" href="#atualizar/${s.id}">${icons.book} Atualizar página</a><a class="icon-btn" title="Ver portal do aluno" href="#aluno/${s.id}">${icons.external}</a><button class="icon-btn" title="Editar cadastro" data-action="edit-student" data-student="${s.id}">${icons.more}</button><button class="icon-btn row-delete-button" title="Excluir aluno" aria-label="Excluir ${esc(s.name)}" data-action="delete-student" data-student="${s.id}">${icons.trash}</button></div></td></tr>`).join("");
+  const rows = list.map(s => `<tr><td><div class="student-name"><span class="mini-avatar">${initials(s.name)}</span><div><strong>${esc(s.name)}</strong><span>Matrícula ${esc(s.studentNumber)} · ${esc(s.email)}</span></div></div></td><td>${esc(s.instrument)} · ${esc(s.level)}</td><td>${esc(s.plan)}</td><td>${paymentTag(s.payment)}</td><td><div class="row-actions"><a class="btn btn-ghost update-student-btn" title="Atualizar conteúdo, exercícios e materiais" href="#atualizar/${s.id}">${icons.book} Atualizar página</a><button class="icon-btn quote-student-button" title="Enviar orçamento pelo WhatsApp" aria-label="Enviar orçamento para ${esc(s.name)}" data-action="quote-student" data-student="${s.id}">${icons.whatsapp}</button><a class="icon-btn" title="Ver portal do aluno" href="#aluno/${s.id}">${icons.external}</a><button class="icon-btn" title="Editar cadastro" data-action="edit-student" data-student="${s.id}">${icons.more}</button><button class="icon-btn row-delete-button" title="Excluir aluno" aria-label="Excluir ${esc(s.name)}" data-action="delete-student" data-student="${s.id}">${icons.trash}</button></div></td></tr>`).join("");
   return appShell("alunos", "Alunos", `<div class="greeting"><div><span class="eyebrow">Sua turma</span><h2>${db.students.length} alunos ativos</h2><p>Cadastro, acompanhamento pedagógico e situação financeira.</p></div></div><div class="toolbar"><label class="search-box">${icons.search}<input id="student-search" value="${esc(filter)}" placeholder="Buscar por nome, e-mail ou instrumento..." /></label><button class="btn btn-primary" data-action="new-student">${icons.plus} Novo aluno</button></div><section class="panel"><div style="overflow-x:auto"><table class="data-table"><thead><tr><th>Aluno</th><th>Nível</th><th>Plano</th><th>Pagamento</th><th></th></tr></thead><tbody>${rows || `<tr><td colspan="5" class="empty">Nenhum aluno encontrado.</td></tr>`}</tbody></table></div></section>`);
 }
 
@@ -397,11 +490,14 @@ function loginPage(kind, error = "") {
 }
 
 function render() {
-  const hash = location.hash.replace(/^#/, "") || "home";
+  const cleanSalesPath = /\/aulas\/?$/.test(location.pathname);
+  const hash = location.hash.replace(/^#/, "") || (cleanSalesPath ? "aulas" : "home");
   const [route, id, detailId] = hash.split("/");
   const app = document.querySelector("#app");
+  document.title = route === "aulas" ? "Aulas de Guitarra e Violão — Felipe Figueroa" : "Felipe Figueroa — Guitarrista & Professor";
   const professorRoute = ["admin", "dashboard", "agenda", "alunos", "atualizar", "materiais", "pagamentos"].includes(route);
   if (route === "login") app.innerHTML = loginPage(id === "professor" ? "professor" : "aluno");
+  else if (route === "aulas") app.innerHTML = salesPage();
   else if (professorRoute && !isProfessorAuthenticated()) app.innerHTML = loginPage("professor");
   else if (route === "admin" || route === "dashboard") app.innerHTML = dashboardPage();
   else if (route === "agenda") app.innerHTML = agendaPage();
@@ -412,7 +508,12 @@ function render() {
   else if (route === "aluno" && (isProfessorAuthenticated() || authenticatedStudentId() === id)) app.innerHTML = studentPortal(id);
   else if (route === "aluno") app.innerHTML = loginPage("aluno");
   else app.innerHTML = publicPage();
-  window.scrollTo(0, 0);
+  requestAnimationFrame(() => {
+    const targetId = route === "aulas" && id ? `aulas-${id}` : route;
+    const target = document.getElementById(targetId);
+    if (target) target.scrollIntoView();
+    else window.scrollTo(0, 0);
+  });
 }
 
 function openModal(title, body, footer = "") {
@@ -467,6 +568,69 @@ function reminderModal(lessonId) {
   openModal("Enviar lembrete", `<div class="choice-list"><a class="choice-btn" target="_blank" href="https://wa.me/${s.phone.replace(/\D/g,"")}?text=${encodeURIComponent(message)}" data-action="mark-reminded">${icons.whatsapp}<div><strong>Enviar por WhatsApp</strong><span>Abre a conversa com a mensagem pronta</span></div>${icons.arrow}</a><a class="choice-btn" href="mailto:${encodeURIComponent(s.email)}?subject=${encodeURIComponent("Lembrete da nossa aula")}&body=${encodeURIComponent(message)}" data-action="mark-reminded">${icons.mail}<div><strong>Enviar por e-mail</strong><span>Abre seu aplicativo de e-mail</span></div>${icons.arrow}</a></div>`);
 }
 
+function quoteMessage(student, plan, finalPrice, mode = "A definir") {
+  const total = Number(finalPrice) || plan.total;
+  const monthlyValue = total / plan.months;
+  const lessonValue = total / plan.lessons;
+  return `Olá, ${student.name.split(" ")[0]}! Tudo bem?
+
+Preparei uma proposta para o seu acompanhamento musical com o Felipe Figueroa. 🎸
+
+PLANO ${plan.name.toUpperCase()}
+• ${plan.lessons} aulas individuais de 60 minutos
+• Frequência de 1 encontro por semana
+• Formato: ${mode}
+• Investimento total: ${money(total)}
+• Equivalente a ${money(monthlyValue)}/mês e ${money(lessonValue)} por aula
+
+O QUE ESTÁ INCLUÍDO
+✓ Plano de estudo personalizado para seu nível e objetivos
+✓ Área exclusiva do aluno com agenda e acompanhamento do progresso
+✓ Resumo de cada encontro e foco da próxima aula
+✓ Exercícios e materiais de apoio organizados
+✓ Nas aulas online, gravação para rever quantas vezes quiser
+
+FORMAS DE PAGAMENTO
+Cartão de crédito, Pix ou dinheiro.
+
+As aulas podem ser online ou presenciais em Belo Horizonte, conforme disponibilidade. Se fizer sentido para você, me responda por aqui para combinarmos o melhor horário.`;
+}
+
+function updateQuotePreview(form, resetPrice = false) {
+  const student = studentById(form.dataset.student);
+  const plan = LESSON_PLANS.find(item => item.id === form.elements.quotePlan.value) || LESSON_PLANS[0];
+  if (!student) return;
+  if (resetPrice) form.elements.finalPrice.value = plan.total;
+  form.elements.message.value = quoteMessage(student, plan, form.elements.finalPrice.value, form.elements.mode.value);
+  const hint = form.querySelector("[data-price-hint]");
+  if (hint) hint.textContent = `Preço de tabela: ${money(plan.total)} · ${plan.lessons} aulas no período`;
+}
+
+function quoteModal(id) {
+  const student = studentById(id);
+  if (!student) { toast("Aluno não encontrado"); return; }
+  const defaultPlan = LESSON_PLANS[0];
+  openModal("Enviar proposta", `<form id="quote-form" class="quote-form" data-student="${student.id}">
+    <div class="quote-recipient"><span class="mini-avatar">${initials(student.name)}</span><div><strong>${esc(student.name)}</strong><small>${student.phone ? `WhatsApp · ${esc(student.phone)}` : "Cadastre o WhatsApp antes de enviar"}</small></div></div>
+    <div class="quote-plan-options">${LESSON_PLANS.map(plan => `<label><input type="radio" name="quotePlan" value="${plan.id}" ${plan.featured ? "checked" : ""}><span><strong>${plan.name}</strong><small>${plan.lessons} aulas · ${money(plan.monthly)}/mês</small></span><b>${money(plan.total)}</b></label>`).join("")}</div>
+    <label class="form-group"><span>Formato da proposta</span><select class="field" name="mode"><option>A definir</option><option>Online</option><option>Presencial em Belo Horizonte</option></select></label>
+    <label class="form-group quote-preview"><span>Mensagem que será enviada</span><textarea class="field" name="message" readonly>${esc(quoteMessage(student, defaultPlan, defaultPlan.total))}</textarea></label>
+    <button class="btn quote-send-button" type="button" data-action="send-quote" data-student="${student.id}" ${student.phone ? "" : "disabled"}>${icons.whatsapp} Enviar orçamento pelo WhatsApp</button>
+    <details class="quote-price-editor"><summary>Editar o preço final desta proposta</summary><label><span>Valor total que será enviado</span><div class="price-input"><span>R$</span><input class="field" type="number" min="0" step="0.01" name="finalPrice" value="${defaultPlan.total}"></div><small data-price-hint>Preço de tabela: ${money(defaultPlan.total)} · ${defaultPlan.lessons} aulas no período</small></label></details>
+  </form>`);
+}
+
+function sendQuote(id) {
+  const student = studentById(id);
+  const form = document.querySelector("#quote-form");
+  if (!student || !form) return;
+  const phone = String(student.phone || "").replace(/\D/g, "");
+  if (!phone) { toast("Cadastre o WhatsApp do aluno antes de enviar"); return; }
+  updateQuotePreview(form);
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(form.elements.message.value)}`, "_blank", "noopener");
+  toast("Proposta preparada no WhatsApp");
+}
+
 function exportData() {
   db.lastBackup = new Date().toISOString(); localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
   const blob = new Blob([JSON.stringify(db, null, 2)], {type:"application/json"}); const url = URL.createObjectURL(blob);
@@ -490,6 +654,8 @@ document.addEventListener("click", e => {
   else if (action === "close-modal") closeModal();
   else if (action === "new-student") studentModal();
   else if (action === "edit-student") studentModal(target.dataset.student);
+  else if (action === "quote-student") quoteModal(target.dataset.student);
+  else if (action === "send-quote") sendQuote(target.dataset.student);
   else if (action === "delete-student") deleteStudentModal(target.dataset.student);
   else if (action === "confirm-delete-student") deleteStudent(target.dataset.student);
   else if (action === "add-exercise") document.querySelector("#exercise-editor")?.insertAdjacentHTML("beforeend", exerciseEditorRow());
@@ -585,6 +751,9 @@ document.addEventListener("submit", e => {
 document.addEventListener("input", e => {
   if (e.target.id === "student-search") { const value=e.target.value; document.querySelector("#app").innerHTML=studentsPage(value); const input=document.querySelector("#student-search"); input.focus(); input.setSelectionRange(value.length,value.length); }
   if (e.target.matches("[data-student-note]")) { const id=e.target.dataset.studentNote; db.notes[id]=e.target.value; localStorage.setItem(STORAGE_KEY,JSON.stringify(db)); }
+  const quoteForm = e.target.closest("#quote-form");
+  if (quoteForm && e.target.matches('[name="quotePlan"]')) updateQuotePreview(quoteForm, true);
+  else if (quoteForm && e.target.matches('[name="finalPrice"], [name="mode"]')) updateQuotePreview(quoteForm);
 });
 window.addEventListener("hashchange", render);
 render();

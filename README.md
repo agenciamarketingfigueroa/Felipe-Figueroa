@@ -15,6 +15,7 @@ Depois acesse `http://localhost:4173`.
 ## Rotas principais
 
 - `#home` — site institucional e mídia kit
+- `/aulas/` — página não listada de vendas das aulas, formatos e planos
 - `#login/professor` — login do professor
 - `#login/aluno` — login do aluno
 - `#admin` — visão geral do professor, protegida por sessão
@@ -49,12 +50,17 @@ A agenda mostra a **próxima matéria** definida no cadastro de cada aluno, faci
 
 Na agenda, use **Finalizar aula** para abrir a atualização pedagógica daquele aluno. Nessa tela você pode publicar o resumo do encontro, as orientações, o foco da próxima aula, os exercícios da semana, materiais de apoio e uma nota interna. Ao publicar, a aula é marcada como concluída e a nova versão aparece imediatamente na sala do aluno.
 
+## Propostas pelo WhatsApp
+
+Na lista de alunos, o botão com o ícone do WhatsApp abre uma proposta pronta. Escolha o plano e a modalidade, revise a mensagem e, se necessário, edite o preço final para condições especiais. Os preços da página pública e do orçamento são definidos uma única vez em `LESSON_PLANS`, no início de `app.js`.
+
 ## Personalização rápida
 
 - Fotos e nomes de artistas: lista `ARTIST_SHOWCASE` em `app.js` e arquivos em `assets/artists/`.
 - E-mail de contato: busque por `contato@felipefigueroa.com.br` em `app.js`.
 - Imagem principal: `assets/hero-felipe.jpg` (versão otimizada de `assets/hero-felipe.png`).
 - Cores e tipografia: variáveis no início de `styles.css`.
+- Preços e duração dos planos: constante `LESSON_PLANS` no início de `app.js`.
 - Dados iniciais de demonstração: objeto `seedData` em `app.js`.
 
 ## Limite do site estático
