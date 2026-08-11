@@ -153,7 +153,7 @@ function publicPage() {
   return `
     <header class="site-nav">
       <div class="container site-nav-inner">
-        <a class="brand" href="#home"><span class="brand-mark">FF</span><strong>Felipe Figueroa</strong><span>/ guitar</span></a>
+        <a class="brand" href="#home"><span class="brand-mark" aria-label="Felipe Figueroa"></span><strong>Felipe Figueroa</strong><span>/ guitar</span></a>
         <nav class="nav-links" aria-label="Navegação principal">
           <a href="#sobre">Sobre</a><a href="#trabalhos">Trabalhos</a><a href="#curso">Curso</a><a href="#contato">Contato</a>
           <span class="nav-access"><a class="btn btn-outline" href="#login/aluno">Aluno</a><a class="btn btn-primary" href="#login/professor">Professor ${icons.arrow}</a></span>
@@ -165,7 +165,7 @@ function publicPage() {
       <section class="hero">
         <div class="container hero-inner">
           <div class="hero-copy">
-            <span class="eyebrow">Guitarrista · Sideman · Educador</span>
+            <span class="eyebrow">Guitarrista · Sideman · Professor</span>
             <h1>Felipe <span>Figueroa</span></h1>
             <p class="hero-lead">Música feita com intenção — no palco, no estúdio e na sala de aula. Uma carreira dedicada à guitarra e a transformar conhecimento em som.</p>
             <div class="hero-actions">
@@ -173,7 +173,7 @@ function publicPage() {
               <button class="btn btn-outline" data-action="print-kit">Baixar mídia kit ${icons.download}</button>
             </div>
           </div>
-          <div class="hero-side-note">São Paulo · Brasil / Disponível para turnês e sessões</div>
+          <div class="hero-side-note">Belo Horizonte · Brasil / Disponível para turnês e sessões</div>
         </div>
       </section>
       <div class="marquee" aria-hidden="true"><div class="marquee-track">
@@ -182,7 +182,7 @@ function publicPage() {
 
       <section class="public-section" id="sobre">
         <div class="container">
-          <div class="section-head"><span class="eyebrow">01 / A história</span><div><h2>Entre o palco e a sala de aula.</h2><p>Felipe Figueroa é músico, guitarrista, sideman e educador. Une experiência prática, repertório e didática para criar performances e formar músicos mais conscientes.</p></div></div>
+          <div class="section-head"><span class="eyebrow">01 / A história</span><div><h2>Entre o palco e a sala de aula.</h2><p>Felipe Figueroa é músico, guitarrista, sideman e professor. Une experiência prática, repertório e didática para criar performances e formar músicos mais conscientes.</p></div></div>
           <div class="about-grid">
             <article class="about-statement"><span class="tag lime"><i class="dot"></i> Em atividade</span><blockquote>“Ensinar música não é entregar respostas. É ajudar cada aluno a <em>escutar melhor.</em>”</blockquote><small>Performance · Direção musical · Guitarra e violão<br>Online e presencial</small></article>
             <div class="stats">
@@ -219,7 +219,7 @@ function publicPage() {
           <a class="contact-link" target="_blank" rel="noopener" href="https://instagram.com/felipefigueroagt"><span>@felipefigueroagt</span>${icons.external}</a>
           <a class="contact-link" href="#login/professor"><span>Área do professor</span>${icons.arrow}</a>
           <a class="contact-link" href="#login/aluno"><span>Área do aluno</span>${icons.arrow}</a>
-        </div></div><footer class="site-footer"><span>© ${new Date().getFullYear()} Felipe Figueroa</span><span>Guitarrista · Sideman · Educador · São Paulo, BR</span><a href="#login/aluno">Acesso do aluno</a></footer></div>
+        </div></div><footer class="site-footer"><span>© ${new Date().getFullYear()} Felipe Figueroa</span><span>Guitarrista · Sideman · Professor · Belo Horizonte, BR</span><a href="#login/aluno">Acesso do aluno</a></footer></div>
       </section>
     </main>`;
 }
@@ -228,10 +228,10 @@ function sidebar(active) {
   const items = [
     ["dashboard", "Visão geral", icons.home], ["agenda", "Agenda", icons.calendar], ["alunos", "Alunos", icons.users], ["materiais", "Materiais", icons.book], ["pagamentos", "Pagamentos", icons.money]
   ];
-  return `<aside class="sidebar" id="sidebar"><a class="brand" href="#home"><span class="brand-mark">FF</span><strong>Studio</strong></a>
+  return `<aside class="sidebar" id="sidebar"><a class="brand" href="#home"><span class="brand-mark" aria-label="Felipe Figueroa"></span><strong>Studio</strong></a>
     <span class="side-label">Gestão</span><nav class="side-nav">${items.map(i => `<button class="side-link ${active === i[0] ? "active" : ""}" data-route="${i[0]}">${i[2]}<span>${i[1]}</span>${i[0] === "agenda" ? `<b class="side-badge">${db.lessons.filter(l => l.status === "scheduled").length}</b>` : ""}</button>`).join("")}</nav>
     <span class="side-label">Site</span><nav class="side-nav"><a class="side-link" href="#home">${icons.external}<span>Ver site público</span></a><button class="side-link" data-action="export">${icons.download}<span>Exportar dados</span></button><button class="side-link" data-action="import">${icons.upload}<span>Importar backup</span></button></nav>
-    <div class="sidebar-bottom"><div class="backup-note"><strong>Backup local</strong><span>${db.lastBackup ? `Último: ${fmtDate(db.lastBackup, {day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit"})}` : "Nenhum backup exportado"}</span></div><div class="user-chip"><span class="avatar">FF</span><div><strong>Felipe Figueroa</strong><span>Professor · Administrador</span></div><button class="icon-btn logout-button" data-action="logout-professor" title="Sair" aria-label="Sair da área do professor">${icons.arrow}</button></div></div>
+    <div class="sidebar-bottom"><div class="backup-note"><strong>Backup local</strong><span>${db.lastBackup ? `Último: ${fmtDate(db.lastBackup, {day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit"})}` : "Nenhum backup exportado"}</span></div><div class="user-chip"><span class="avatar professor-avatar" aria-label="Felipe Figueroa"></span><div><strong>Felipe Figueroa</strong><span>Professor · Administrador</span></div><button class="icon-btn logout-button" data-action="logout-professor" title="Sair" aria-label="Sair da área do professor">${icons.arrow}</button></div></div>
   </aside>`;
 }
 
@@ -358,15 +358,15 @@ function studentPortal(id) {
     {id:"x2",title:"Praticar com metrônomo",detail:"Subir de 60 a 76 BPM",done:false}
   ];
   const materials = studentMaterials(s.id);
-  return `<div class="student-shell"><header class="student-nav"><div class="container"><a class="brand" href="#home"><span class="brand-mark">FF</span><strong>Felipe Figueroa</strong><span>/ sala do aluno</span></a><div class="student-nav-actions"><span class="tag" style="color:#555;border-color:rgba(0,0,0,.16)"><i class="dot" style="color:#6ca11f"></i>${professorView ? "Visualização do professor" : paymentTagText(s.payment)}</span>${professorView ? `<a class="btn btn-outline" href="#atualizar/${s.id}">${icons.book}<span>Editar</span></a><a class="btn btn-outline" href="#alunos"><span>Voltar</span>${icons.arrow}</a>` : `<a class="btn btn-outline" href="#home">${icons.external}<span>Site</span></a><button class="btn btn-outline" data-action="logout-student"><span>Sair</span>${icons.arrow}</button>`}</div></div></header>
-    <main><section class="student-hero"><div class="container student-hero-row"><div><span class="eyebrow" style="color:#647b21">Sua jornada musical</span><h1>Olá, ${esc(s.name.split(" ")[0])}.<br><span>Vamos tocar?</span></h1></div><div class="practice-pill"><strong>${s.streak || 0} dias</strong><span>de sequência de prática</span></div></div></section>
+  return `<div class="student-shell"><header class="student-nav"><div class="container"><a class="brand" href="#home"><span class="brand-mark" aria-label="Felipe Figueroa"></span><strong>Felipe Figueroa</strong><span>/ sala do aluno</span></a><div class="student-nav-actions"><span class="tag" style="color:#555;border-color:rgba(0,0,0,.16)"><i class="dot" style="color:#6ca11f"></i>${professorView ? "Visualização do professor" : paymentTagText(s.payment)}</span>${professorView ? `<a class="btn btn-outline" href="#atualizar/${s.id}">${icons.book}<span>Editar</span></a><a class="btn btn-outline" href="#alunos"><span>Voltar</span>${icons.arrow}</a>` : `<a class="btn btn-outline" href="#home">${icons.external}<span>Site</span></a><button class="btn btn-outline" data-action="logout-student"><span>Sair</span>${icons.arrow}</button>`}</div></div></header>
+    <main><section class="student-hero"><div class="container student-hero-row"><div><span class="eyebrow" style="color:#3d5bb8">Sua jornada musical</span><h1>Olá, ${esc(s.name.split(" ")[0])}.<br><span>Vamos tocar?</span></h1></div><div class="practice-pill"><strong>${s.streak || 0} dias</strong><span>de sequência de prática</span></div></div></section>
     <div class="container student-grid"><div>
-      <section class="light-card"><div class="light-card-head"><h2>Foco atual</h2><span class="tag" style="color:#555;border-color:rgba(0,0,0,.16)">Última aula</span></div><div class="lesson-focus"><span class="eyebrow" style="color:#768d35">Matéria que vimos</span><h3>${esc(s.current || "Conteúdo em construção")}</h3><p>${esc(s.notes || "Continue revisando devagar e com atenção ao som de cada nota.")}</p></div><div class="next-focus"><small>Na próxima aula</small><strong>${esc(s.next || "Revisão e aplicação musical")}</strong></div></section>
+      <section class="light-card"><div class="light-card-head"><h2>Foco atual</h2><span class="tag" style="color:#555;border-color:rgba(0,0,0,.16)">Última aula</span></div><div class="lesson-focus"><span class="eyebrow" style="color:#4d64b8">Matéria que vimos</span><h3>${esc(s.current || "Conteúdo em construção")}</h3><p>${esc(s.notes || "Continue revisando devagar e com atenção ao som de cada nota.")}</p></div><div class="next-focus"><small>Na próxima aula</small><strong>${esc(s.next || "Revisão e aplicação musical")}</strong></div></section>
       <section class="light-card"><div class="light-card-head"><h2>Exercícios da semana</h2><span class="tag" style="color:#555;border-color:rgba(0,0,0,.16)">${exercises.filter(e=>e.done).length}/${exercises.length} feitos</span></div><div class="exercise-list">${exercises.map(e=>`<div class="exercise-item"><button class="check ${e.done ? "done" : ""}" aria-label="Marcar exercício" data-action="toggle-exercise" data-student="${s.id}" data-exercise="${e.id}">${icons.check}</button><div><strong>${esc(e.title)}</strong><span>${esc(e.detail)}</span></div><time>${e.done ? "feito" : "pendente"}</time></div>`).join("")}</div></section>
     </div><aside>
       <section class="light-card"><div class="light-card-head"><h2>Próximas aulas</h2>${icons.calendar}</div><div class="student-schedule">${lessons.length ? lessons.slice(0,4).map(l=>{const d=new Date(l.date); return `<div class="student-class"><div class="date-box"><strong>${fmtDate(d,{day:"2-digit"})}</strong><span>${fmtDate(d,{month:"short"})}</span></div><div class="student-class-info"><strong>${fmtDate(d,{weekday:"long"})} · ${fmtDate(d,{hour:"2-digit",minute:"2-digit"})}</strong><span>${esc(l.mode)} · ${l.duration} min</span></div>${l.link ? `<a class="join-btn" href="${esc(l.link)}" target="_blank">Entrar</a>` : ""}</div>`}).join("") : `<div class="empty">Nenhuma aula agendada.</div>`}</div></section>
       <section class="light-card"><div class="light-card-head"><h2>Ferramentas</h2></div><div class="quick-tools"><a class="quick-tool" target="_blank" href="https://www.google.com/search?q=metr%C3%B4nomo">${icons.timer}<strong>Metrônomo</strong><span>Pratique no tempo</span></a><a class="quick-tool" target="_blank" href="https://www.google.com/search?q=afinador+online">${icons.music}<strong>Afinador</strong><span>Afinação precisa</span></a></div></section>
-      <section class="light-card student-workbook"><div class="light-card-head"><h2>Material de apoio</h2><span class="tag" style="color:#555;border-color:rgba(0,0,0,.16)">${materials.length ? `${materials.length} indicado${materials.length === 1 ? "" : "s"}` : "Biblioteca"}</span></div>${materials.length ? `<div class="assigned-materials">${materials.map(material => `<a class="assigned-material" href="${safeHref(material.url)}" target="_blank" rel="noopener"><span>${icons.external}</span><div><strong>${esc(material.title)}</strong><small>${esc(material.detail || "Abrir material de apoio")}</small></div>${icons.arrow}</a>`).join("")}</div>` : ""}<div class="student-workbook-body"><span class="eyebrow" style="color:#657e18">Workbook base · 195 páginas</span><h3>Facilitando o violão</h3><p>Fundamentos, teoria e técnica que você também pode aplicar na guitarra.</p><div><a class="btn btn-primary" href="${WORKBOOK_URL}" target="_blank" rel="noopener">Abrir ${icons.external}</a><a class="btn btn-outline" href="${WORKBOOK_URL}" download>Baixar ${icons.download}</a></div></div></section>
+      <section class="light-card student-workbook"><div class="light-card-head"><h2>Material de apoio</h2><span class="tag" style="color:#555;border-color:rgba(0,0,0,.16)">${materials.length ? `${materials.length} indicado${materials.length === 1 ? "" : "s"}` : "Biblioteca"}</span></div>${materials.length ? `<div class="assigned-materials">${materials.map(material => `<a class="assigned-material" href="${safeHref(material.url)}" target="_blank" rel="noopener"><span>${icons.external}</span><div><strong>${esc(material.title)}</strong><small>${esc(material.detail || "Abrir material de apoio")}</small></div>${icons.arrow}</a>`).join("")}</div>` : ""}<div class="student-workbook-body"><span class="eyebrow" style="color:#3d5bb8">Workbook base · 195 páginas</span><h3>Facilitando o violão</h3><p>Fundamentos, teoria e técnica que você também pode aplicar na guitarra.</p><div><a class="btn btn-primary" href="${WORKBOOK_URL}" target="_blank" rel="noopener">Abrir ${icons.external}</a><a class="btn btn-outline" href="${WORKBOOK_URL}" download>Baixar ${icons.download}</a></div></div></section>
       <section class="light-card"><div class="light-card-head"><h2>Meu caderno</h2><span class="tag" style="color:#555;border-color:rgba(0,0,0,.16)">privado</span></div><div class="note-area"><textarea class="field" data-student-note="${s.id}" placeholder="Anote dúvidas, ideias de repertório e metas...">${esc(db.notes[s.id] || "")}</textarea></div></section>
     </aside></div></main></div>`;
 }
@@ -376,7 +376,7 @@ function paymentTagText(p) { return p === "paid" ? "Mensalidade em dia" : p === 
 function loginPage(kind, error = "") {
   const isStudent = kind === "aluno";
   return `<main class="login-shell">
-    <a class="brand login-brand" href="#home"><span class="brand-mark">FF</span><strong>Felipe Figueroa</strong><span>/ acesso</span></a>
+    <a class="brand login-brand" href="#home"><span class="brand-mark" aria-label="Felipe Figueroa"></span><strong>Felipe Figueroa</strong><span>/ acesso</span></a>
     <section class="login-visual" aria-hidden="true"><div class="login-visual-copy"><span class="eyebrow">Palco · Estúdio · Sala de aula</span><strong>Som, estudo<br>e evolução.</strong></div></section>
     <section class="login-panel"><div class="login-card">
       <a class="back-link" href="#home">${icons.arrow} Voltar ao site</a>

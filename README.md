@@ -53,7 +53,7 @@ Na agenda, use **Finalizar aula** para abrir a atualização pedagógica daquele
 
 - Fotos e nomes de artistas: lista `ARTIST_SHOWCASE` em `app.js` e arquivos em `assets/artists/`.
 - E-mail de contato: busque por `contato@felipefigueroa.com.br` em `app.js`.
-- Imagem principal: `assets/hero-guitar.png`.
+- Imagem principal: `assets/hero-felipe.jpg` (versão otimizada de `assets/hero-felipe.png`).
 - Cores e tipografia: variáveis no início de `styles.css`.
 - Dados iniciais de demonstração: objeto `seedData` em `app.js`.
 
