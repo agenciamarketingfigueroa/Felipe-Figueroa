@@ -20,6 +20,7 @@ Depois acesse `http://localhost:4173`.
 - `#admin` — visão geral do professor, protegida por sessão
 - `#agenda` — agenda e links das aulas
 - `#alunos` — cadastro e edição dos alunos
+- `#atualizar/{id}` — atualização pedagógica com resumo, exercícios e materiais do aluno
 - `#materiais` — biblioteca didática e mapa da apostila
 - `#pagamentos` — controle local dos pagamentos
 - `#aluno/{id}` — sala individual, liberada depois do login
@@ -44,9 +45,13 @@ O arquivo `assets/materials/apostila-facilitando-o-violao.pdf` fica disponível 
 
 A agenda mostra a **próxima matéria** definida no cadastro de cada aluno, facilitando a preparação da aula e a indicação do módulo correspondente da apostila.
 
+## Finalização da aula
+
+Na agenda, use **Finalizar aula** para abrir a atualização pedagógica daquele aluno. Nessa tela você pode publicar o resumo do encontro, as orientações, o foco da próxima aula, os exercícios da semana, materiais de apoio e uma nota interna. Ao publicar, a aula é marcada como concluída e a nova versão aparece imediatamente na sala do aluno.
+
 ## Personalização rápida
 
-- Fotos e nomes de artistas: seção `artist-grid` em `app.js`.
+- Fotos e nomes de artistas: lista `ARTIST_SHOWCASE` em `app.js` e arquivos em `assets/artists/`.
 - E-mail de contato: busque por `contato@felipefigueroa.com.br` em `app.js`.
 - Imagem principal: `assets/hero-guitar.png`.
 - Cores e tipografia: variáveis no início de `styles.css`.

@@ -13,6 +13,22 @@ const WORKBOOK_MODULES = [
   { number: "08", title: "Solos e arranjos", page: 170, topics: "Regiões, hammer-on, pull-off e vibrato" },
   { number: "09", title: "Pentatônica", page: 178, topics: "Shapes, relativos e improvisação" },
 ];
+const ARTIST_SHOWCASE = [
+  { name: "Ramon e Rafael", type: "Dupla", image: "assets/artists/ramon-e-rafael.jpg", position: "50% 38%" },
+  { name: "Flávio Vitor Jr.", type: "Artista", image: "assets/artists/flavio-vitor-jr.jpg", position: "50% 30%" },
+  { name: "Junho Chu", type: "Artista", image: "assets/artists/junho-chu.jpg", position: "50% 35%" },
+  { name: "Juninho Cassimiro", type: "Artista", image: "assets/artists/juninho-cassimiro.jpg", position: "50% 30%" },
+  { name: "Davidson Silva", type: "Artista", image: "assets/artists/davidson-silva.jpg", position: "50% 28%" },
+  { name: "Diego Fernandes", type: "Artista", image: "assets/artists/diego-fernandes.jpg", position: "50% 34%" },
+  { name: "Celina Borges", type: "Artista", image: "assets/artists/celina-borges.jpg", position: "50% 30%" },
+  { name: "GBA Worship", type: "Projeto", image: "assets/artists/gba-worship.jpg", position: "50% 45%" },
+  { name: "Suely Façanha", type: "Artista", image: "assets/artists/suely-facanha.jpg", position: "50% 30%" },
+  { name: "Nandah", type: "Artista", image: "assets/artists/nandah.jpg", position: "50% 42%" },
+  { name: "Lucimare Nascimento", type: "Artista", image: "assets/artists/lucimare-nascimento.jpg", position: "50% 30%" },
+  { name: "Rogério Henrique", type: "Artista", image: "assets/artists/rogerio-henrique.jpg", position: "50% 50%" },
+  { name: "Ministério Jeito Ágape", type: "Ministério", image: "assets/artists/jeito-agape.jpg", position: "50% 50%" },
+  { name: "Green Line Band", type: "Banda", image: "assets/artists/green-line-band.jpg", position: "50% 45%" },
+];
 
 const icons = {
   arrow: '<svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
@@ -61,6 +77,12 @@ const seedData = {
       { id: "e3", title: "Trocas sem interromper o tempo", detail: "10 min · metrônomo em 72 BPM", done: false },
     ],
   },
+  supportMaterials: {
+    ana: [
+      { id: "m1", title: "Apostila — Condução de vozes", detail: "Revisar as páginas indicadas antes da próxima aula.", url: `${WORKBOOK_URL}#page=125` },
+    ],
+  },
+  updates: {},
   notes: { ana: "Gravar o exercício 2 até sexta. Atenção à dinâmica no segundo ciclo." },
 };
 
@@ -81,6 +103,10 @@ function loadData() {
         if (!student.studentNumber) student.studentNumber = String(1001 + index);
         if (!student.birthday) student.birthday = demoBirthdays[index] || "2000-01-01";
       });
+      if (!stored.exercises) stored.exercises = {};
+      if (!stored.supportMaterials) stored.supportMaterials = {};
+      if (!stored.updates) stored.updates = {};
+      if (!stored.notes) stored.notes = {};
       localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
       return stored;
     }
@@ -101,6 +127,7 @@ function esc(value = "") {
 }
 function initials(name) { return name.split(/\s+/).slice(0, 2).map(n => n[0]).join("").toUpperCase(); }
 function studentById(id) { return db.students.find(s => s.id === id); }
+function studentMaterials(id) { return (db.supportMaterials && db.supportMaterials[id]) || []; }
 function isProfessorAuthenticated() { return sessionStorage.getItem(PROFESSOR_AUTH_KEY) === "true"; }
 function authenticatedStudentId() { return sessionStorage.getItem(STUDENT_AUTH_KEY); }
 function birthdayPassword(birthday = "") {
@@ -110,6 +137,11 @@ function birthdayPassword(birthday = "") {
 function fmtDate(date, options = {}) { return new Intl.DateTimeFormat("pt-BR", options).format(new Date(date)); }
 function money(value) { return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value); }
 function slugify(s) { return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+function safeHref(value = "") {
+  const href = String(value).trim();
+  if (/^https?:\/\//i.test(href) || /^assets\//i.test(href)) return esc(href);
+  return "#";
+}
 function toast(message) {
   const region = document.querySelector("#toast-region");
   const el = document.createElement("div"); el.className = "toast"; el.textContent = message; region.appendChild(el);
@@ -164,14 +196,11 @@ function publicPage() {
 
       <section class="public-section artists-section" id="trabalhos">
         <div class="container">
-          <div class="section-head"><span class="eyebrow">02 / Na estrada</span><div><h2>Palcos, estúdios e histórias.</h2><p>Um recorte de projetos e artistas. Estes cards estão preparados para receber suas fotos, nomes e créditos reais.</p></div></div>
+          <div class="section-head"><span class="eyebrow">02 / Na estrada</span><div><h2>Palcos, estúdios e histórias.</h2><p>Uma seleção de artistas, projetos e bandas que fazem parte da trajetória musical de Felipe.</p></div></div>
           <div class="artist-grid">
-            ${[
-              ["Artista / projeto 01", "Turnê · Guitarra", "38% 50%"], ["Projeto ao vivo", "Sideman · 2024", "78% 50%"],
-              ["Sessão de estúdio", "Guitarras · Arranjos", "65% 38%"], ["Artista / projeto 04", "Show · Festival", "58% 65%"]
-            ].map(a => `<article class="artist-card"><div class="artist-image" style="--pos:${a[2]}"></div><div class="artist-label"><span>${a[1]}</span><strong>${a[0]}</strong></div></article>`).join("")}
+            ${ARTIST_SHOWCASE.map((artist, index) => `<article class="artist-card"><img class="artist-image" src="${artist.image}" alt="${esc(artist.name)}" style="--pos:${artist.position}" ${index > 3 ? 'loading="lazy"' : ""} decoding="async"><div class="artist-label"><span>${artist.type} · Colaboração</span><strong>${artist.name}</strong></div></article>`).join("")}
           </div>
-          <p class="artist-note">* Espaços reservados para seu acervo. Substitua as imagens e legendas pelos trabalhos que deseja destacar.</p>
+          <p class="artist-note">Trabalhos e encontros que atravessam diferentes fases da carreira.</p>
         </div>
       </section>
 
@@ -235,7 +264,7 @@ function dashboardPage() {
 function agendaRow(lesson) {
   const s = studentById(lesson.studentId) || { name: "Aluno removido" };
   const d = new Date(lesson.date);
-  return `<article class="agenda-item"><div class="agenda-time">${fmtDate(d,{hour:"2-digit",minute:"2-digit"})}<small>${fmtDate(d,{weekday:"short",day:"2-digit",month:"short"})}</small></div><div class="agenda-person"><span class="mini-avatar">${initials(s.name)}</span><div><strong>${esc(s.name)}</strong><span>${esc(lesson.mode)} · ${lesson.duration} min · ${esc(lesson.topic || "Aula")}</span><span class="agenda-next"><b>Próxima matéria:</b> ${esc(s.next || "A definir")}</span></div></div><div class="agenda-actions">${lesson.link ? `<a class="btn btn-outline" href="${esc(lesson.link)}" target="_blank" rel="noopener">Entrar ${icons.external}</a>` : ""}<button class="btn btn-ghost" title="Enviar lembrete" data-action="remind" data-lesson="${lesson.id}">${icons.bell}</button></div></article>`;
+  return `<article class="agenda-item"><div class="agenda-time">${fmtDate(d,{hour:"2-digit",minute:"2-digit"})}<small>${fmtDate(d,{weekday:"short",day:"2-digit",month:"short"})}</small></div><div class="agenda-person"><span class="mini-avatar">${initials(s.name)}</span><div><strong>${esc(s.name)}</strong><span>${esc(lesson.mode)} · ${lesson.duration} min · ${esc(lesson.topic || "Aula")}</span><span class="agenda-next"><b>Próxima matéria:</b> ${esc(s.next || "A definir")}</span></div></div><div class="agenda-actions">${lesson.status === "completed" ? `<span class="tag success">${icons.check} Concluída</span>` : `${lesson.link ? `<a class="btn btn-outline" href="${esc(lesson.link)}" target="_blank" rel="noopener">Entrar ${icons.external}</a>` : ""}<a class="btn btn-primary" href="#atualizar/${s.id}/${lesson.id}">${icons.check} Finalizar aula</a><button class="btn btn-ghost" title="Enviar lembrete" data-action="remind" data-lesson="${lesson.id}">${icons.bell}</button>`}</div></article>`;
 }
 
 function agendaPage() {
@@ -245,7 +274,7 @@ function agendaPage() {
 
 function studentsPage(filter = "") {
   const list = db.students.filter(s => [s.name,s.email,s.instrument,s.studentNumber].join(" ").toLowerCase().includes(filter.toLowerCase()));
-  const rows = list.map(s => `<tr><td><div class="student-name"><span class="mini-avatar">${initials(s.name)}</span><div><strong>${esc(s.name)}</strong><span>Matrícula ${esc(s.studentNumber)} · ${esc(s.email)}</span></div></div></td><td>${esc(s.instrument)} · ${esc(s.level)}</td><td>${esc(s.plan)}</td><td>${paymentTag(s.payment)}</td><td><div class="row-actions"><a class="icon-btn" title="Ver portal do aluno" href="#aluno/${s.id}">${icons.external}</a><button class="icon-btn" title="Editar aluno" data-action="edit-student" data-student="${s.id}">${icons.more}</button></div></td></tr>`).join("");
+  const rows = list.map(s => `<tr><td><div class="student-name"><span class="mini-avatar">${initials(s.name)}</span><div><strong>${esc(s.name)}</strong><span>Matrícula ${esc(s.studentNumber)} · ${esc(s.email)}</span></div></div></td><td>${esc(s.instrument)} · ${esc(s.level)}</td><td>${esc(s.plan)}</td><td>${paymentTag(s.payment)}</td><td><div class="row-actions"><a class="btn btn-ghost update-student-btn" title="Atualizar conteúdo, exercícios e materiais" href="#atualizar/${s.id}">${icons.book} Atualizar página</a><a class="icon-btn" title="Ver portal do aluno" href="#aluno/${s.id}">${icons.external}</a><button class="icon-btn" title="Editar cadastro" data-action="edit-student" data-student="${s.id}">${icons.more}</button></div></td></tr>`).join("");
   return appShell("alunos", "Alunos", `<div class="greeting"><div><span class="eyebrow">Sua turma</span><h2>${db.students.length} alunos ativos</h2><p>Cadastro, acompanhamento pedagógico e situação financeira.</p></div></div><div class="toolbar"><label class="search-box">${icons.search}<input id="student-search" value="${esc(filter)}" placeholder="Buscar por nome, e-mail ou instrumento..." /></label><button class="btn btn-primary" data-action="new-student">${icons.plus} Novo aluno</button></div><section class="panel"><div style="overflow-x:auto"><table class="data-table"><thead><tr><th>Aluno</th><th>Nível</th><th>Plano</th><th>Pagamento</th><th></th></tr></thead><tbody>${rows || `<tr><td colspan="5" class="empty">Nenhum aluno encontrado.</td></tr>`}</tbody></table></div></section>`);
 }
 
@@ -273,15 +302,63 @@ function materialsPage() {
   `);
 }
 
+function exerciseEditorRow(exercise = {}) {
+  return `<div class="editor-row" data-exercise-row>
+    <input type="hidden" data-field="id" value="${esc(exercise.id || "")}">
+    <div class="editor-row-number">${icons.music}</div>
+    <div class="editor-row-fields"><input class="field" data-field="title" value="${esc(exercise.title || "")}" placeholder="Ex.: Escala pentatônica — posição 1"><input class="field" data-field="detail" value="${esc(exercise.detail || "")}" placeholder="Orientação: 10 min · 70 BPM · tocar 3x"></div>
+    <button class="icon-btn editor-remove" type="button" data-action="remove-editor-row" aria-label="Remover exercício" title="Remover">${icons.close}</button>
+  </div>`;
+}
+
+function materialEditorRow(material = {}) {
+  return `<div class="editor-row material-editor-row" data-material-row>
+    <input type="hidden" data-field="id" value="${esc(material.id || "")}">
+    <div class="editor-row-number">${icons.book}</div>
+    <div class="editor-row-fields"><input class="field" data-field="title" value="${esc(material.title || "")}" placeholder="Nome do material"><input class="field" type="text" inputmode="url" data-field="url" value="${esc(material.url || "")}" placeholder="https://..."><input class="field" data-field="detail" value="${esc(material.detail || "")}" placeholder="O que o aluno deve revisar neste material"></div>
+    <button class="icon-btn editor-remove" type="button" data-action="remove-editor-row" aria-label="Remover material" title="Remover">${icons.close}</button>
+  </div>`;
+}
+
+function updateStudentPage(id, lessonId = "") {
+  const s = studentById(id);
+  if (!s) return studentsPage();
+  const lesson = db.lessons.find(item => item.id === lessonId && item.studentId === id);
+  const exercises = db.exercises[id] || [];
+  const materials = studentMaterials(id);
+  const nextLesson = [...db.lessons].filter(item => item.studentId === id && item.status === "scheduled" && item.id !== lessonId && new Date(item.date) >= new Date()).sort((a,b)=>new Date(a.date)-new Date(b.date))[0];
+  const lastUpdated = s.lastUpdatedAt ? fmtDate(s.lastUpdatedAt, { day:"2-digit", month:"long", hour:"2-digit", minute:"2-digit" }) : "Ainda não publicado";
+  return appShell("alunos", `Atualizar · ${esc(s.name.split(" ")[0])}`, `
+    <a class="back-link update-back" href="#alunos">${icons.arrow} Voltar para alunos</a>
+    <div class="update-heading"><div class="update-student"><span class="avatar update-avatar">${initials(s.name)}</span><div><span class="eyebrow">Página do aluno</span><h2>${esc(s.name)}</h2><p>${esc(s.instrument)} · ${esc(s.level)} · última atualização: ${lastUpdated}</p></div></div><a class="btn btn-outline" href="#aluno/${s.id}" target="_blank">Ver como aluno ${icons.external}</a></div>
+    ${lesson ? `<div class="lesson-finish-banner"><div>${icons.check}<span><strong>Finalizando a aula de ${fmtDate(lesson.date,{day:"2-digit",month:"long"})}</strong><small>${esc(lesson.topic || "Aula")} · ao publicar, ela será marcada como concluída</small></span></div><span class="tag warning">Em andamento</span></div>` : ""}
+    <form id="update-student-form" data-student="${s.id}" data-lesson="${lesson?.id || ""}">
+      <div class="update-layout"><div class="update-main">
+        <section class="panel update-section"><div class="panel-head"><div><span class="update-step">01</span><h3>Resumo da aula</h3><p>Estas informações aparecem no topo da página do aluno.</p></div><span class="tag lime">Visível ao aluno</span></div><div class="update-fields">
+          <label class="form-group"><span>O que vimos hoje</span><input class="field" required name="current" value="${esc(s.current || lesson?.topic || "")}" placeholder="Ex.: Inversões de acordes no campo harmônico"></label>
+          <label class="form-group"><span>Orientações e pontos de atenção</span><textarea class="field" name="notes" placeholder="Resumo, feedback e como estudar durante a semana...">${esc(s.notes || "")}</textarea></label>
+          <label class="form-group"><span>Foco da próxima aula</span><input class="field" name="next" value="${esc(s.next || "")}" placeholder="Ex.: Condução de vozes em DADGAD"></label>
+        </div></section>
+        <section class="panel update-section"><div class="panel-head"><div><span class="update-step">02</span><h3>Exercícios da semana</h3><p>Adicione tarefas claras com tempo, andamento ou repetição.</p></div><button class="btn btn-ghost" type="button" data-action="add-exercise">${icons.plus} Adicionar</button></div><div class="editor-list" id="exercise-editor">${exercises.length ? exercises.map(exerciseEditorRow).join("") : exerciseEditorRow()}</div><div class="editor-footer"><label class="check-option"><input type="checkbox" name="resetProgress"><span>${icons.check}</span><div><strong>Reiniciar progresso</strong><small>Marca todos os exercícios publicados como pendentes.</small></div></label></div></section>
+        <section class="panel update-section"><div class="panel-head"><div><span class="update-step">03</span><h3>Material de apoio</h3><p>Links, vídeos, PDFs ou páginas específicas da apostila.</p></div><button class="btn btn-ghost" type="button" data-action="add-material">${icons.plus} Adicionar</button></div><div class="material-shortcut"><div>${icons.book}<span><strong>Apostila Facilitando o Violão</strong><small>Insira rapidamente o workbook completo na lista do aluno.</small></span></div><button type="button" class="btn btn-ghost" data-action="add-workbook">Usar apostila</button></div><div class="editor-list" id="material-editor">${materials.map(materialEditorRow).join("")}</div><div class="empty-editor ${materials.length ? "hidden" : ""}" id="material-empty">Nenhum material extra. A apostila geral continua disponível no portal.</div></section>
+      </div><aside class="update-side">
+        <section class="panel publish-card"><span class="eyebrow">Antes de publicar</span><h3>Tudo pronto?</h3><p>A atualização fica salva neste dispositivo e aparece imediatamente na página de ${esc(s.name.split(" ")[0])}.</p><div class="publish-summary"><div><span>Próxima aula</span><strong>${nextLesson ? `${fmtDate(nextLesson.date,{day:"2-digit",month:"short"})} · ${fmtDate(nextLesson.date,{hour:"2-digit",minute:"2-digit"})}` : "Não agendada"}</strong></div><div><span>Exercícios atuais</span><strong>${exercises.length}</strong></div><div><span>Materiais extras</span><strong>${materials.length}</strong></div></div><button class="btn btn-primary publish-button" type="submit">${icons.check} Publicar atualização</button><a class="btn btn-ghost" href="#alunos">Cancelar</a></section>
+        <section class="panel internal-card"><div class="panel-head"><div><h3>Nota interna</h3><p>Só aparece para você.</p></div>${icons.book}</div><div class="update-fields"><label class="form-group"><span>Acompanhamento particular</span><textarea class="field" name="teacherNotes" placeholder="Percepções, dificuldades, repertório futuro...">${esc(s.teacherNotes || "")}</textarea></label></div></section>
+      </aside></div>
+    </form>`);
+}
+
 function studentPortal(id) {
   const s = studentById(id);
   if (!s) return loginPage("aluno", "Aluno não encontrado. Faça o login novamente.");
-  const lessons = db.lessons.filter(l=>l.studentId===s.id && new Date(l.date)>=new Date()).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const professorView = isProfessorAuthenticated();
+  const lessons = db.lessons.filter(l=>l.studentId===s.id && l.status === "scheduled" && new Date(l.date)>=new Date()).sort((a,b)=>new Date(a.date)-new Date(b.date));
   const exercises = db.exercises[s.id] || [
     {id:"x1",title:"Revisar conteúdo da última aula",detail:"15 min · estudo consciente",done:false},
     {id:"x2",title:"Praticar com metrônomo",detail:"Subir de 60 a 76 BPM",done:false}
   ];
-  return `<div class="student-shell"><header class="student-nav"><div class="container"><a class="brand" href="#home"><span class="brand-mark">FF</span><strong>Felipe Figueroa</strong><span>/ sala do aluno</span></a><div class="student-nav-actions"><span class="tag" style="color:#555;border-color:rgba(0,0,0,.16)"><i class="dot" style="color:#6ca11f"></i>${paymentTagText(s.payment)}</span><a class="btn btn-outline" href="#home">${icons.external}<span>Site</span></a><button class="btn btn-outline" data-action="logout-student"><span>Sair</span>${icons.arrow}</button></div></div></header>
+  const materials = studentMaterials(s.id);
+  return `<div class="student-shell"><header class="student-nav"><div class="container"><a class="brand" href="#home"><span class="brand-mark">FF</span><strong>Felipe Figueroa</strong><span>/ sala do aluno</span></a><div class="student-nav-actions"><span class="tag" style="color:#555;border-color:rgba(0,0,0,.16)"><i class="dot" style="color:#6ca11f"></i>${professorView ? "Visualização do professor" : paymentTagText(s.payment)}</span>${professorView ? `<a class="btn btn-outline" href="#atualizar/${s.id}">${icons.book}<span>Editar</span></a><a class="btn btn-outline" href="#alunos"><span>Voltar</span>${icons.arrow}</a>` : `<a class="btn btn-outline" href="#home">${icons.external}<span>Site</span></a><button class="btn btn-outline" data-action="logout-student"><span>Sair</span>${icons.arrow}</button>`}</div></div></header>
     <main><section class="student-hero"><div class="container student-hero-row"><div><span class="eyebrow" style="color:#647b21">Sua jornada musical</span><h1>Olá, ${esc(s.name.split(" ")[0])}.<br><span>Vamos tocar?</span></h1></div><div class="practice-pill"><strong>${s.streak || 0} dias</strong><span>de sequência de prática</span></div></div></section>
     <div class="container student-grid"><div>
       <section class="light-card"><div class="light-card-head"><h2>Foco atual</h2><span class="tag" style="color:#555;border-color:rgba(0,0,0,.16)">Última aula</span></div><div class="lesson-focus"><span class="eyebrow" style="color:#768d35">Matéria que vimos</span><h3>${esc(s.current || "Conteúdo em construção")}</h3><p>${esc(s.notes || "Continue revisando devagar e com atenção ao som de cada nota.")}</p></div><div class="next-focus"><small>Na próxima aula</small><strong>${esc(s.next || "Revisão e aplicação musical")}</strong></div></section>
@@ -289,7 +366,7 @@ function studentPortal(id) {
     </div><aside>
       <section class="light-card"><div class="light-card-head"><h2>Próximas aulas</h2>${icons.calendar}</div><div class="student-schedule">${lessons.length ? lessons.slice(0,4).map(l=>{const d=new Date(l.date); return `<div class="student-class"><div class="date-box"><strong>${fmtDate(d,{day:"2-digit"})}</strong><span>${fmtDate(d,{month:"short"})}</span></div><div class="student-class-info"><strong>${fmtDate(d,{weekday:"long"})} · ${fmtDate(d,{hour:"2-digit",minute:"2-digit"})}</strong><span>${esc(l.mode)} · ${l.duration} min</span></div>${l.link ? `<a class="join-btn" href="${esc(l.link)}" target="_blank">Entrar</a>` : ""}</div>`}).join("") : `<div class="empty">Nenhuma aula agendada.</div>`}</div></section>
       <section class="light-card"><div class="light-card-head"><h2>Ferramentas</h2></div><div class="quick-tools"><a class="quick-tool" target="_blank" href="https://www.google.com/search?q=metr%C3%B4nomo">${icons.timer}<strong>Metrônomo</strong><span>Pratique no tempo</span></a><a class="quick-tool" target="_blank" href="https://www.google.com/search?q=afinador+online">${icons.music}<strong>Afinador</strong><span>Afinação precisa</span></a></div></section>
-      <section class="light-card student-workbook"><div class="light-card-head"><h2>Material de apoio</h2><span class="tag" style="color:#555;border-color:rgba(0,0,0,.16)">PDF</span></div><div class="student-workbook-body"><span class="eyebrow" style="color:#657e18">Workbook · 195 páginas</span><h3>Facilitando o violão</h3><p>Fundamentos, teoria e técnica que você também pode aplicar na guitarra.</p><div><a class="btn btn-primary" href="${WORKBOOK_URL}" target="_blank" rel="noopener">Abrir ${icons.external}</a><a class="btn btn-outline" href="${WORKBOOK_URL}" download>Baixar ${icons.download}</a></div></div></section>
+      <section class="light-card student-workbook"><div class="light-card-head"><h2>Material de apoio</h2><span class="tag" style="color:#555;border-color:rgba(0,0,0,.16)">${materials.length ? `${materials.length} indicado${materials.length === 1 ? "" : "s"}` : "Biblioteca"}</span></div>${materials.length ? `<div class="assigned-materials">${materials.map(material => `<a class="assigned-material" href="${safeHref(material.url)}" target="_blank" rel="noopener"><span>${icons.external}</span><div><strong>${esc(material.title)}</strong><small>${esc(material.detail || "Abrir material de apoio")}</small></div>${icons.arrow}</a>`).join("")}</div>` : ""}<div class="student-workbook-body"><span class="eyebrow" style="color:#657e18">Workbook base · 195 páginas</span><h3>Facilitando o violão</h3><p>Fundamentos, teoria e técnica que você também pode aplicar na guitarra.</p><div><a class="btn btn-primary" href="${WORKBOOK_URL}" target="_blank" rel="noopener">Abrir ${icons.external}</a><a class="btn btn-outline" href="${WORKBOOK_URL}" download>Baixar ${icons.download}</a></div></div></section>
       <section class="light-card"><div class="light-card-head"><h2>Meu caderno</h2><span class="tag" style="color:#555;border-color:rgba(0,0,0,.16)">privado</span></div><div class="note-area"><textarea class="field" data-student-note="${s.id}" placeholder="Anote dúvidas, ideias de repertório e metas...">${esc(db.notes[s.id] || "")}</textarea></div></section>
     </aside></div></main></div>`;
 }
@@ -320,14 +397,15 @@ function loginPage(kind, error = "") {
 
 function render() {
   const hash = location.hash.replace(/^#/, "") || "home";
-  const [route, id] = hash.split("/");
+  const [route, id, detailId] = hash.split("/");
   const app = document.querySelector("#app");
-  const professorRoute = ["admin", "dashboard", "agenda", "alunos", "materiais", "pagamentos"].includes(route);
+  const professorRoute = ["admin", "dashboard", "agenda", "alunos", "atualizar", "materiais", "pagamentos"].includes(route);
   if (route === "login") app.innerHTML = loginPage(id === "professor" ? "professor" : "aluno");
   else if (professorRoute && !isProfessorAuthenticated()) app.innerHTML = loginPage("professor");
   else if (route === "admin" || route === "dashboard") app.innerHTML = dashboardPage();
   else if (route === "agenda") app.innerHTML = agendaPage();
   else if (route === "alunos") app.innerHTML = studentsPage();
+  else if (route === "atualizar") app.innerHTML = updateStudentPage(id, detailId);
   else if (route === "materiais") app.innerHTML = materialsPage();
   else if (route === "pagamentos") app.innerHTML = paymentsPage();
   else if (route === "aluno" && (isProfessorAuthenticated() || authenticatedStudentId() === id)) app.innerHTML = studentPortal(id);
@@ -388,6 +466,10 @@ document.addEventListener("click", e => {
   else if (action === "close-modal") closeModal();
   else if (action === "new-student") studentModal();
   else if (action === "edit-student") studentModal(target.dataset.student);
+  else if (action === "add-exercise") document.querySelector("#exercise-editor")?.insertAdjacentHTML("beforeend", exerciseEditorRow());
+  else if (action === "add-material") { document.querySelector("#material-editor")?.insertAdjacentHTML("beforeend", materialEditorRow()); document.querySelector("#material-empty")?.classList.add("hidden"); }
+  else if (action === "add-workbook") { document.querySelector("#material-editor")?.insertAdjacentHTML("beforeend", materialEditorRow({ title:"Apostila Facilitando o Violão", detail:"Revisar o conteúdo indicado para a próxima aula.", url:WORKBOOK_URL })); document.querySelector("#material-empty")?.classList.add("hidden"); }
+  else if (action === "remove-editor-row") { target.closest("[data-exercise-row], [data-material-row]")?.remove(); if (!document.querySelector("[data-material-row]")) document.querySelector("#material-empty")?.classList.remove("hidden"); }
   else if (action === "new-lesson") lessonModal();
   else if (action === "remind") reminderModal(target.dataset.lesson);
   else if (action === "mark-reminded") { toast("Lembrete preparado para envio"); setTimeout(closeModal,300); }
@@ -428,6 +510,50 @@ document.addEventListener("submit", e => {
   }
   if (e.target.id === "student-form") { e.preventDefault(); const values=Object.fromEntries(new FormData(e.target)); const duplicate=db.students.find(student=>student.studentNumber===values.studentNumber && student.id!==values.id); if(duplicate){toast("Este número de aluno já está em uso");return;} const existing=studentById(values.id); if(existing) Object.assign(existing,values); else { values.id=slugify(values.name)+"-"+Date.now().toString(36); values.streak=0; db.students.push(values); db.exercises[values.id]=[]; } saveData("Aluno salvo com sucesso"); closeModal(); location.hash="alunos"; render(); }
   if (e.target.id === "lesson-form") { e.preventDefault(); const values=Object.fromEntries(new FormData(e.target)); values.id="l"+Date.now().toString(36); values.date=new Date(values.date).toISOString(); values.duration=Number(values.duration); values.status="scheduled"; db.lessons.push(values); saveData("Aula agendada com sucesso"); closeModal(); location.hash="agenda"; render(); }
+  if (e.target.id === "update-student-form") {
+    e.preventDefault();
+    const form = e.target;
+    const student = studentById(form.dataset.student);
+    if (!student) { toast("Aluno não encontrado"); return; }
+    const values = Object.fromEntries(new FormData(form));
+    db.exercises ||= {};
+    const previousExercises = db.exercises[student.id] || [];
+    const exercises = [...form.querySelectorAll("[data-exercise-row]")].map(row => {
+      const id = row.querySelector('[data-field="id"]').value || `e${Date.now().toString(36)}${Math.random().toString(36).slice(2,6)}`;
+      const old = previousExercises.find(item => item.id === id);
+      return { id, title:row.querySelector('[data-field="title"]').value.trim(), detail:row.querySelector('[data-field="detail"]').value.trim(), done:values.resetProgress === "on" ? false : Boolean(old?.done) };
+    }).filter(item => item.title);
+    const materialRows = [...form.querySelectorAll("[data-material-row]")];
+    const incompleteMaterial = materialRows.find(row => {
+      const title = row.querySelector('[data-field="title"]').value.trim();
+      const url = row.querySelector('[data-field="url"]').value.trim();
+      return (title || url) && !(title && url);
+    });
+    if (incompleteMaterial) { toast("Preencha o nome e o link do material"); incompleteMaterial.querySelector(".field:placeholder-shown")?.focus(); return; }
+    const materials = materialRows.map(row => ({
+      id:row.querySelector('[data-field="id"]').value || `m${Date.now().toString(36)}${Math.random().toString(36).slice(2,6)}`,
+      title:row.querySelector('[data-field="title"]').value.trim(),
+      url:row.querySelector('[data-field="url"]').value.trim(),
+      detail:row.querySelector('[data-field="detail"]').value.trim(),
+    })).filter(item => item.title && item.url);
+    student.current = String(values.current || "").trim();
+    student.notes = String(values.notes || "").trim();
+    student.next = String(values.next || "").trim();
+    student.teacherNotes = String(values.teacherNotes || "").trim();
+    student.lastUpdatedAt = new Date().toISOString();
+    db.exercises[student.id] = exercises;
+    db.supportMaterials ||= {};
+    db.supportMaterials[student.id] = materials;
+    db.updates ||= {};
+    db.updates[student.id] ||= [];
+    db.updates[student.id].unshift({ id:`u${Date.now().toString(36)}`, date:student.lastUpdatedAt, lessonId:form.dataset.lesson || null, current:student.current, exerciseCount:exercises.length, materialCount:materials.length });
+    db.updates[student.id] = db.updates[student.id].slice(0, 20);
+    const lesson = db.lessons.find(item => item.id === form.dataset.lesson && item.studentId === student.id);
+    if (lesson) lesson.status = "completed";
+    saveData(`Página de ${student.name.split(" ")[0]} atualizada`);
+    location.hash = `aluno/${student.id}`;
+    render();
+  }
 });
 
 document.addEventListener("input", e => {
