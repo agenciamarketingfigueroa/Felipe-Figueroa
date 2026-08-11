@@ -497,6 +497,14 @@ select.field { appearance: none; }
 .form-group.full { grid-column: 1 / -1; }
 .form-group label { display: block; margin: 0 0 7px; color: #888680; font: 500 9px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .07em; }
 .modal-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 17px 22px; border-top: 1px solid var(--line); }
+.modal-delete-button { margin-right: auto; }
+.row-delete-button { color: #ff918f; border-color: rgba(255,90,88,.22); }
+.row-delete-button:hover { color: #ffd0cf; border-color: rgba(255,90,88,.55); background: rgba(255,90,88,.1); }
+.delete-warning { display: flex; align-items: flex-start; gap: 16px; padding: 18px; border: 1px solid rgba(255,90,88,.25); border-radius: 12px; background: rgba(255,90,88,.07); }
+.delete-warning > .icon { width: 24px; height: 24px; flex: 0 0 auto; color: #ff918f; }
+.delete-warning strong { display: block; margin-bottom: 8px; color: white; font-size: 14px; }
+.delete-warning p { margin: 0 0 10px; color: #aaa8a1; font-size: 11px; line-height: 1.65; }
+.delete-warning small { color: #77756f; font: 400 9px/1.5 var(--font-mono); }
 .choice-list { display: grid; gap: 8px; }
 .choice-btn { display: flex; align-items: center; gap: 14px; padding: 16px; color: white; background: #202020; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; text-align: left; }
 .choice-btn:hover { border-color: var(--accent); }

@@ -44,6 +44,7 @@ const icons = {
   more: '<svg class="icon" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>',
   external: '<svg class="icon" viewBox="0 0 24 24"><path d="M15 3h6v6m0-6-9 9M10 5H5v14h14v-5"/></svg>',
   close: '<svg class="icon" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg>',
+  trash: '<svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3m3 0-1 14H7L6 7m4 4v6m4-6v6"/></svg>',
   clock: '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
   book: '<svg class="icon" viewBox="0 0 24 24"><path d="M4 4h6a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H4Zm16 0h-4a3 3 0 0 0-3 3v13a3 3 0 0 1 3-3h4Z"/></svg>',
   check: '<svg class="icon" viewBox="0 0 24 24"><path d="m6 12 4 4 8-9"/></svg>',
@@ -274,7 +275,7 @@ function agendaPage() {
 
 function studentsPage(filter = "") {
   const list = db.students.filter(s => [s.name,s.email,s.instrument,s.studentNumber].join(" ").toLowerCase().includes(filter.toLowerCase()));
-  const rows = list.map(s => `<tr><td><div class="student-name"><span class="mini-avatar">${initials(s.name)}</span><div><strong>${esc(s.name)}</strong><span>Matrícula ${esc(s.studentNumber)} · ${esc(s.email)}</span></div></div></td><td>${esc(s.instrument)} · ${esc(s.level)}</td><td>${esc(s.plan)}</td><td>${paymentTag(s.payment)}</td><td><div class="row-actions"><a class="btn btn-ghost update-student-btn" title="Atualizar conteúdo, exercícios e materiais" href="#atualizar/${s.id}">${icons.book} Atualizar página</a><a class="icon-btn" title="Ver portal do aluno" href="#aluno/${s.id}">${icons.external}</a><button class="icon-btn" title="Editar cadastro" data-action="edit-student" data-student="${s.id}">${icons.more}</button></div></td></tr>`).join("");
+  const rows = list.map(s => `<tr><td><div class="student-name"><span class="mini-avatar">${initials(s.name)}</span><div><strong>${esc(s.name)}</strong><span>Matrícula ${esc(s.studentNumber)} · ${esc(s.email)}</span></div></div></td><td>${esc(s.instrument)} · ${esc(s.level)}</td><td>${esc(s.plan)}</td><td>${paymentTag(s.payment)}</td><td><div class="row-actions"><a class="btn btn-ghost update-student-btn" title="Atualizar conteúdo, exercícios e materiais" href="#atualizar/${s.id}">${icons.book} Atualizar página</a><a class="icon-btn" title="Ver portal do aluno" href="#aluno/${s.id}">${icons.external}</a><button class="icon-btn" title="Editar cadastro" data-action="edit-student" data-student="${s.id}">${icons.more}</button><button class="icon-btn row-delete-button" title="Excluir aluno" aria-label="Excluir ${esc(s.name)}" data-action="delete-student" data-student="${s.id}">${icons.trash}</button></div></td></tr>`).join("");
   return appShell("alunos", "Alunos", `<div class="greeting"><div><span class="eyebrow">Sua turma</span><h2>${db.students.length} alunos ativos</h2><p>Cadastro, acompanhamento pedagógico e situação financeira.</p></div></div><div class="toolbar"><label class="search-box">${icons.search}<input id="student-search" value="${esc(filter)}" placeholder="Buscar por nome, e-mail ou instrumento..." /></label><button class="btn btn-primary" data-action="new-student">${icons.plus} Novo aluno</button></div><section class="panel"><div style="overflow-x:auto"><table class="data-table"><thead><tr><th>Aluno</th><th>Nível</th><th>Plano</th><th>Pagamento</th><th></th></tr></thead><tbody>${rows || `<tr><td colspan="5" class="empty">Nenhum aluno encontrado.</td></tr>`}</tbody></table></div></section>`);
 }
 
@@ -429,7 +430,30 @@ function studentModal(id) {
     <div class="form-group"><label>Instrumento</label><select class="field" name="instrument"><option ${s.instrument==="Guitarra"?"selected":""}>Guitarra</option><option ${s.instrument==="Violão"?"selected":""}>Violão</option></select></div><div class="form-group"><label>Nível</label><select class="field" name="level">${["Iniciante","Intermediário","Avançado"].map(x=>`<option ${s.level===x?"selected":""}>${x}</option>`).join("")}</select></div>
     <div class="form-group"><label>Plano</label><select class="field" name="plan">${["Mensal","Trimestral","Avulso"].map(x=>`<option ${s.plan===x?"selected":""}>${x}</option>`).join("")}</select></div><div class="form-group"><label>Pagamento</label><select class="field" name="payment"><option value="paid" ${s.payment==="paid"?"selected":""}>Em dia</option><option value="pending" ${s.payment==="pending"?"selected":""}>Pendente</option><option value="late" ${s.payment==="late"?"selected":""}>Atrasado</option></select></div>
     <div class="form-group full"><label>Matéria atual</label><input class="field" name="current" value="${esc(s.current || "")}"></div><div class="form-group full"><label>Próxima matéria</label><input class="field" name="next" value="${esc(s.next || "")}"></div><div class="form-group full"><label>Observações</label><textarea class="field" name="notes">${esc(s.notes || "")}</textarea></div>
-  </form>`, `<button class="btn btn-ghost" data-action="close-modal">Cancelar</button><button class="btn btn-primary" type="submit" form="student-form">Salvar aluno</button>`);
+  </form>`, `${s.id ? `<button class="btn btn-danger modal-delete-button" data-action="delete-student" data-student="${s.id}">${icons.trash} Excluir aluno</button>` : ""}<button class="btn btn-ghost" data-action="close-modal">Cancelar</button><button class="btn btn-primary" type="submit" form="student-form">Salvar aluno</button>`);
+}
+
+function deleteStudentModal(id) {
+  const student = studentById(id);
+  if (!student) { toast("Aluno não encontrado"); return; }
+  const lessonCount = db.lessons.filter(lesson => lesson.studentId === id).length;
+  closeModal();
+  openModal("Excluir aluno", `<div class="delete-warning">${icons.trash}<div><strong>Excluir ${esc(student.name)} permanentemente?</strong><p>O cadastro e ${lessonCount} ${lessonCount === 1 ? "aula relacionada" : "aulas relacionadas"}, além de exercícios, materiais e anotações, serão removidos deste dispositivo.</p><small>Essa ação só poderá ser desfeita restaurando um backup exportado anteriormente.</small></div></div>`, `<button class="btn btn-ghost" data-action="close-modal">Cancelar</button><button class="btn btn-danger" data-action="confirm-delete-student" data-student="${student.id}">${icons.trash} Sim, excluir aluno</button>`);
+}
+
+function deleteStudent(id) {
+  const student = studentById(id);
+  if (!student) { closeModal(); toast("Aluno não encontrado"); return; }
+  db.students = db.students.filter(item => item.id !== id);
+  db.lessons = db.lessons.filter(lesson => lesson.studentId !== id);
+  ["exercises", "supportMaterials", "updates", "notes"].forEach(key => {
+    if (db[key]) delete db[key][id];
+  });
+  if (authenticatedStudentId() === id) sessionStorage.removeItem(STUDENT_AUTH_KEY);
+  saveData(`${student.name} foi excluído`);
+  closeModal();
+  location.hash = "alunos";
+  render();
 }
 
 function lessonModal() {
@@ -466,6 +490,8 @@ document.addEventListener("click", e => {
   else if (action === "close-modal") closeModal();
   else if (action === "new-student") studentModal();
   else if (action === "edit-student") studentModal(target.dataset.student);
+  else if (action === "delete-student") deleteStudentModal(target.dataset.student);
+  else if (action === "confirm-delete-student") deleteStudent(target.dataset.student);
   else if (action === "add-exercise") document.querySelector("#exercise-editor")?.insertAdjacentHTML("beforeend", exerciseEditorRow());
   else if (action === "add-material") { document.querySelector("#material-editor")?.insertAdjacentHTML("beforeend", materialEditorRow()); document.querySelector("#material-empty")?.classList.add("hidden"); }
   else if (action === "add-workbook") { document.querySelector("#material-editor")?.insertAdjacentHTML("beforeend", materialEditorRow({ title:"Apostila Facilitando o Violão", detail:"Revisar o conteúdo indicado para a próxima aula.", url:WORKBOOK_URL })); document.querySelector("#material-empty")?.classList.add("hidden"); }
