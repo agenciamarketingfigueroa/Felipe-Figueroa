@@ -186,6 +186,7 @@ img { display: block; max-width: 100%; }
 .artist-note { margin: 18px 0 0; color: #74736e; font-size: 12px; }
 
 .course-card { display: grid; grid-template-columns: 1fr 1fr; min-height: 520px; border: 1px solid var(--line); overflow: hidden; }
+.courses-list { display: grid; gap: 22px; }
 .course-visual { position: relative; display: grid; place-items: center; background: var(--accent); color: white; overflow: hidden; }
 .course-visual::before { content: "D A D G A D"; position: absolute; inset: 0; display: grid; place-items: center; font: 700 16vw/1 var(--font-display); color: rgba(0,0,0,.07); white-space: nowrap; transform: rotate(-12deg); }
 .tuning-disc { width: min(330px, 70%); aspect-ratio: 1; border: 1px solid rgba(0,0,0,.35); border-radius: 50%; display: grid; place-items: center; position: relative; }
@@ -197,6 +198,9 @@ img { display: block; max-width: 100%; }
 .course-copy p { color: var(--muted); margin: 0 0 30px; }
 .course-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 34px; }
 .course-list div { padding-top: 12px; border-top: 1px solid var(--line); font: 400 10px/1.4 var(--font-mono); color: #c5c3bd; text-transform: uppercase; }
+.dfv-course-visual img { width: 100%; height: 100%; object-fit: cover; }
+.dfv-course-visual::after { content: ""; position: absolute; inset: 0; background: linear-gradient(130deg, rgba(8,8,8,.1), rgba(8,8,8,.7)); }
+.dfv-course-visual > span { position: absolute; z-index: 1; color: white; font: 600 clamp(80px, 10vw, 140px)/1 var(--font-display); letter-spacing: -.04em; }
 
 .contact-section { padding: 120px 0 55px; background: #070707; }
 .contact-big { display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; padding-bottom: 70px; border-bottom: 1px solid var(--line); }
@@ -329,6 +333,86 @@ img { display: block; max-width: 100%; }
 .sales-final > .container > div { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
 .sales-footer { padding: 26px 0; border-top: 1px solid var(--line); background: #070707; }
 .sales-footer .container { display: flex; justify-content: space-between; color: #77756f; font: 400 9px/1 var(--font-mono); text-transform: uppercase; }
+
+/* De Férias com o Violão */
+.dfv-page { background: #090909; }
+.dfv-page h2 { letter-spacing: -.03em; line-height: 1.04; }
+.dfv-hero { position: relative; min-height: 760px; padding: 148px 0 82px; overflow: hidden; background: radial-gradient(circle at 75% 18%, rgba(95,124,255,.18), transparent 32%), #090909; }
+.dfv-hero::before { content: ""; position: absolute; inset: 0; opacity: .1; pointer-events: none; background-image: linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px); background-size: 72px 72px; mask-image: linear-gradient(to bottom, black, transparent 88%); }
+.dfv-hero-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(390px, .95fr); align-items: center; gap: clamp(42px, 6vw, 82px); }
+.dfv-hero-copy h1 { max-width: 720px; margin: 21px 0 25px; font: 600 clamp(58px, 6.8vw, 96px)/1.04 var(--font-display); text-transform: uppercase; letter-spacing: -.045em; }
+.dfv-hero-copy h1 span { display: block; color: transparent; -webkit-text-stroke: 1.4px rgba(130,153,255,.88); }
+.dfv-hero-copy > p { max-width: 650px; margin: 0; color: #b8b6b0; font-size: clamp(16px, 1.4vw, 19px); line-height: 1.65; }
+.dfv-hero-proof { max-width: 610px; display: flex; align-items: flex-start; gap: 10px; margin-top: 25px; color: #999790; font: 400 10px/1.55 var(--font-mono); text-transform: uppercase; letter-spacing: .05em; }
+.dfv-hero-proof .icon { flex: 0 0 auto; color: #8299ff; }
+.dfv-hero-copy > small { display: block; margin-top: 12px; color: #74726c; font-size: 10px; }
+.dfv-cta-group { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 30px; }
+.dfv-cta-note { color: #85837c; font: 400 9px/1.4 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
+.dfv-hero-visual { position: relative; min-height: 510px; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: #141414; box-shadow: var(--shadow); }
+.dfv-hero-visual::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 35%, rgba(7,7,7,.82)); pointer-events: none; }
+.dfv-hero-visual > img { width: 100%; height: 100%; min-height: 510px; object-fit: cover; object-position: 66% center; }
+.dfv-product-mark { position: absolute; z-index: 1; left: 30px; right: 30px; bottom: 28px; }
+.dfv-product-mark span, .dfv-product-mark small { display: block; color: #bdbab2; font: 500 9px/1.4 var(--font-mono); text-transform: uppercase; letter-spacing: .12em; }
+.dfv-product-mark strong { display: block; margin: 8px 0 9px; color: white; font: 600 clamp(61px, 6vw, 88px)/1 var(--font-display); text-transform: uppercase; letter-spacing: -.035em; }
+.dfv-problem { background: var(--paper); color: var(--ink); }
+.dfv-problem .eyebrow, .dfv-benefits-section .eyebrow { color: #3d5bb8; }
+.dfv-split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(48px, 9vw, 130px); align-items: start; }
+.dfv-split h2, .dfv-method-grid h2, .dfv-challenge h2, .dfv-audience-grid h2, .dfv-offer-copy h2 { margin: 18px 0 0; font: 500 clamp(44px, 5.7vw, 75px)/1.04 var(--font-display); text-transform: uppercase; }
+.dfv-problem-copy > p { margin: 4px 0 25px; color: #64635e; font-size: 15px; line-height: 1.8; }
+.dfv-problem-copy ul { list-style: none; margin: 0 0 28px; padding: 0; display: grid; gap: 11px; }
+.dfv-problem-copy li { display: flex; align-items: center; gap: 10px; color: #55544f; font-size: 12px; }
+.dfv-problem-copy li .icon { width: 15px; color: #3d5bb8; }
+.dfv-problem-copy > strong { display: block; padding: 22px 0 0; border-top: 1px solid rgba(0,0,0,.16); font: 500 24px/1.35 var(--font-display); text-transform: uppercase; }
+.dfv-method { background: #0e0e0e; }
+.dfv-method-grid { display: grid; grid-template-columns: .28fr .9fr 1fr; gap: clamp(32px, 5vw, 72px); align-items: start; }
+.dfv-method-number { color: #202020; font: 700 clamp(100px, 12vw, 170px)/.78 var(--font-display); }
+.dfv-method-grid p { margin: 4px 0 17px; color: #aaa8a1; font-size: 14px; line-height: 1.8; }
+.dfv-method-grid blockquote { margin: 28px 0 0; padding: 23px 0 23px 24px; border-left: 2px solid var(--accent); color: #dedbd3; font: 400 22px/1.45 var(--font-display); text-transform: uppercase; }
+.dfv-challenge { background: #080808; }
+.dfv-challenge-card { display: grid; grid-template-columns: 1.15fr .85fr; gap: clamp(35px, 7vw, 95px); align-items: stretch; padding: clamp(34px, 6vw, 78px); border: 1px solid rgba(130,153,255,.3); border-radius: var(--radius); background: radial-gradient(circle at 90% 8%, rgba(95,124,255,.2), transparent 33%), #121216; box-shadow: 0 30px 90px rgba(0,0,0,.28); }
+.dfv-challenge-copy h2 { margin: 24px 0 25px; }
+.dfv-challenge-copy p { max-width: 680px; margin: 0 0 16px; color: #aaa8a1; font-size: 14px; line-height: 1.8; }
+.dfv-challenge-visual { min-height: 390px; display: flex; flex-direction: column; justify-content: flex-end; padding: 30px; overflow: hidden; border: 1px solid var(--line); background: repeating-linear-gradient(135deg, rgba(255,255,255,.025) 0 1px, transparent 1px 14px), #0c0c0f; }
+.dfv-challenge-visual > strong { color: #8299ff; font: 600 clamp(110px, 13vw, 180px)/.7 var(--font-display); }
+.dfv-challenge-visual > span { margin-top: 18px; color: white; font: 500 24px/1 var(--font-display); text-transform: uppercase; }
+.dfv-challenge-visual > div { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 30px; }
+.dfv-challenge-visual small { padding: 7px 9px; border: 1px solid var(--line); color: #77756f; font: 400 8px/1 var(--font-mono); text-transform: uppercase; }
+.dfv-challenge-visual p { margin: 13px 0 0; color: #5f5d58; font-size: 9px; }
+.dfv-benefits-section { background: var(--paper); color: var(--ink); }
+.dfv-benefits-section .sales-section-head p { color: #696862; }
+.dfv-benefits { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.dfv-benefits article { position: relative; min-height: 270px; padding: 28px; display: flex; flex-direction: column; justify-content: flex-end; border: 1px solid rgba(0,0,0,.14); background: #e7e5de; }
+.dfv-benefits article > span { position: absolute; left: 27px; top: 25px; color: #85837d; font: 500 9px/1 var(--font-mono); }
+.dfv-benefits article > .icon { position: absolute; right: 25px; top: 23px; width: 22px; color: #3d5bb8; }
+.dfv-benefits h3 { margin: 0 0 11px; font: 500 25px/1.14 var(--font-display); text-transform: uppercase; }
+.dfv-benefits p { margin: 0; color: #64635e; font-size: 11px; line-height: 1.65; }
+.dfv-audience-section { background: #101010; }
+.dfv-audience-grid { display: grid; grid-template-columns: .75fr 1.25fr; gap: clamp(45px, 8vw, 110px); }
+.dfv-check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dfv-check-grid > div { min-height: 105px; display: flex; align-items: center; gap: 14px; padding: 22px; border: 1px solid var(--line); background: #151515; color: #c6c4bd; font-size: 12px; }
+.dfv-check-grid .icon { flex: 0 0 auto; color: #8299ff; }
+.dfv-not-for { margin-top: 70px; padding: 27px 30px; display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: center; border: 1px solid var(--line); }
+.dfv-not-for p { margin: 0; color: #aaa8a1; font-size: 13px; line-height: 1.7; }
+.dfv-not-for strong { color: var(--paper); }
+.dfv-offer-section { background: radial-gradient(circle at 78% 20%, rgba(95,124,255,.2), transparent 28%), #080808; }
+.dfv-offer-grid { display: grid; grid-template-columns: 1fr minmax(380px, .72fr); gap: clamp(48px, 9vw, 130px); align-items: center; }
+.dfv-offer-copy p { max-width: 600px; margin: 25px 0 0; color: #9b9992; font-size: 15px; line-height: 1.8; }
+.dfv-price-card { padding: clamp(30px, 4vw, 48px); border: 1px solid rgba(130,153,255,.45); border-radius: var(--radius); background: rgba(17,17,21,.9); box-shadow: var(--shadow); }
+.dfv-price-card h3 { margin: 25px 0; font: 500 32px/1.14 var(--font-display); text-transform: uppercase; }
+.dfv-price-card ul { list-style: none; display: grid; gap: 12px; margin: 0 0 27px; padding: 0; }
+.dfv-price-card li { display: flex; align-items: center; gap: 9px; color: #b8b6b0; font-size: 11px; }
+.dfv-price-card li .icon { width: 15px; color: #8299ff; }
+.dfv-price { padding: 25px 0; border-block: 1px solid var(--line); }
+.dfv-price > span, .dfv-price > small { display: block; color: #77756f; font: 400 9px/1.4 var(--font-mono); text-transform: uppercase; }
+.dfv-price > strong { display: block; margin: 8px 0 6px; color: white; font: 600 clamp(62px, 7vw, 90px)/.9 var(--font-display); }
+.dfv-price del { color: #9a9891; }
+.dfv-price-card .dfv-cta-group { align-items: stretch; flex-direction: column; }
+.dfv-wide-cta { width: 100%; }
+.dfv-final p { max-width: 680px; line-height: 1.75; }
+.dfv-final h2 { line-height: 1.04; }
+.dfv-public-card .course-copy h2 { line-height: 1.04; }
+.dfv-final .dfv-cta-note { display: block; margin-top: 14px; }
+.btn:focus-visible, .icon-btn:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px solid #9aafff; outline-offset: 3px; }
 
 /* App shell */
 .app-shell { min-height: 100vh; background: #0d0d0d; }
@@ -686,6 +770,11 @@ select.field { appearance: none; }
   .login-shell { grid-template-columns: .8fr 1.2fr; }
   .login-visual-copy { display: none; }
   .sales-hero-grid, .portal-showcase-grid { grid-template-columns: 1fr; }
+  .dfv-hero-grid, .dfv-challenge-card, .dfv-offer-grid { grid-template-columns: 1fr; }
+  .dfv-hero-visual { max-width: 760px; }
+  .dfv-method-grid { grid-template-columns: .25fr 1fr; }
+  .dfv-method-grid > div:last-child { grid-column: 2; }
+  .dfv-benefits { grid-template-columns: repeat(2, 1fr); }
   .sales-anchor-card { max-width: 560px; }
   .sales-section-head { grid-template-columns: 1fr 1.5fr; }
   .sales-section-head p { grid-column: 2; }
@@ -788,6 +877,27 @@ select.field { appearance: none; }
   .faq-grid { gap: 35px; }
   .sales-final { padding: 85px 0; }
   .sales-footer .container { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .dfv-hero { min-height: 0; padding: 108px 0 70px; }
+  .dfv-hero-grid { grid-template-columns: minmax(0, 1fr); gap: 38px; }
+  .dfv-hero-copy { width: 100%; min-width: 0; }
+  .dfv-hero-copy h1 { width: 100%; max-width: 100%; font-size: clamp(40px, 11.8vw, 50px); }
+  .dfv-nav .brand span:last-child { display: none; }
+  .dfv-hero-visual, .dfv-hero-visual > img { min-height: 390px; }
+  .dfv-hero-visual > img { object-position: 70% center; }
+  .dfv-product-mark { left: 22px; right: 22px; bottom: 22px; }
+  .dfv-cta-group { align-items: stretch; flex-direction: column; }
+  .dfv-cta-group .btn { width: 100%; }
+  .dfv-split, .dfv-method-grid, .dfv-audience-grid { grid-template-columns: 1fr; gap: 35px; }
+  .dfv-method-number { display: none; }
+  .dfv-method-grid > div:last-child { grid-column: auto; }
+  .dfv-challenge-card { padding: 24px; }
+  .dfv-challenge-visual { min-height: 330px; padding: 23px; }
+  .dfv-benefits, .dfv-check-grid { grid-template-columns: 1fr; }
+  .dfv-benefits article { min-height: 235px; }
+  .dfv-check-grid > div { min-height: 82px; }
+  .dfv-not-for { grid-template-columns: 1fr; gap: 16px; margin-top: 45px; padding: 23px; }
+  .dfv-offer-grid { gap: 38px; }
+  .dfv-price-card { padding: 26px; }
   .quote-plan-options { grid-template-columns: 1fr; }
   .quote-plan-options label { display: grid; grid-template-columns: 1fr auto; align-items: center; }
   .quote-plan-options b { grid-column: 2; grid-row: 1; margin-top: 0; }
