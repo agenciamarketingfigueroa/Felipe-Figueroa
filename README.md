@@ -51,7 +51,7 @@ A agenda mostra a **próxima matéria** definida no cadastro de cada aluno, faci
 
 A página `/partituras/` carrega o inventário gerado em `assets/partituras-catalog.js`. O catálogo atual reúne 358 PDFs e 249 títulos. A listagem elimina cópias idênticas pela combinação de música, artista e tonalidade, preservando linhas separadas quando o tom muda. Há busca por título ou artista e filtros por artista, tonalidade e tipo de versão. Os PDFs não são copiados para o site.
 
-A oferta de pré-lançamento apresenta o pack completo por R$ 147 para os primeiros 50 músicos e posiciona a comunidade fundadora como gratuita. Enquanto o checkout não estiver definido, os CTAs abrem mensagens de interesse por e-mail.
+A oferta de pré-lançamento apresenta o pack completo por R$ 147 à vista ou 12x de R$ 15,20 para os primeiros 50 músicos e posiciona a comunidade fundadora como gratuita. Enquanto o checkout não estiver definido, os CTAs abrem mensagens de interesse por e-mail.
 
 Para atualizar o catálogo depois de adicionar ou renomear partituras, execute:
 
