@@ -16,6 +16,7 @@ Depois acesse `http://localhost:4173`.
 
 - `#home` — site institucional e mídia kit
 - `/aulas/` — página não listada de vendas das aulas, formatos e planos
+- `/partituras/` — página de pré-lançamento do acervo de cifras em partitura
 - `#login/professor` — login do professor
 - `#login/aluno` — login do aluno
 - `#admin` — visão geral do professor, protegida por sessão
@@ -45,6 +46,18 @@ Os dados ficam somente no navegador/dispositivo atual. Limpar os dados do navega
 O arquivo `assets/materials/apostila-facilitando-o-violao.pdf` fica disponível na biblioteca do professor e na sala do aluno. A biblioteca organiza as 195 páginas em 9 módulos com atalhos para fundamentos, acordes, tempo, tétrades, solos e pentatônica.
 
 A agenda mostra a **próxima matéria** definida no cadastro de cada aluno, facilitando a preparação da aula e a indicação do módulo correspondente da apostila.
+
+## Catálogo de cifras em partitura
+
+A página `/partituras/` carrega o inventário gerado em `assets/partituras-catalog.js`. O catálogo atual reúne 358 PDFs e 249 títulos. A listagem elimina cópias idênticas pela combinação de música, artista e tonalidade, preservando linhas separadas quando o tom muda. Há busca por título ou artista e filtros por artista, tonalidade e tipo de versão. Os PDFs não são copiados para o site.
+
+A oferta de pré-lançamento apresenta o pack completo por R$ 147 para os primeiros 50 músicos e posiciona a comunidade fundadora como gratuita. Enquanto o checkout não estiver definido, os CTAs abrem mensagens de interesse por e-mail.
+
+Para atualizar o catálogo depois de adicionar ou renomear partituras, execute:
+
+```bash
+deno run --allow-read="<diretorio-das-partituras>" --allow-write="assets/partituras-catalog.js" scripts/build-partituras-catalog.ts "<diretorio-das-partituras>" "assets/partituras-catalog.js"
+```
 
 ## Finalização da aula
 

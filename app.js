@@ -127,6 +127,7 @@ function loadData() {
   return initial;
 }
 let db = loadData();
+let partiturasCatalogLimit = 18;
 
 function saveData(message = "Alterações salvas neste dispositivo") {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
@@ -355,6 +356,148 @@ function dfvPage() {
 
       <section class="sales-final dfv-final"><div class="container"><span class="eyebrow">Um começo simples</span><h2>Talvez esteja na hora de finalmente tirar o violão do canto.</h2><p>Você não precisa esperar o momento perfeito, estudar meses de teoria ou achar que nasceu sem talento. Comece pelo básico, aprenda no seu ritmo e descubra como é tocar sua primeira música.</p><div>${dfvCta("Quero aprender a tocar")}</div>${dfvCheckoutNote()}</div></section>
       <footer class="sales-footer"><div class="container"><span>© ${new Date().getFullYear()} Felipe Figueroa</span><span>De Férias com o Violão · Curso online para iniciantes</span><a href="./">Voltar ao site</a></div></footer>
+    </main>`;
+}
+
+function partiturasPage() {
+  const launchMail = `mailto:contato@felipefigueroa.com.br?subject=${encodeURIComponent("Quero o preço fundador do acervo de cifras em partitura")}&body=${encodeURIComponent("Olá, Felipe! Quero entrar na lista do pack completo por R$ 147 no preço fundador.")}`;
+  const communityMail = `mailto:contato@felipefigueroa.com.br?subject=${encodeURIComponent("Quero entrar na comunidade fundadora de músicos")}&body=${encodeURIComponent("Olá, Felipe! Quero entrar gratuitamente na comunidade fundadora de músicos.")}`;
+  const fileCatalog = globalThis.PARTITURAS_CATALOG || [];
+  const catalog = globalThis.PARTITURAS_RESULTS || [];
+  const catalogMeta = globalThis.PARTITURAS_CATALOG_META || { files: fileCatalog.length, songs: catalog.length, artists: 0, keyed: 0 };
+  const artists = [...new Set(catalog.map(score => score.artist))].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const keyOrder = ["C", "Cm", "C#", "C#m", "Db", "Dbm", "D", "Dm", "D#", "D#m", "Eb", "Ebm", "E", "Em", "F", "Fm", "F#", "F#m", "Gb", "Gbm", "G", "Gm", "G#", "G#m", "Ab", "Abm", "A", "Am", "A#", "A#m", "Bb", "Bbm", "B", "Bm"];
+  const keys = [...new Set(catalog.map(score => score.key).filter(Boolean))].sort((a, b) => { const ai = keyOrder.indexOf(a); const bi = keyOrder.indexOf(b); return (ai < 0 ? keyOrder.length : ai) - (bi < 0 ? keyOrder.length : bi) || a.localeCompare(b, "pt-BR"); });
+  const features = [...new Set(catalog.flatMap(score => score.features))].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const delivery = [
+    [icons.book, "Acervo com 358+ músicas", "Um repertório construído em anos tocando casamentos no violão e no teclado."],
+    [icons.music, "Cifras em partitura", "Pausas, compassos e trocas de acordes indicados no ponto em que acontecem."],
+    [icons.timer, "Aulas de escrita", "Aprenda o processo para ouvir, organizar e escrever suas próprias cifras com precisão."],
+    [icons.users, "Comunidade gratuita", "Network, troca de experiências, repertório e oportunidades entre músicos."],
+  ];
+  const audience = [
+    "Toca violão ou teclado em casamentos e eventos",
+    "Quer reduzir o tempo gasto relembrando repertório",
+    "Precisa visualizar pausas e trocas com mais clareza",
+    "Quer construir um acervo próprio com método",
+    "Valoriza chegar ao evento mais seguro e preparado",
+    "Quer trocar repertório e oportunidades com outros músicos",
+  ];
+  return `
+    <header class="site-nav charts-nav">
+      <div class="container site-nav-inner">
+        <a class="brand" href="./"><span class="brand-mark" aria-label="Felipe Figueroa"></span><strong>Felipe Figueroa</strong><span>/ partituras</span></a>
+        <nav class="nav-links" aria-label="Navegação da página de cifras em partitura">
+          <a href="partituras/#partituras/metodo">O método</a><a href="partituras/#partituras/acervo">Ver acervo</a><a href="partituras/#partituras/conteudo">O que você recebe</a><a href="partituras/#partituras/comunidade">Comunidade</a>
+          <span class="nav-access"><a class="btn btn-outline" href="./">Voltar ao site</a><a class="btn btn-primary" href="partituras/#partituras/oferta">Preço fundador ${icons.arrow}</a></span>
+        </nav>
+        <div class="nav-mobile-access"><a class="icon-btn" href="./" aria-label="Voltar ao site">${icons.home}</a><a class="icon-btn" href="partituras/#partituras/oferta" aria-label="Conhecer o acervo">${icons.book}</a></div>
+      </div>
+    </header>
+    <main class="charts-page">
+      <section class="charts-hero">
+        <div class="container charts-hero-grid">
+          <div class="charts-hero-copy">
+            <span class="tag lime"><i class="dot"></i> Repertório de casamento · violão e teclado</span>
+            <h1>Toque sem precisar <span>ouvir tudo de novo.</span></h1>
+            <p>Mais de 358 cifras em partitura: um jeito mais profundo de escrever a música, com pausas e trocas de acordes nos lugares exatos para você bater o olho e saber o que acontece.</p>
+            <div class="charts-hero-actions"><a class="btn btn-primary" href="partituras/#partituras/oferta">Quero o preço fundador ${icons.arrow}</a><a class="btn btn-outline" href="partituras/#partituras/metodo">Entender a diferença ${icons.music}</a></div>
+            <div class="charts-proof"><span>${icons.check} Acervo criado no palco</span><span>${icons.check} Aulas para criar as suas</span><span>${icons.check} Comunidade gratuita</span></div>
+          </div>
+          <figure class="charts-real-product">
+            <img src="assets/partituras-mockup-real.jpg" alt="Mockup com as partituras reais de A Amizade, A Benção e All of Me" width="1536" height="1024" decoding="async">
+            <figcaption><span>Exemplos reais do acervo</span><strong>${catalogMeta.files}</strong><small>partituras catalogadas</small></figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <div class="charts-marquee" aria-hidden="true"><div>${Array(2).fill("PAUSAS NO LUGAR CERTO · TROCAS NO TEMPO CERTO · REPERTÓRIO PRONTO · MENOS HORAS REOUVINDO · ").map(x => `<span>${x}</span>`).join("")}</div></div>
+
+      <section class="sales-section charts-problem">
+        <div class="container charts-problem-grid">
+          <div><span class="eyebrow">A cena se repete</span><h2>Você já tirou essa música. Mas precisa tirar de novo.</h2></div>
+          <div class="charts-problem-copy"><p>A cifra comum mostra os acordes, mas quase sempre esconde o que mais confunde na hora de tocar: quanto tempo ficar em cada um, onde a banda para, quando o acorde muda e como voltar.</p><p>Então, antes de cada casamento, você abre a gravação original outra vez, procura o trecho, tenta lembrar a estrutura e reconstrói um trabalho que já tinha feito.</p><blockquote>Não falta repertório.<br>Falta um mapa que guarde a música por você.</blockquote></div>
+        </div>
+      </section>
+
+      <section class="sales-section charts-method" id="partituras-metodo">
+        <div class="container">
+          <div class="sales-section-head"><span class="eyebrow">A cifra ganhou tempo</span><h2>Mais que acordes.<br>Um mapa de execução.</h2><p>A cifra em partitura registra a estrutura de um jeito visual e detalhado. Você entende onde está, o que vem depois e o momento exato da troca — sem depender da memória.</p></div>
+          <div class="charts-compare">
+            <article class="charts-common"><span>Antes · cifra comum</span><h3>G &nbsp; D &nbsp; Em &nbsp; C</h3><p>Os acordes estão ali. O tempo, as pausas e a estrutura continuam na sua cabeça — ou na gravação.</p><div><i></i><i></i><i></i><i></i></div></article>
+            <article class="charts-detailed"><span>Depois · cifra em partitura</span><div class="mini-chart"><b>G</b><b>D/F#</b><b>Em7</b><b>C9</b></div><p>Compassos organizados, duração visível e marcações que ajudam você a retomar a música com rapidez.</p><ul><li>${icons.check} pausas visíveis</li><li>${icons.check} trocas posicionadas</li><li>${icons.check} estrutura registrada</li></ul></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="sales-section charts-library" id="partituras-conteudo">
+        <div class="container">
+          <div class="charts-library-head"><div><span class="eyebrow">O produto completo</span><h2>Um acervo para tocar.<br>Um método para crescer.</h2></div><strong aria-label="Mais de 358 músicas">358<sup>+</sup></strong></div>
+          <div class="charts-delivery">${delivery.map((item, index) => `<article><span>${String(index + 1).padStart(2, "0")}</span>${item[0]}<h3>${item[1]}</h3><p>${item[2]}</p></article>`).join("")}</div>
+        </div>
+      </section>
+
+      <section class="sales-section charts-catalog" id="partituras-acervo">
+        <div class="container">
+          <div class="charts-catalog-head"><div><span class="eyebrow">Explore antes de entrar</span><h2>Procure no acervo real.</h2><p>Pesquise por título ou artista e refine por tonalidade e tipo de versão. Cada linha representa uma combinação única de música, artista e tom; cópias idênticas aparecem apenas uma vez.</p></div><div class="charts-catalog-stats"><div><strong>${catalogMeta.files}</strong><span>partituras</span></div><div><strong>${catalogMeta.songs}</strong><span>títulos</span></div><div><strong>${catalogMeta.artists}</strong><span>artistas</span></div></div></div>
+          <div class="charts-catalog-toolbar">
+            <label class="charts-catalog-search">${icons.search}<span class="sr-only">Buscar música ou artista</span><input type="search" placeholder="Buscar música ou artista…" autocomplete="off" data-catalog-search></label>
+            <label><span>Artista</span><select data-catalog-artist><option value="">Todos os artistas</option>${artists.map(artist => `<option value="${esc(artist)}">${artist === "Não informado" ? "Sem artista informado" : esc(artist)}</option>`).join("")}</select></label>
+            <label><span>Tom</span><select data-catalog-key><option value="">Todos os tons</option>${keys.map(key => `<option value="${esc(key)}">${esc(key)}</option>`).join("")}</select></label>
+            <label><span>Versão</span><select data-catalog-feature><option value="">Todos os tipos</option>${features.map(feature => `<option value="${esc(feature)}">${esc(feature)}</option>`).join("")}</select></label>
+          </div>
+          <div class="charts-catalog-summary"><strong data-catalog-count>${Math.min(18, catalog.length)} de ${catalog.length}</strong><span>resultados encontrados</span><button type="button" data-action="catalog-clear">Limpar filtros</button></div>
+          <div class="charts-catalog-list-head" aria-hidden="true"><span>#</span><span>Música</span><span>Artista</span><span>Tom</span><span>Detalhes</span></div>
+          <div class="charts-catalog-grid" data-catalog-grid>
+            ${catalog.map((score, index) => { const artistLabel = score.artist === "Não informado" ? "Artista não informado" : score.artist; const keyLabel = score.key || "Original"; const details = [...score.features, ...score.details].slice(0, 2); return `<article class="charts-catalog-row${index >= 18 ? " catalog-overflow" : ""}" data-catalog-card data-search="${esc(score.search)}" data-artists="${esc(score.artist)}" data-keys="${esc(score.key)}" data-features="${esc(score.features.join("|"))}"><span>${String(index + 1).padStart(3, "0")}</span><div><h3>${esc(score.title)}</h3></div><p>${esc(artistLabel)}</p><b class="${score.key ? "" : "no-key"}">${esc(keyLabel)}</b><footer>${details.length ? details.map(detail => `<span>${esc(detail)}</span>`).join("") : `<span>Partitura completa</span>`}</footer></article>`; }).join("")}
+          </div>
+          <div class="charts-catalog-more"><button class="btn btn-outline" type="button" data-action="catalog-more">Mostrar mais partituras ${icons.plus}</button></div>
+          <div class="charts-catalog-empty" data-catalog-empty hidden><strong>Nenhuma partitura encontrada.</strong><span>Tente outro artista, tonalidade ou termo de busca.</span></div>
+        </div>
+      </section>
+
+      <section class="sales-section charts-course">
+        <div class="container charts-course-grid">
+          <div class="charts-course-visual" aria-hidden="true"><span>OUVIR</span><span>MAPEAR</span><span>ESCREVER</span><span>TOCAR</span><div>${icons.music}</div></div>
+          <div class="charts-course-copy"><span class="tag lime">Aulas incluídas</span><h2>Aprenda a escrever as suas próprias cifras.</h2><p>O acervo resolve o repertório que já está pronto. As aulas mostram o raciocínio por trás dele para você ganhar independência nas próximas músicas.</p><ol><li><span>01</span><div><strong>Ouça com intenção</strong><small>Identifique forma, entradas, pausas e pontos de mudança.</small></div></li><li><span>02</span><div><strong>Organize a estrutura</strong><small>Transforme o que você ouviu em um mapa claro.</small></div></li><li><span>03</span><div><strong>Registre para o palco</strong><small>Escreva de um jeito que continue útil meses depois.</small></div></li></ol></div>
+        </div>
+      </section>
+
+      <section class="sales-section charts-community" id="partituras-comunidade">
+        <div class="container charts-community-grid">
+          <div class="charts-community-copy"><span class="tag lime"><i class="dot"></i> Comunidade fundadora · gratuita</span><h2>Uma rede de músicos fica melhor quando mais gente participa.</h2><p>A comunidade nasce aberta para músicos que vivem situações parecidas trocarem repertório, soluções, experiências de palco e oportunidades de trabalho. Nesta fase fundadora, entrar e participar não custa nada.</p><div class="charts-community-tags"><span>Network</span><span>Oportunidades</span><span>Repertório</span><span>Experiência de palco</span></div><a class="btn btn-outline charts-community-cta" href="${communityMail}">Quero entrar gratuitamente ${icons.arrow}</a><small>Se um clube com entregas extras for criado no futuro, ele será separado e opcional.</small></div>
+          <div class="charts-network" aria-label="Representação de uma rede de músicos"><span class="network-person np-1">VIOLÃO</span><span class="network-person np-2">TECLADO</span><span class="network-person np-3">EVENTOS</span><span class="network-person np-4">VOCÊ</span><div class="network-center">${icons.users}<strong>REDE</strong><small>músicos que compartilham</small></div></div>
+        </div>
+      </section>
+
+      <section class="sales-section charts-audience">
+        <div class="container charts-audience-grid"><div><span class="eyebrow">Para quem é</span><h2>Feito para quem não pode improvisar a preparação.</h2><p>Especialmente para músicos que atendem eventos, trabalham com repertórios extensos e precisam recuperar uma música com rapidez.</p></div><div class="charts-check-grid">${audience.map(item => `<div>${icons.check}<span>${item}</span></div>`).join("")}</div></div>
+      </section>
+
+      <section class="sales-section charts-story">
+        <div class="container charts-story-grid"><div class="charts-story-number"><strong>358</strong><span>músicas tiradas<br>uma a uma</span></div><div><span class="eyebrow">Criado na vida real</span><h2>Não nasceu como teoria. Nasceu da necessidade de tocar.</h2><p>Felipe Figueroa construiu esse acervo trabalhando com violão e teclado em casamentos. Cada cifra registra uma música que precisou ser entendida, organizada e executada no momento certo.</p><blockquote>“Eu tiro a música uma vez e não preciso ouvir a original de novo.”</blockquote><small>Felipe Figueroa · músico e professor desde 2010</small></div></div>
+      </section>
+
+      <section class="sales-section charts-offer" id="partituras-oferta">
+        <div class="container charts-offer-grid">
+          <div class="charts-offer-copy"><span class="eyebrow">Oferta fundadora</span><h2>Seu próximo evento pode começar com o repertório pronto.</h2><p>Os primeiros 50 músicos poderão entrar com o menor preço desta fase de lançamento. Depois, o valor passa para a próxima etapa da oferta.</p><div class="charts-offer-badges"><span>${icons.check} 358+ cifras em partitura</span><span>${icons.check} Aulas de escrita</span><span>${icons.check} Comunidade gratuita</span></div></div>
+          <article class="charts-offer-card"><span class="tag lime">Preço fundador · primeiros 50</span><h3>Acervo de cifras em partitura</h3><p>Violão e teclado para casamentos e eventos.</p><div class="charts-price"><span>Pack completo</span><strong><small>R$</small> 147</strong><p>à vista <i>· parcelamento disponível no lançamento</i></p></div><ul><li>${icons.book}<span><strong>Repertório detalhado</strong><small>Pausas, compassos e trocas no ponto certo.</small></span></li><li>${icons.music}<span><strong>Método completo</strong><small>Aprenda também a escrever suas próprias cifras.</small></span></li><li>${icons.users}<span><strong>Comunidade fundadora gratuita</strong><small>Network e oportunidades sem mensalidade nesta fase.</small></span></li></ul><a class="btn btn-primary" href="${launchMail}">Quero garantir o preço fundador ${icons.arrow}</a><small>Sem pagamento agora. O botão abre seu aplicativo de e-mail para entrar na lista.</small></article>
+        </div>
+      </section>
+
+      <section class="sales-section faq-section" id="partituras-duvidas">
+        <div class="container faq-grid"><div><span class="eyebrow">Dúvidas frequentes</span><h2>Antes de entrar no acervo.</h2><p>O essencial para entender a proposta desta nova ferramenta de trabalho.</p></div><div class="faq-list">
+          <details><summary>O que é uma cifra em partitura?</summary><p>É uma forma mais detalhada de registrar a cifra. Além dos acordes, ela organiza a música no tempo e mostra pausas, compassos e pontos de troca com mais precisão.</p></details>
+          <details><summary>Preciso saber ler partitura tradicional?</summary><p>O material parte da linguagem de cifras e acrescenta organização rítmica e estrutural. As aulas incluídas vão ensinar como interpretar e criar esse tipo de anotação.</p></details>
+          <details><summary>O repertório serve para quais instrumentos?</summary><p>O acervo nasceu do trabalho de Felipe tocando violão e teclado em casamentos. A aplicação de cada música pode variar conforme a formação e o arranjo do evento.</p></details>
+          <details><summary>Posso aprender a escrever minhas próprias cifras?</summary><p>Sim. Além do acervo, a proposta inclui aulas ensinando o processo usado para ouvir, mapear e registrar novas músicas.</p></details>
+          <details><summary>Como funciona a comunidade?</summary><p>A comunidade fundadora será gratuita e voltada para network, repertório, experiências e oportunidades entre músicos. Um possível clube futuro com entregas extras será uma oferta separada e opcional.</p></details>
+          <details><summary>Qual será o valor e como recebo o material?</summary><p>O preço fundador do pack completo será de R$ 147 à vista para os primeiros 50 músicos, com possibilidade de parcelamento no lançamento. O formato de entrega e o acesso serão informados antes da abertura das vendas.</p></details>
+        </div></div>
+      </section>
+
+      <section class="sales-final charts-final"><div class="container"><span class="eyebrow">Tire uma vez. Toque sempre.</span><h2>Menos tempo procurando a música.<br>Mais segurança para tocar.</h2><p>Pack completo por R$ 147 no preço fundador para os primeiros 50 músicos.</p><a class="btn btn-primary" href="${launchMail}">Quero o preço fundador ${icons.arrow}</a></div></section>
+      <footer class="sales-footer"><div class="container"><span>© ${new Date().getFullYear()} Felipe Figueroa</span><span>Cifras em partitura · violão e teclado</span><a href="./">Voltar ao site</a></div></footer>
     </main>`;
 }
 
@@ -620,14 +763,16 @@ function loginPage(kind, error = "") {
 function render() {
   const cleanSalesPath = /\/aulas\/?$/.test(location.pathname);
   const cleanDfvPath = /\/de-ferias-com-violao\/?$/.test(location.pathname);
-  const hash = location.hash.replace(/^#/, "") || (cleanSalesPath ? "aulas" : cleanDfvPath ? "dfv" : "home");
+  const cleanPartiturasPath = /\/partituras\/?$/.test(location.pathname);
+  const hash = location.hash.replace(/^#/, "") || (cleanSalesPath ? "aulas" : cleanDfvPath ? "dfv" : cleanPartiturasPath ? "partituras" : "home");
   const [route, id, detailId] = hash.split("/");
   const app = document.querySelector("#app");
-  document.title = route === "aulas" ? "Aulas de Guitarra e Violão — Felipe Figueroa" : route === "dfv" ? "De Férias com o Violão | Felipe Figueroa" : "Felipe Figueroa — Guitarrista & Professor";
+  document.title = route === "aulas" ? "Aulas de Guitarra e Violão — Felipe Figueroa" : route === "dfv" ? "De Férias com o Violão | Felipe Figueroa" : route === "partituras" ? "Cifras em Partitura | Felipe Figueroa" : "Felipe Figueroa — Guitarrista & Professor";
   const professorRoute = ["admin", "dashboard", "agenda", "alunos", "atualizar", "materiais", "pagamentos"].includes(route);
   if (route === "login") app.innerHTML = loginPage(id === "professor" ? "professor" : "aluno");
   else if (route === "aulas") app.innerHTML = salesPage();
   else if (route === "dfv") app.innerHTML = dfvPage();
+  else if (route === "partituras") app.innerHTML = partiturasPage();
   else if (professorRoute && !isProfessorAuthenticated()) app.innerHTML = loginPage("professor");
   else if (route === "admin" || route === "dashboard") app.innerHTML = dashboardPage();
   else if (route === "agenda") app.innerHTML = agendaPage();
@@ -639,7 +784,8 @@ function render() {
   else if (route === "aluno") app.innerHTML = loginPage("aluno");
   else app.innerHTML = publicPage();
   requestAnimationFrame(() => {
-    const targetId = route === "aulas" && id ? `aulas-${id}` : route === "dfv" && id ? `dfv-${id}` : route;
+    if (route === "partituras") { partiturasCatalogLimit = 18; updatePartiturasCatalog(); }
+    const targetId = route === "aulas" && id ? `aulas-${id}` : route === "dfv" && id ? `dfv-${id}` : route === "partituras" && id ? `partituras-${id}` : route;
     const target = document.getElementById(targetId);
     if (target) target.scrollIntoView();
     else window.scrollTo(0, 0);
@@ -773,12 +919,51 @@ function importData() {
   input.onchange = () => { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { try { const parsed = JSON.parse(reader.result); if (!Array.isArray(parsed.students) || !Array.isArray(parsed.lessons)) throw new Error(); db = parsed; saveData(null); toast("Backup importado. Seus dados foram restaurados."); render(); } catch (_) { toast("Arquivo inválido. Escolha um backup deste sistema."); } }; reader.readAsText(file); }; input.click();
 }
 
+function normalizeCatalogSearch(value = "") {
+  return String(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+
+function updatePartiturasCatalog(resetLimit = false) {
+  const grid = document.querySelector("[data-catalog-grid]");
+  if (!grid) return;
+  if (resetLimit) partiturasCatalogLimit = 18;
+  const query = normalizeCatalogSearch(document.querySelector("[data-catalog-search]")?.value);
+  const artist = document.querySelector("[data-catalog-artist]")?.value || "";
+  const key = document.querySelector("[data-catalog-key]")?.value || "";
+  const feature = document.querySelector("[data-catalog-feature]")?.value || "";
+  const cards = [...grid.querySelectorAll("[data-catalog-card]")];
+  const matches = cards.filter(card => {
+    const matchesQuery = !query || card.dataset.search.includes(query);
+    const matchesArtist = !artist || card.dataset.artists.split("|").includes(artist);
+    const matchesKey = !key || card.dataset.keys.split("|").includes(key);
+    const matchesFeature = !feature || card.dataset.features.split("|").includes(feature);
+    const matchesAll = matchesQuery && matchesArtist && matchesKey && matchesFeature;
+    card.classList.toggle("catalog-filtered", !matchesAll);
+    return matchesAll;
+  });
+  matches.forEach((card, index) => card.classList.toggle("catalog-overflow", index >= partiturasCatalogLimit));
+  const shown = Math.min(partiturasCatalogLimit, matches.length);
+  const count = document.querySelector("[data-catalog-count]");
+  if (count) count.textContent = `${shown} de ${matches.length}`;
+  const more = document.querySelector('[data-action="catalog-more"]');
+  if (more) more.hidden = matches.length <= partiturasCatalogLimit;
+  const empty = document.querySelector("[data-catalog-empty]");
+  if (empty) empty.hidden = matches.length > 0;
+}
+
+function clearPartiturasCatalog() {
+  document.querySelectorAll("[data-catalog-search], [data-catalog-artist], [data-catalog-key], [data-catalog-feature]").forEach(field => { field.value = ""; });
+  updatePartiturasCatalog(true);
+}
+
 document.addEventListener("click", e => {
   const route = e.target.closest("[data-route]"); if (route) { location.hash = route.dataset.route; return; }
   const target = e.target.closest("[data-action]"); if (!target) return;
   const action = target.dataset.action;
   if (action === "print-kit") window.print();
   else if (action === "dfv-checkout") toast("Inscrições em breve");
+  else if (action === "catalog-more") { partiturasCatalogLimit += 18; updatePartiturasCatalog(); }
+  else if (action === "catalog-clear") clearPartiturasCatalog();
   else if (action === "toggle-sidebar") document.querySelector("#sidebar")?.classList.toggle("open");
   else if (action === "logout-professor") { sessionStorage.removeItem(PROFESSOR_AUTH_KEY); location.hash = "home"; toast("Sessão do professor encerrada"); }
   else if (action === "logout-student") { sessionStorage.removeItem(STUDENT_AUTH_KEY); location.hash = "home"; toast("Sessão do aluno encerrada"); }
@@ -881,10 +1066,14 @@ document.addEventListener("submit", e => {
 
 document.addEventListener("input", e => {
   if (e.target.id === "student-search") { const value=e.target.value; document.querySelector("#app").innerHTML=studentsPage(value); const input=document.querySelector("#student-search"); input.focus(); input.setSelectionRange(value.length,value.length); }
+  if (e.target.matches("[data-catalog-search]")) updatePartiturasCatalog(true);
   if (e.target.matches("[data-student-note]")) { const id=e.target.dataset.studentNote; db.notes[id]=e.target.value; localStorage.setItem(STORAGE_KEY,JSON.stringify(db)); }
   const quoteForm = e.target.closest("#quote-form");
   if (quoteForm && e.target.matches('[name="quotePlan"]')) updateQuotePreview(quoteForm, true);
   else if (quoteForm && e.target.matches('[name="finalPrice"], [name="mode"]')) updateQuotePreview(quoteForm);
+});
+document.addEventListener("change", e => {
+  if (e.target.matches("[data-catalog-artist], [data-catalog-key], [data-catalog-feature]")) updatePartiturasCatalog(true);
 });
 window.addEventListener("hashchange", render);
 render();
