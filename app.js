@@ -228,8 +228,12 @@ function publicPage() {
         <div class="container">
           <div class="courses-list">
           <div class="course-card">
-            <div class="course-visual"><div class="tuning-disc"><strong>DAD<br>GAD</strong></div></div>
+            <div class="course-visual dadgad-course-visual"><div class="dadgad-brand-lockup" aria-label="Descomplicando o DADGAD"><span>DAD<br>GAD</span></div></div>
             <div class="course-copy"><span class="eyebrow">Curso autoral</span><h2>Descomplicando o DADGAD</h2><p>Um mergulho acessível na afinação celta: da lógica do braço aos voicings, repertório e aplicação musical. Conteúdo em português, feito para você tocar de verdade.</p><div class="course-list"><div>≈ 40 aulas</div><div>Acesso online</div><div>Comunidade</div></div><a class="btn btn-primary" target="_blank" rel="noopener" href="https://descomplicandodadgad.com.br">Conheça o curso ${icons.external}</a></div>
+          </div>
+          <div class="course-card partituras-public-card">
+            <div class="course-visual partituras-course-visual"><img src="assets/partituras-mockup-real.jpg" alt="Violão, teclado e partituras do novo pack" loading="lazy" decoding="async"></div>
+            <div class="course-copy"><span class="eyebrow">Novo material</span><h2>Pack de Partituras</h2><p>Um acervo de cifras em partitura para violão e teclado, com pausas, compassos e trocas de acordes marcados nos lugares exatos. Mais segurança e menos tempo tirando músicas para casamentos e eventos.</p><div class="course-list"><div>358 partituras</div><div>249 músicas</div><div>Aulas e comunidade</div></div><a class="btn btn-primary" href="partituras/">Conheça o novo pack ${icons.arrow}</a></div>
           </div>
           ${SHOW_DFV_COURSE ? `<div class="course-card dfv-public-card"><div class="course-visual dfv-course-visual"><img src="assets/hero-guitar.png" alt="Pessoa tocando violão" loading="lazy" decoding="async"><span>DFV</span></div><div class="course-copy"><span class="eyebrow">Curso para iniciantes</span><h2>De Férias com o Violão</h2><p>Um curso rápido e prático para quem quer sair do zero e começar a tocar suas primeiras músicas no violão.</p><div class="course-list"><div>Aulas em vídeo</div><div>Apostila</div><div>Suporte</div></div><a class="btn btn-primary" href="de-ferias-com-violao/">Conhecer o DFV ${icons.arrow}</a></div></div>` : ""}
           </div>

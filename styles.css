@@ -186,19 +186,33 @@ img { display: block; max-width: 100%; }
 .artist-label span { color: rgba(255,255,255,.62); font: 400 9px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }
 .artist-note { margin: 18px 0 0; color: #74736e; font-size: 12px; }
 
-.course-card { display: grid; grid-template-columns: 1fr 1fr; min-height: 520px; border: 1px solid var(--line); overflow: hidden; }
+.course-card { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); height: clamp(560px, 46vw, 620px); min-height: 520px; border: 1px solid var(--line); overflow: hidden; }
 .courses-list { display: grid; gap: 22px; }
-.course-visual { position: relative; display: grid; place-items: center; background: var(--accent); color: white; overflow: hidden; }
+.course-visual { position: relative; min-width: 0; display: grid; place-items: center; background: var(--accent); color: white; overflow: hidden; }
 .course-visual::before { content: "D A D G A D"; position: absolute; inset: 0; display: grid; place-items: center; font: 700 16vw/1 var(--font-display); color: rgba(0,0,0,.07); white-space: nowrap; transform: rotate(-12deg); }
-.tuning-disc { width: min(330px, 70%); aspect-ratio: 1; border: 1px solid rgba(0,0,0,.35); border-radius: 50%; display: grid; place-items: center; position: relative; }
-.tuning-disc::before, .tuning-disc::after { content: ""; position: absolute; border: 1px solid rgba(0,0,0,.25); border-radius: 50%; inset: 12%; }
-.tuning-disc::after { inset: 24%; }
-.tuning-disc strong { font: 600 clamp(68px, 8vw, 108px)/1 var(--font-display); z-index: 1; }
-.course-copy { padding: clamp(36px, 5vw, 74px); display: flex; flex-direction: column; justify-content: center; background: var(--panel); }
+.dadgad-course-visual {
+  background: radial-gradient(circle at 50% 45%, rgba(95,124,255,.2), transparent 38%), linear-gradient(145deg, #090a0f, #020204 72%);
+  box-shadow: inset 0 0 110px rgba(0,0,0,.58);
+}
+.dadgad-course-visual::before { content: none; }
+.dadgad-brand-lockup {
+  position: relative; z-index: 2; display: inline-flex; align-items: center; gap: .85rem; color: #f0eee7;
+  font-size: .68rem; line-height: 1.05; letter-spacing: .04em; text-align: left; text-transform: uppercase;
+}
+.dadgad-brand-lockup > span {
+  width: clamp(250px, 25vw, 310px); aspect-ratio: 1; display: grid; place-items: center; border: 2px solid rgba(130,153,255,.42); border-radius: 50%;
+  color: #8299ff; font-family: var(--font-display); font-size: clamp(68px, 7vw, 86px); font-weight: 600; line-height: .8; text-align: center;
+  box-shadow: 0 0 80px rgba(95,124,255,.12), inset 0 0 45px rgba(95,124,255,.035);
+}
+.course-copy { min-width: 0; padding: clamp(36px, 5vw, 74px); display: flex; flex-direction: column; justify-content: center; background: var(--panel); }
 .course-copy h2 { margin: 18px 0 20px; font: 500 clamp(45px, 5vw, 70px)/.95 var(--font-display); text-transform: uppercase; }
 .course-copy p { color: var(--muted); margin: 0 0 30px; }
 .course-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 34px; }
 .course-list div { padding-top: 12px; border-top: 1px solid var(--line); font: 400 10px/1.4 var(--font-mono); color: #c5c3bd; text-transform: uppercase; }
+.partituras-course-visual { background: #151516; }
+.partituras-course-visual::before { content: ""; z-index: 1; background: linear-gradient(135deg, rgba(8,8,8,.06), rgba(8,8,8,.48)); transform: none; }
+.partituras-course-visual img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
+.partituras-public-card:hover .partituras-course-visual img { transform: scale(1.025); }
 .dfv-course-visual img { width: 100%; height: 100%; object-fit: cover; }
 .dfv-course-visual::after { content: ""; position: absolute; inset: 0; background: linear-gradient(130deg, rgba(8,8,8,.1), rgba(8,8,8,.7)); }
 .dfv-course-visual > span { position: absolute; z-index: 1; color: white; font: 600 clamp(80px, 10vw, 140px)/1 var(--font-display); letter-spacing: -.04em; }
@@ -931,6 +945,8 @@ select.field { appearance: none; }
   .hero-side-note { display: none; }
   .section-head { grid-template-columns: 1fr; gap: 12px; }
   .about-grid, .course-card, .student-grid { grid-template-columns: 1fr; }
+  .course-card { height: auto; }
+  .course-visual { height: clamp(420px, 60vw, 560px); min-height: 0; }
   .artist-grid { grid-template-columns: repeat(2, 1fr); }
   .metrics { grid-template-columns: repeat(2, 1fr); }
   .dashboard-grid { grid-template-columns: 1fr; }
@@ -990,7 +1006,8 @@ select.field { appearance: none; }
   .artist-grid { grid-auto-rows: 210px; }
   .artist-card:first-child { grid-column: span 2; }
   .course-card { min-height: 0; }
-  .course-visual { min-height: 370px; }
+  .course-visual { height: 370px; min-height: 370px; }
+  .dadgad-brand-lockup > span { width: clamp(210px, 58vw, 250px); font-size: clamp(58px, 16vw, 69px); }
   .course-list { grid-template-columns: 1fr; }
   .contact-big { align-items: flex-start; flex-direction: column; }
   .contact-links { width: 100%; }
