@@ -4,6 +4,7 @@ const STUDENT_AUTH_KEY = "ff-student-auth";
 const WORKBOOK_URL = "assets/materials/apostila-facilitando-o-violao.pdf";
 const EVENT_SOURCE_URL = "https://drive.google.com/file/d/1W0algsCcY671wriIHv7XLCmq-xt2Iuqk/view";
 const EVENT_SYNC_URL = "assets/data/eventos.json";
+const PUBLIC_AGENDA_URL = "assets/data/agenda-eventos.json";
 const DFV_OFFER = { regularPrice: 67, launchPrice: 47 };
 // TODO(DFV): insira aqui a URL definitiva do checkout. Todos os CTAs usam este único valor.
 const DFV_CHECKOUT_URL = "";
@@ -146,6 +147,8 @@ function loadData() {
 let db = loadData();
 let partiturasCatalogLimit = 18;
 let eventSyncInProgress = false;
+let publicAgendaHistory = [];
+let publicAgendaStatus = "loading";
 const cashFilters = {
   mode: "month",
   year: String(new Date().getFullYear()),
@@ -200,7 +203,8 @@ async function syncEventCash(showFeedback = false) {
       status: "ok",
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-    if (location.hash.replace(/^#/, "").split("/")[0] === "eventos" && isProfessorAuthenticated()) render();
+    const currentRoute = location.hash.replace(/^#/, "").split("/")[0] || "home";
+    if ((currentRoute === "eventos" && isProfessorAuthenticated()) || ["home","sobre","trabalhos","agenda-publica","curso","contato"].includes(currentRoute)) render();
     if (showFeedback) toast(`${incoming.length} eventos carregados da planilha`);
   } catch (_) {
     db.eventSync = { ...(db.eventSync || {}), status:"error" };
@@ -209,6 +213,74 @@ async function syncEventCash(showFeedback = false) {
   } finally {
     eventSyncInProgress = false;
   }
+}
+
+async function loadPublicAgendaHistory() {
+  try {
+    const response = await fetch(`${PUBLIC_AGENDA_URL}?v=${Date.now()}`, { cache:"no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const payload = await response.json();
+    if (!Array.isArray(payload.events)) throw new Error("Formato inválido");
+    publicAgendaHistory = payload.events.map(event => ({
+      date: String(event.date || ""),
+      type: String(event.type || "Evento"),
+      partner: String(event.partner || "Equipe musical"),
+    })).filter(event => /^\d{4}-\d{2}-\d{2}$/.test(event.date));
+    publicAgendaStatus = "ready";
+  } catch (_) {
+    publicAgendaStatus = "error";
+  }
+  const currentRoute = location.hash.replace(/^#/, "").split("/")[0] || "home";
+  if (["home","sobre","trabalhos","agenda-publica","curso","contato"].includes(currentRoute)) render();
+}
+
+function publicAgendaDate(date) {
+  return fmtDate(`${date}T12:00:00`, { day:"2-digit", month:"short", year:"numeric" });
+}
+
+function publicAgendaEntries() {
+  const financialEvents = db.events.filter(event => event.source === "spreadsheet" && /^\d{4}-\d{2}-\d{2}/.test(event.date || "")).map(event => ({
+    date: event.date.slice(0, 10),
+    type: event.type || "Evento",
+    partner: event.group || "Equipe musical",
+  }));
+  const entries = [...publicAgendaHistory, ...financialEvents];
+  return [...new Map(entries.map(event => [[event.date,event.type,event.partner].join("|"), event])).values()]
+    .sort((a,b) => a.date.localeCompare(b.date) || a.type.localeCompare(b.type,"pt-BR") || a.partner.localeCompare(b.partner,"pt-BR"));
+}
+
+function publicAgendaRow(event) {
+  return `<article class="public-agenda-row"><time datetime="${event.date}">${publicAgendaDate(event.date)}</time><span class="public-agenda-type">${esc(event.type)}</span><strong>${esc(event.partner)}</strong></article>`;
+}
+
+function publicAgendaSection() {
+  if (publicAgendaStatus === "loading") return `<section class="public-section public-agenda-section" id="agenda-publica"><div class="container"><div class="public-agenda-loading">Organizando o histórico de eventos...</div></div></section>`;
+  if (publicAgendaStatus === "error") return `<section class="public-section public-agenda-section" id="agenda-publica"><div class="container"><div class="public-agenda-loading">A agenda está temporariamente indisponível.</div></div></section>`;
+
+  const today = new Date();
+  const todayKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
+  const entries = publicAgendaEntries();
+  const past = entries.filter(event => event.date < todayKey).sort((a,b) => b.date.localeCompare(a.date));
+  const future = entries.filter(event => event.date >= todayKey);
+  const featuredFuture = future.slice(0, 8);
+  const moreFuture = future.slice(8);
+  const years = [...new Set(past.map(event => event.date.slice(0,4)))].sort((a,b) => b.localeCompare(a));
+
+  return `<section class="public-section public-agenda-section" id="agenda-publica">
+    <div class="container">
+      <div class="section-head"><span class="eyebrow">03 / Agenda</span><div><h2>Experiência em cena,<br>data por data.</h2><p>Casamentos, recepções, festas e shows que fazem parte da trajetória profissional de Felipe.</p></div></div>
+      <div class="public-agenda-summary"><div><strong>${past.length}</strong><span>eventos realizados</span></div><div><strong>${future.length}</strong><span>próximas datas</span></div><p>Histórico profissional organizado a partir dos registros do Google Agenda. Exibimos somente data, tipo de evento e parceria musical.</p></div>
+      <div class="public-agenda-columns">
+        <section class="public-agenda-block upcoming"><header><span class="eyebrow">Próximos eventos</span><h3>Agenda futura</h3></header>
+          <div class="public-agenda-list">${featuredFuture.length ? featuredFuture.map(publicAgendaRow).join("") : `<p class="public-agenda-empty">Novas datas serão divulgadas em breve.</p>`}</div>
+          ${moreFuture.length ? `<details class="public-agenda-more"><summary>Ver mais ${moreFuture.length} ${moreFuture.length === 1 ? "data futura" : "datas futuras"} ${icons.arrow}</summary><div class="public-agenda-list">${moreFuture.map(publicAgendaRow).join("")}</div></details>` : ""}
+        </section>
+        <section class="public-agenda-block history"><header><span class="eyebrow">Arquivo</span><h3>Eventos passados</h3><p>Abra um ano para consultar todas as participações.</p></header>
+          <div class="public-agenda-years">${years.map(year => { const yearEvents=past.filter(event=>event.date.startsWith(year)); return `<details><summary><strong>${year}</strong><span>${yearEvents.length} ${yearEvents.length === 1 ? "evento" : "eventos"}</span>${icons.arrow}</summary><div class="public-agenda-list">${yearEvents.map(publicAgendaRow).join("")}</div></details>`; }).join("")}</div>
+        </section>
+      </div>
+    </div>
+  </section>`;
 }
 
 function esc(value = "") {
@@ -272,7 +344,7 @@ function publicPage() {
       <div class="container site-nav-inner">
         <a class="brand" href="#home"><span class="brand-mark" aria-label="Felipe Figueroa"></span><strong>Felipe Figueroa</strong><span>/ guitar</span></a>
         <nav class="nav-links" aria-label="Navegação principal">
-          <a href="#sobre">Sobre</a><a href="#trabalhos">Trabalhos</a><a href="#curso">Curso</a><a href="#contato">Contato</a>
+          <a href="#sobre">Sobre</a><a href="#trabalhos">Trabalhos</a><a href="#agenda-publica">Agenda</a><a href="#curso">Curso</a><a href="#contato">Contato</a>
           <span class="nav-access"><a class="btn btn-outline" href="#login/aluno">Aluno</a><a class="btn btn-primary" href="#login/professor">Professor ${icons.arrow}</a></span>
         </nav>
         <div class="nav-mobile-access"><a class="icon-btn" href="#login/aluno" aria-label="Acesso do aluno" title="Aluno">${icons.book}</a><a class="icon-btn" href="#login/professor" aria-label="Acesso do professor" title="Professor">${icons.users}</a></div>
@@ -320,6 +392,8 @@ function publicPage() {
           <p class="artist-note">Trabalhos e encontros que atravessam diferentes fases da carreira.</p>
         </div>
       </section>
+
+      ${publicAgendaSection()}
 
       <section class="public-section" id="curso">
         <div class="container">
@@ -1363,3 +1437,4 @@ document.addEventListener("change", e => {
 window.addEventListener("hashchange", render);
 render();
 syncEventCash();
+loadPublicAgendaHistory();

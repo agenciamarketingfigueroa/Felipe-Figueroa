@@ -15,6 +15,7 @@ Depois acesse `http://localhost:4173`.
 ## Rotas principais
 
 - `#home` — site institucional e mídia kit
+- `#agenda-publica` — agenda pública de casamentos, festas, recepções e shows
 - `/aulas/` — página não listada de vendas das aulas, formatos e planos
 - `/partituras/` — página de pré-lançamento do acervo de cifras em partitura
 - `#login/professor` — login do professor
@@ -67,6 +68,10 @@ Na agenda, use **Finalizar aula** para abrir a atualização pedagógica daquele
 ## Propostas pelo WhatsApp
 
 Na lista de alunos, o botão com o ícone do WhatsApp abre uma proposta pronta. Escolha o plano e a modalidade, revise a mensagem e, se necessário, edite o preço final para condições especiais. Os preços da página pública e do orçamento são definidos uma única vez em `LESSON_PLANS`, no início de `app.js`.
+
+## Agenda pública
+
+A seção `#agenda-publica` exibe somente data, tipo e parceria musical. As próximas oito datas aparecem abertas e as demais ficam em um controle “ver mais”. O histórico é agrupado por ano e permanece fechado até o visitante escolher um período. A base histórica em `assets/data/agenda-eventos.json` foi consolidada a partir do Google Agenda com exclusão de ensaios, reuniões, gravações, passagens de som e shows identificados como participação do público. Eventos futuros vêm da planilha financeira sincronizada, mas nenhum valor, cliente, endereço ou observação financeira é mostrado na página pública.
 
 ## Caixa de eventos
 

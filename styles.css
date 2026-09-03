@@ -186,6 +186,36 @@ img { display: block; max-width: 100%; }
 .artist-label span { color: rgba(255,255,255,.62); font: 400 9px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }
 .artist-note { margin: 18px 0 0; color: #74736e; font-size: 12px; }
 
+.public-agenda-section { position: relative; overflow: hidden; background: radial-gradient(circle at 88% 8%, rgba(95,124,255,.13), transparent 26%), #0b0b0b; }
+.public-agenda-section::before { content: "LIVE"; position: absolute; right: -2vw; top: 80px; color: rgba(255,255,255,.018); font: 700 clamp(120px,20vw,280px)/1 var(--font-display); pointer-events: none; }
+.public-agenda-summary { position: relative; display: grid; grid-template-columns: auto auto minmax(260px,1fr); align-items: end; gap: 38px; padding: 26px 0; margin-bottom: 28px; border-block: 1px solid var(--line); }
+.public-agenda-summary > div strong { display: block; color: #8299ff; font: 500 clamp(46px,5vw,68px)/.85 var(--font-display); }
+.public-agenda-summary > div span { display: block; margin-top: 9px; color: #8e8c85; font: 500 9px/1.3 var(--font-mono); letter-spacing: .09em; text-transform: uppercase; }
+.public-agenda-summary > p { max-width: 500px; justify-self: end; margin: 0; color: var(--muted); font-size: 13px; }
+.public-agenda-columns { position: relative; display: grid; grid-template-columns: minmax(0,1.05fr) minmax(340px,.95fr); gap: 18px; align-items: start; }
+.public-agenda-block { border: 1px solid var(--line); background: rgba(16,16,16,.88); }
+.public-agenda-block > header { padding: 28px 30px 24px; border-bottom: 1px solid var(--line); }
+.public-agenda-block > header h3 { margin: 10px 0 0; font: 500 clamp(30px,3.2vw,44px)/1 var(--font-display); text-transform: uppercase; }
+.public-agenda-block > header p { margin: 9px 0 0; color: var(--muted); font-size: 12px; }
+.public-agenda-list { display: grid; }
+.public-agenda-row { display: grid; grid-template-columns: 132px 104px minmax(0,1fr); gap: 14px; align-items: center; min-height: 66px; padding: 14px 30px; border-bottom: 1px solid var(--line); }
+.public-agenda-row:last-child { border-bottom: 0; }
+.public-agenda-row time { color: #aaa8a1; font: 400 10px/1.3 var(--font-mono); text-transform: uppercase; }
+.public-agenda-row strong { overflow: hidden; color: #eceae3; font: 500 15px/1.25 var(--font-display); text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.public-agenda-type { width: fit-content; padding: 6px 8px; border: 1px solid rgba(130,153,255,.35); border-radius: 999px; color: #aebcff; font: 500 8px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; }
+.public-agenda-more > summary, .public-agenda-years > details > summary { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 62px; padding: 16px 30px; color: #cac8c1; cursor: pointer; list-style: none; font: 500 10px/1.2 var(--font-mono); letter-spacing: .05em; text-transform: uppercase; }
+.public-agenda-more > summary::-webkit-details-marker, .public-agenda-years > details > summary::-webkit-details-marker { display: none; }
+.public-agenda-more > summary { border-top: 1px solid var(--line); }
+.public-agenda-more > summary .icon, .public-agenda-years summary .icon { width: 15px; flex: 0 0 auto; transition: transform .2s ease; }
+.public-agenda-more[open] > summary .icon, .public-agenda-years details[open] > summary .icon { transform: rotate(90deg); }
+.public-agenda-years > details { border-bottom: 1px solid var(--line); }
+.public-agenda-years > details:last-child { border-bottom: 0; }
+.public-agenda-years > details > summary strong { color: #eceae3; font: 500 26px/1 var(--font-display); }
+.public-agenda-years > details > summary span { margin-left: auto; color: #77756f; }
+.public-agenda-years .public-agenda-list { max-height: 520px; overflow-y: auto; border-top: 1px solid var(--line); background: #0d0d0d; }
+.public-agenda-empty, .public-agenda-loading { margin: 0; padding: 36px 30px; color: var(--muted); font-size: 13px; }
+.public-agenda-loading { border: 1px solid var(--line); background: var(--panel); }
+
 .course-card { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); height: clamp(560px, 46vw, 620px); min-height: 520px; border: 1px solid var(--line); overflow: hidden; }
 .courses-list { display: grid; gap: 22px; }
 .course-visual { position: relative; min-width: 0; display: grid; place-items: center; background: var(--accent); color: white; overflow: hidden; }
@@ -996,6 +1026,8 @@ select.field { appearance: none; }
   .course-card { height: auto; }
   .course-visual { height: clamp(420px, 60vw, 560px); min-height: 0; }
   .artist-grid { grid-template-columns: repeat(2, 1fr); }
+  .public-agenda-columns { grid-template-columns: 1fr; }
+  .public-agenda-summary { grid-template-columns: auto auto 1fr; gap: 24px; }
   .metrics { grid-template-columns: repeat(2, 1fr); }
   .cash-filters { grid-template-columns: repeat(3, 1fr); }
   .cash-search { grid-column: span 2; }
@@ -1055,6 +1087,14 @@ select.field { appearance: none; }
   .about-statement { min-height: 400px; padding: 27px; }
   .artist-grid { grid-auto-rows: 210px; }
   .artist-card:first-child { grid-column: span 2; }
+  .public-agenda-summary { grid-template-columns: 1fr 1fr; align-items: start; }
+  .public-agenda-summary > p { grid-column: 1 / -1; justify-self: start; }
+  .public-agenda-block > header { padding: 24px 20px 20px; }
+  .public-agenda-row { grid-template-columns: 1fr auto; gap: 8px 12px; padding: 14px 20px; }
+  .public-agenda-row time { grid-column: 1; }
+  .public-agenda-row .public-agenda-type { grid-column: 2; grid-row: 1; }
+  .public-agenda-row strong { grid-column: 1 / -1; grid-row: 2; white-space: normal; }
+  .public-agenda-more > summary, .public-agenda-years > details > summary { padding-inline: 20px; }
   .course-card { min-height: 0; }
   .course-visual { height: 370px; min-height: 370px; }
   .dadgad-brand-lockup > span { width: clamp(210px, 58vw, 250px); font-size: clamp(58px, 16vw, 69px); }
