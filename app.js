@@ -149,6 +149,7 @@ let partiturasCatalogLimit = 18;
 let eventSyncInProgress = false;
 let publicAgendaHistory = [];
 let publicAgendaStatus = "loading";
+let publicAgendaFilter = "all";
 const cashFilters = {
   mode: "month",
   year: String(new Date().getFullYear()),
@@ -225,6 +226,7 @@ async function loadPublicAgendaHistory() {
       date: String(event.date || ""),
       type: String(event.type || "Evento"),
       partner: String(event.partner || "Equipe musical"),
+      location: String(event.location || ""),
     })).filter(event => /^\d{4}-\d{2}-\d{2}$/.test(event.date));
     publicAgendaStatus = "ready";
   } catch (_) {
@@ -243,14 +245,21 @@ function publicAgendaEntries() {
     date: event.date.slice(0, 10),
     type: event.type || "Evento",
     partner: event.group || "Equipe musical",
+    location: event.venue || "",
   }));
-  const entries = [...publicAgendaHistory, ...financialEvents];
-  return [...new Map(entries.map(event => [[event.date,event.type,event.partner].join("|"), event])).values()]
+  return [...publicAgendaHistory, ...financialEvents]
     .sort((a,b) => a.date.localeCompare(b.date) || a.type.localeCompare(b.type,"pt-BR") || a.partner.localeCompare(b.partner,"pt-BR"));
 }
 
+function publicAgendaCategory(type = "") {
+  const normalized = slugify(type);
+  if (normalized.startsWith("casamento")) return "casamento";
+  if (normalized.startsWith("show")) return "show";
+  return "festa";
+}
+
 function publicAgendaRow(event) {
-  return `<article class="public-agenda-row"><time datetime="${event.date}">${publicAgendaDate(event.date)}</time><span class="public-agenda-type">${esc(event.type)}</span><strong>${esc(event.partner)}</strong></article>`;
+  return `<article class="public-agenda-row"><time datetime="${event.date}">${publicAgendaDate(event.date)}</time><span class="public-agenda-type">${esc(event.type)}</span><div class="public-agenda-info"><strong>${esc(event.partner)}</strong>${event.location ? `<span class="public-agenda-location"><b>Onde</b> ${esc(event.location)}</span>` : ""}</div></article>`;
 }
 
 function publicAgendaSection() {
@@ -260,23 +269,35 @@ function publicAgendaSection() {
   const today = new Date();
   const todayKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
   const entries = publicAgendaEntries();
-  const past = entries.filter(event => event.date < todayKey).sort((a,b) => b.date.localeCompare(a.date));
-  const future = entries.filter(event => event.date >= todayKey);
+  const allPast = entries.filter(event => event.date < todayKey).sort((a,b) => b.date.localeCompare(a.date));
+  const allFuture = entries.filter(event => event.date >= todayKey);
+  const matchesFilter = event => publicAgendaFilter === "all" || publicAgendaCategory(event.type) === publicAgendaFilter;
+  const past = allPast.filter(matchesFilter);
+  const future = allFuture.filter(matchesFilter);
   const featuredFuture = future.slice(0, 8);
   const moreFuture = future.slice(8);
   const years = [...new Set(past.map(event => event.date.slice(0,4)))].sort((a,b) => b.localeCompare(a));
+  const counts = { casamento:0, festa:0, show:0 };
+  allPast.forEach(event => { counts[publicAgendaCategory(event.type)] += 1; });
+  const filters = [
+    ["all", "Todos", allPast.length],
+    ["casamento", "Casamentos", counts.casamento],
+    ["festa", "Festas e recepções", counts.festa],
+    ["show", "Shows", counts.show],
+  ];
 
   return `<section class="public-section public-agenda-section" id="agenda-publica">
     <div class="container">
       <div class="section-head"><span class="eyebrow">03 / Agenda</span><div><h2>Experiência em cena,<br>data por data.</h2><p>Casamentos, recepções, festas e shows que fazem parte da trajetória profissional de Felipe.</p></div></div>
-      <div class="public-agenda-summary"><div><strong>${past.length}</strong><span>eventos realizados</span></div><div><strong>${future.length}</strong><span>próximas datas</span></div><p>Histórico profissional organizado a partir dos registros do Google Agenda. Exibimos somente data, tipo de evento e parceria musical.</p></div>
+      <div class="public-agenda-summary"><div><strong>${allPast.length}</strong><span>eventos realizados</span></div><div><strong>${allFuture.length}</strong><span>próximas datas</span></div><p>Histórico profissional organizado a partir dos registros do Google Agenda. Exibimos data, tipo, local quando disponível e parceria musical.</p></div>
+      <div class="public-agenda-filter-wrap"><div><span class="eyebrow">Filtrar por tipo</span><p>Veja quantas participações já foram realizadas em cada categoria.</p></div><div class="public-agenda-filters" role="group" aria-label="Filtrar agenda por tipo de evento">${filters.map(([value,label,count]) => `<button type="button" class="public-agenda-filter ${publicAgendaFilter === value ? "active" : ""}" data-action="filter-public-agenda" data-filter="${value}" aria-pressed="${publicAgendaFilter === value}"><span>${esc(label)}</span><strong>${count}</strong></button>`).join("")}</div></div>
       <div class="public-agenda-columns">
         <section class="public-agenda-block upcoming"><header><span class="eyebrow">Próximos eventos</span><h3>Agenda futura</h3></header>
           <div class="public-agenda-list">${featuredFuture.length ? featuredFuture.map(publicAgendaRow).join("") : `<p class="public-agenda-empty">Novas datas serão divulgadas em breve.</p>`}</div>
           ${moreFuture.length ? `<details class="public-agenda-more"><summary>Ver mais ${moreFuture.length} ${moreFuture.length === 1 ? "data futura" : "datas futuras"} ${icons.arrow}</summary><div class="public-agenda-list">${moreFuture.map(publicAgendaRow).join("")}</div></details>` : ""}
         </section>
-        <section class="public-agenda-block history"><header><span class="eyebrow">Arquivo</span><h3>Eventos passados</h3><p>Abra um ano para consultar todas as participações.</p></header>
-          <div class="public-agenda-years">${years.map(year => { const yearEvents=past.filter(event=>event.date.startsWith(year)); return `<details><summary><strong>${year}</strong><span>${yearEvents.length} ${yearEvents.length === 1 ? "evento" : "eventos"}</span>${icons.arrow}</summary><div class="public-agenda-list">${yearEvents.map(publicAgendaRow).join("")}</div></details>`; }).join("")}</div>
+        <section class="public-agenda-block history"><header><span class="eyebrow">Arquivo</span><h3>Eventos passados</h3><p>Abra um ano para consultar todas as participações${publicAgendaFilter === "all" ? "" : " desta categoria"}.</p></header>
+          <div class="public-agenda-years">${years.length ? years.map(year => { const yearEvents=past.filter(event=>event.date.startsWith(year)); return `<details><summary><strong>${year}</strong><span>${yearEvents.length} ${yearEvents.length === 1 ? "evento" : "eventos"}</span>${icons.arrow}</summary><div class="public-agenda-list">${yearEvents.map(publicAgendaRow).join("")}</div></details>`; }).join("") : `<p class="public-agenda-empty">Nenhum evento encontrado neste filtro.</p>`}</div>
         </section>
       </div>
     </div>
@@ -1250,6 +1271,7 @@ document.addEventListener("click", e => {
   const target = e.target.closest("[data-action]"); if (!target) return;
   const action = target.dataset.action;
   if (action === "print-kit") window.print();
+  else if (action === "filter-public-agenda") { publicAgendaFilter = target.dataset.filter || "all"; render(); }
   else if (action === "dfv-checkout") toast("Inscrições em breve");
   else if (action === "catalog-more") { partiturasCatalogLimit += 18; updatePartiturasCatalog(); }
   else if (action === "catalog-clear") clearPartiturasCatalog();

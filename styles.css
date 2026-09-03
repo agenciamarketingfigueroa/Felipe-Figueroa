@@ -192,6 +192,13 @@ img { display: block; max-width: 100%; }
 .public-agenda-summary > div strong { display: block; color: #8299ff; font: 500 clamp(46px,5vw,68px)/.85 var(--font-display); }
 .public-agenda-summary > div span { display: block; margin-top: 9px; color: #8e8c85; font: 500 9px/1.3 var(--font-mono); letter-spacing: .09em; text-transform: uppercase; }
 .public-agenda-summary > p { max-width: 500px; justify-self: end; margin: 0; color: var(--muted); font-size: 13px; }
+.public-agenda-filter-wrap { position: relative; display: grid; grid-template-columns: minmax(220px,.7fr) minmax(0,1.3fr); align-items: end; gap: 30px; margin-bottom: 28px; }
+.public-agenda-filter-wrap > div:first-child p { max-width: 340px; margin: 9px 0 0; color: var(--muted); font-size: 12px; }
+.public-agenda-filters { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 8px; }
+.public-agenda-filter { display: flex; min-width: 0; min-height: 64px; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 14px; border: 1px solid var(--line); background: rgba(16,16,16,.88); color: #9c9a94; cursor: pointer; font: 500 9px/1.25 var(--font-mono); letter-spacing: .04em; text-align: left; text-transform: uppercase; transition: border-color .2s ease, background .2s ease, color .2s ease; }
+.public-agenda-filter strong { color: #eceae3; font: 500 25px/1 var(--font-display); }
+.public-agenda-filter:hover, .public-agenda-filter.active { border-color: rgba(130,153,255,.65); background: rgba(95,124,255,.14); color: #c9d1ff; }
+.public-agenda-filter:focus-visible { outline: 2px solid #8299ff; outline-offset: 2px; }
 .public-agenda-columns { position: relative; display: grid; grid-template-columns: minmax(0,1.05fr) minmax(340px,.95fr); gap: 18px; align-items: start; }
 .public-agenda-block { border: 1px solid var(--line); background: rgba(16,16,16,.88); }
 .public-agenda-block > header { padding: 28px 30px 24px; border-bottom: 1px solid var(--line); }
@@ -201,7 +208,10 @@ img { display: block; max-width: 100%; }
 .public-agenda-row { display: grid; grid-template-columns: 132px 104px minmax(0,1fr); gap: 14px; align-items: center; min-height: 66px; padding: 14px 30px; border-bottom: 1px solid var(--line); }
 .public-agenda-row:last-child { border-bottom: 0; }
 .public-agenda-row time { color: #aaa8a1; font: 400 10px/1.3 var(--font-mono); text-transform: uppercase; }
-.public-agenda-row strong { overflow: hidden; color: #eceae3; font: 500 15px/1.25 var(--font-display); text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.public-agenda-info { min-width: 0; }
+.public-agenda-info strong { display: block; overflow: hidden; color: #eceae3; font: 500 15px/1.25 var(--font-display); text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.public-agenda-location { display: block; margin-top: 5px; overflow: hidden; color: #77756f; font-size: 10px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+.public-agenda-location b { margin-right: 5px; color: #aaa8a1; font: 500 8px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; }
 .public-agenda-type { width: fit-content; padding: 6px 8px; border: 1px solid rgba(130,153,255,.35); border-radius: 999px; color: #aebcff; font: 500 8px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; }
 .public-agenda-more > summary, .public-agenda-years > details > summary { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 62px; padding: 16px 30px; color: #cac8c1; cursor: pointer; list-style: none; font: 500 10px/1.2 var(--font-mono); letter-spacing: .05em; text-transform: uppercase; }
 .public-agenda-more > summary::-webkit-details-marker, .public-agenda-years > details > summary::-webkit-details-marker { display: none; }
@@ -1028,6 +1038,7 @@ select.field { appearance: none; }
   .artist-grid { grid-template-columns: repeat(2, 1fr); }
   .public-agenda-columns { grid-template-columns: 1fr; }
   .public-agenda-summary { grid-template-columns: auto auto 1fr; gap: 24px; }
+  .public-agenda-filter-wrap { grid-template-columns: 1fr; gap: 16px; }
   .metrics { grid-template-columns: repeat(2, 1fr); }
   .cash-filters { grid-template-columns: repeat(3, 1fr); }
   .cash-search { grid-column: span 2; }
@@ -1089,11 +1100,13 @@ select.field { appearance: none; }
   .artist-card:first-child { grid-column: span 2; }
   .public-agenda-summary { grid-template-columns: 1fr 1fr; align-items: start; }
   .public-agenda-summary > p { grid-column: 1 / -1; justify-self: start; }
+  .public-agenda-filters { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .public-agenda-block > header { padding: 24px 20px 20px; }
   .public-agenda-row { grid-template-columns: 1fr auto; gap: 8px 12px; padding: 14px 20px; }
   .public-agenda-row time { grid-column: 1; }
   .public-agenda-row .public-agenda-type { grid-column: 2; grid-row: 1; }
-  .public-agenda-row strong { grid-column: 1 / -1; grid-row: 2; white-space: normal; }
+  .public-agenda-info { grid-column: 1 / -1; grid-row: 2; }
+  .public-agenda-info strong, .public-agenda-location { white-space: normal; }
   .public-agenda-more > summary, .public-agenda-years > details > summary { padding-inline: 20px; }
   .course-card { min-height: 0; }
   .course-visual { height: 370px; min-height: 370px; }
