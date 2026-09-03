@@ -704,6 +704,8 @@ select.field { appearance: none; }
 .cash-source-link { display: inline-flex; align-items: center; gap: 7px; }
 .cash-source-link:hover { color: #9aafff; }
 .cash-source-link .icon { width: 13px; }
+.cash-sync-summary { display: flex; align-items: center; justify-content: flex-end; gap: 9px; flex-wrap: wrap; }
+.cash-sync-summary .btn { min-height: 36px; }
 .cash-filters { display: grid; grid-template-columns: 1fr .75fr 1fr 1fr 1fr minmax(220px, 1.6fr); gap: 10px; margin-bottom: 18px; padding: 16px; background: #141414; border: 1px solid var(--line); border-radius: 13px; }
 .cash-filters > label > span { display: block; margin: 0 0 7px; color: #77756f; font: 500 8px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .08em; }
 .cash-filters > label[hidden] { display: none; }
@@ -1069,6 +1071,7 @@ select.field { appearance: none; }
   .cash-search { grid-column: 1 / -1; }
   .cash-period-heading { align-items: flex-start; flex-direction: column; gap: 5px; }
   .cash-source-link { margin-top: 3px; }
+  .cash-sync-summary { justify-content: flex-start; margin-top: 3px; }
   .cash-table { min-width: 720px; }
   .cash-table th:nth-child(3), .cash-table td:nth-child(3), .cash-table th:nth-child(4), .cash-table td:nth-child(4) { display: none; }
   .data-table.debtor-table th:nth-child(3), .data-table.debtor-table td:nth-child(3), .data-table.debtor-table th:nth-child(4), .data-table.debtor-table td:nth-child(4) { display: table-cell; }

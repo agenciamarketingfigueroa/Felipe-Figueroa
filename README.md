@@ -40,7 +40,7 @@ As sessões usam `sessionStorage` e são encerradas ao clicar em **Sair** ou ao 
 
 Use **Exportar dados** ao final do expediente. O sistema baixa um arquivo JSON com alunos, aulas, exercícios, pagamentos, eventos, recebimentos e anotações. Para restaurar os dados, use **Importar backup** e selecione esse arquivo.
 
-Os dados ficam somente no navegador/dispositivo atual. Limpar os dados do navegador antes de exportar o backup pode apagar as alterações.
+Os dados de alunos e alterações locais ficam somente no navegador/dispositivo atual. Limpar os dados do navegador antes de exportar o backup pode apagar essas alterações. Os eventos sincronizados podem ser carregados novamente a partir do JSON publicado.
 
 ## Apostila integrada
 
@@ -70,11 +70,13 @@ Na lista de alunos, o botão com o ícone do WhatsApp abre uma proposta pronta. 
 
 ## Caixa de eventos
 
-A rota `#eventos` reúne os eventos profissionais em um caixa separado das mensalidades dos alunos. É possível cadastrar e editar evento, contratante/devedor, grupo, cliente, local, valor previsto, status da agenda, observações e link do Google Calendar.
+A rota `#eventos` reúne os eventos profissionais em um caixa separado das mensalidades dos alunos. A aba `Eventos` do arquivo `Controle de Caixa - Eventos - Felipe Figueroa.xlsm` é a fonte oficial dos registros, valores e recebimentos.
 
 Os recebimentos são registrados individualmente e mantêm um histórico por evento. O painel calcula automaticamente valor previsto, total recebido, saldo em aberto e devedores agrupados. Os filtros permitem consultar mês, semestre ou ano, além de busca e situação financeira.
 
-A estrutura foi baseada no arquivo `Controle de Caixa - Eventos - Felipe Figueroa.xlsm` do Google Drive. O link para a planilha-base aparece na tela, mas não há sincronização automática: site e planilha continuam sendo fontes separadas.
+A sincronização é feita por `.github/workflows/sync-event-cash.yml` a cada 30 minutos. A rotina baixa somente essa planilha, transforma a aba `Eventos` em `assets/data/eventos.json` e publica uma nova versão quando encontra alterações. O painel lê esse JSON automaticamente e mantém os dados sincronizados no navegador. Para evitar conflitos, registros vindos da planilha devem ser editados no Drive; a sincronização é de mão única, da planilha para o site.
+
+Para a rotina automática funcionar, o arquivo precisa estar compartilhado no Google Drive como **Qualquer pessoa com o link — Leitor**. Essa configuração torna públicos os dados presentes na aba `Eventos`, conforme a decisão do proprietário do site.
 
 ## Personalização rápida
 

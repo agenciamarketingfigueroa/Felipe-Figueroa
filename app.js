@@ -3,6 +3,7 @@ const PROFESSOR_AUTH_KEY = "ff-professor-auth";
 const STUDENT_AUTH_KEY = "ff-student-auth";
 const WORKBOOK_URL = "assets/materials/apostila-facilitando-o-violao.pdf";
 const EVENT_SOURCE_URL = "https://drive.google.com/file/d/1W0algsCcY671wriIHv7XLCmq-xt2Iuqk/view";
+const EVENT_SYNC_URL = "assets/data/eventos.json";
 const DFV_OFFER = { regularPrice: 67, launchPrice: 47 };
 // TODO(DFV): insira aqui a URL definitiva do checkout. Todos os CTAs usam este único valor.
 const DFV_CHECKOUT_URL = "";
@@ -96,6 +97,7 @@ const seedData = {
   },
   updates: {},
   events: [],
+  eventSync: null,
   notes: { ana: "Gravar o exercício 2 até sexta. Atenção à dinâmica no segundo ciclo." },
 };
 
@@ -113,6 +115,7 @@ function normalizeData(data) {
   if (!data.updates) data.updates = {};
   if (!data.notes) data.notes = {};
   if (!Array.isArray(data.events)) data.events = [];
+  if (!data.eventSync) data.eventSync = null;
   data.events.forEach(event => {
     if (!Array.isArray(event.payments)) event.payments = [];
     if (Number(event.received) > 0 && !event.payments.length) {
@@ -142,6 +145,7 @@ function loadData() {
 }
 let db = loadData();
 let partiturasCatalogLimit = 18;
+let eventSyncInProgress = false;
 const cashFilters = {
   mode: "month",
   year: String(new Date().getFullYear()),
@@ -154,6 +158,57 @@ const cashFilters = {
 function saveData(message = "Alterações salvas neste dispositivo") {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
   if (message) toast(message);
+}
+
+function eventFromSpreadsheet(event) {
+  const received = numberValue(event.received);
+  return {
+    id: String(event.id),
+    date: String(event.date),
+    type: String(event.type || "Evento"),
+    title: String(event.title || "Evento"),
+    group: String(event.group || ""),
+    debtor: String(event.debtor || ""),
+    client: String(event.client || ""),
+    scheduleStatus: String(event.scheduleStatus || ""),
+    venue: String(event.venue || ""),
+    expected: numberValue(event.expected),
+    calendarUrl: String(event.calendarUrl || ""),
+    notes: String(event.notes || ""),
+    competence: String(event.competence || ""),
+    source: "spreadsheet",
+    payments: received > 0 ? [{ id:`sheet-${event.id}`, date:event.date, amount:received, note:"Recebido informado na planilha" }] : [],
+  };
+}
+
+async function syncEventCash(showFeedback = false) {
+  if (eventSyncInProgress) return;
+  eventSyncInProgress = true;
+  try {
+    const response = await fetch(`${EVENT_SYNC_URL}?v=${Date.now()}`, { cache:"no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const payload = await response.json();
+    if (!Array.isArray(payload.events)) throw new Error("Formato inválido");
+    const incoming = payload.events.map(eventFromSpreadsheet);
+    const incomingIds = new Set(incoming.map(event => event.id));
+    const localEvents = db.events.filter(event => event.source !== "spreadsheet" && !incomingIds.has(String(event.id)));
+    db.events = [...localEvents, ...incoming];
+    db.eventSync = {
+      syncedAt: payload.syncedAt || new Date().toISOString(),
+      intervalMinutes: numberValue(payload.syncIntervalMinutes) || 30,
+      count: incoming.length,
+      status: "ok",
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+    if (location.hash.replace(/^#/, "").split("/")[0] === "eventos" && isProfessorAuthenticated()) render();
+    if (showFeedback) toast(`${incoming.length} eventos carregados da planilha`);
+  } catch (_) {
+    db.eventSync = { ...(db.eventSync || {}), status:"error" };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+    if (showFeedback) toast("Não foi possível atualizar agora. Mantive os últimos dados carregados.");
+  } finally {
+    eventSyncInProgress = false;
+  }
 }
 
 function esc(value = "") {
@@ -649,7 +704,7 @@ function sidebar(active) {
 
 function appShell(active, title, content) {
   const primaryAction = active === "eventos"
-    ? `<button class="btn btn-primary" data-action="new-event">${icons.plus}<span>Novo evento</span></button>`
+    ? `<a class="btn btn-primary" href="${EVENT_SOURCE_URL}" target="_blank" rel="noopener">${icons.external}<span>Editar planilha</span></a>`
     : `<button class="btn btn-primary" data-action="new-lesson">${icons.plus}<span>Nova aula</span></button>`;
   return `<div class="app-shell">${sidebar(active)}<main class="app-main"><header class="app-topbar"><div style="display:flex;align-items:center;gap:12px"><button class="icon-btn mobile-menu" data-action="toggle-sidebar" aria-label="Menu">${icons.menu}</button><h1>${title}</h1></div><div class="top-actions"><button class="btn btn-ghost" data-action="export">${icons.download}<span>Backup</span></button>${primaryAction}</div></header><div class="app-content">${content}</div></main></div>`;
 }
@@ -746,11 +801,14 @@ function cashPage() {
     const date = new Date(event.date);
     const receivedValue = eventReceived(event);
     const balanceValue = eventBalance(event);
-    return `<tr><td><strong>${fmtDate(date,{day:"2-digit",month:"short",year:"numeric"})}</strong><span class="cell-detail">${fmtDate(date,{hour:"2-digit",minute:"2-digit"})}</span></td><td><div class="event-name"><strong>${esc(event.title || event.type || "Evento")}</strong><span>${esc([event.client,event.venue].filter(Boolean).join(" · ") || "Sem detalhes")}</span></div></td><td><strong>${esc(event.debtor || "A identificar")}</strong><span class="cell-detail">${esc(event.group || "Sem grupo")}</span></td><td>${money(numberValue(event.expected))}</td><td>${money(receivedValue)}</td><td><strong class="${balanceValue > 0 ? "cash-negative" : "cash-positive"}">${money(balanceValue)}</strong></td><td>${eventStatusTag(event)}</td><td><div class="row-actions">${event.calendarUrl ? `<a class="icon-btn" href="${safeHref(event.calendarUrl)}" target="_blank" rel="noopener" title="Abrir no Calendar">${icons.calendar}</a>` : ""}<button class="btn btn-ghost" data-action="receive-event" data-event="${event.id}">${icons.money} Receber</button><button class="icon-btn" data-action="edit-event" data-event="${event.id}" title="Editar evento">${icons.more}</button></div></td></tr>`;
+    const actions = event.source === "spreadsheet"
+      ? `<a class="btn btn-ghost" href="${EVENT_SOURCE_URL}" target="_blank" rel="noopener">Editar na planilha</a>`
+      : `<button class="btn btn-ghost" data-action="receive-event" data-event="${event.id}">${icons.money} Receber</button><button class="icon-btn" data-action="edit-event" data-event="${event.id}" title="Editar evento">${icons.more}</button>`;
+    return `<tr><td><strong>${fmtDate(date,{day:"2-digit",month:"short",year:"numeric"})}</strong><span class="cell-detail">${fmtDate(date,{hour:"2-digit",minute:"2-digit"})}</span></td><td><div class="event-name"><strong>${esc(event.title || event.type || "Evento")}</strong><span>${esc([event.client,event.venue].filter(Boolean).join(" · ") || "Sem detalhes")}</span></div></td><td><strong>${esc(event.debtor || "A identificar")}</strong><span class="cell-detail">${esc(event.group || "Sem grupo")}</span></td><td>${money(numberValue(event.expected))}</td><td>${money(receivedValue)}</td><td><strong class="${balanceValue > 0 ? "cash-negative" : "cash-positive"}">${money(balanceValue)}</strong></td><td>${eventStatusTag(event)}</td><td><div class="row-actions">${event.calendarUrl ? `<a class="icon-btn" href="${safeHref(event.calendarUrl)}" target="_blank" rel="noopener" title="Abrir no Calendar">${icons.calendar}</a>` : ""}${actions}</div></td></tr>`;
   }).join("");
   const debtorRows = debtors.map(item => `<tr><td><strong>${esc(item.debtor)}</strong><span class="cell-detail">${esc([...item.groups].join(" · ") || "Sem grupo")}</span></td><td>${money(item.expected)}</td><td>${money(item.received)}</td><td><strong class="cash-negative">${money(item.balance)}</strong></td></tr>`).join("");
   return appShell("eventos", "Caixa de eventos", `
-    <div class="greeting"><div><span class="eyebrow">Financeiro de eventos</span><h2>Previsão e recebimentos</h2><p>Veja quanto deve entrar, o que já entrou e quem ainda possui saldo em aberto.</p></div><a class="date-chip cash-source-link" href="${EVENT_SOURCE_URL}" target="_blank" rel="noopener">Abrir planilha-base ${icons.external}</a></div>
+    <div class="greeting"><div><span class="eyebrow">Financeiro de eventos</span><h2>Previsão e recebimentos</h2><p>Veja quanto deve entrar, o que já entrou e quem ainda possui saldo em aberto.</p></div><div class="cash-sync-summary"><span class="date-chip">${db.eventSync?.status === "error" ? "Última atualização indisponível" : db.eventSync?.syncedAt ? `Planilha atualizada em ${fmtDate(db.eventSync.syncedAt,{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}` : "Carregando planilha..."}</span><button class="btn btn-ghost" data-action="sync-events">${icons.calendar} Atualizar agora</button></div></div>
     <section class="cash-filters" aria-label="Filtros do caixa">
       <label><span>Período</span><select class="field" id="cash-mode"><option value="month" ${cashFilters.mode === "month" ? "selected" : ""}>Mensal</option><option value="semester" ${cashFilters.mode === "semester" ? "selected" : ""}>Semestral</option><option value="year" ${cashFilters.mode === "year" ? "selected" : ""}>Anual</option></select></label>
       <label><span>Ano</span><input class="field" id="cash-year" type="number" min="2020" max="2100" value="${esc(cashFilters.year)}"></label>
@@ -766,9 +824,9 @@ function cashPage() {
       <div class="metric"><div class="metric-top">${icons.clock}<span>em aberto</span></div><strong class="cash-negative">${money(balance)}</strong><span>ainda falta receber</span></div>
       <div class="metric"><div class="metric-top">${icons.users}<span>devedores</span></div><strong>${debtors.length}</strong><span>pessoas ou empresas com saldo</span></div>
     </section>
-    <section class="panel"><div class="panel-head"><div><h3>Eventos do período</h3><p>${events.length} registros exibidos</p></div><button class="btn btn-primary" data-action="new-event">${icons.plus} Novo evento</button></div><div class="cash-table-wrap"><table class="data-table cash-table"><thead><tr><th>Data</th><th>Evento</th><th>Contratante / devedor</th><th>Previsto</th><th>Recebido</th><th>Saldo</th><th>Status</th><th></th></tr></thead><tbody>${rows || `<tr><td colspan="8" class="empty">Nenhum evento encontrado neste período.</td></tr>`}</tbody></table></div></section>
+    <section class="panel"><div class="panel-head"><div><h3>Eventos do período</h3><p>${events.length} registros exibidos</p></div><a class="btn btn-primary" href="${EVENT_SOURCE_URL}" target="_blank" rel="noopener">${icons.external} Editar planilha</a></div><div class="cash-table-wrap"><table class="data-table cash-table"><thead><tr><th>Data</th><th>Evento</th><th>Contratante / devedor</th><th>Previsto</th><th>Recebido</th><th>Saldo</th><th>Status</th><th></th></tr></thead><tbody>${rows || `<tr><td colspan="8" class="empty">Nenhum evento encontrado neste período.</td></tr>`}</tbody></table></div></section>
     <section class="panel debtor-panel"><div class="panel-head"><div><h3>Quem deve o quê</h3><p>Saldos agrupados por contratante no período selecionado.</p></div><span class="tag warning">${money(balance)} em aberto</span></div><div class="cash-table-wrap"><table class="data-table debtor-table"><thead><tr><th>Contratante / devedor</th><th>Previsto</th><th>Recebido</th><th>Saldo</th></tr></thead><tbody>${debtorRows || `<tr><td colspan="4" class="empty">Nenhum saldo em aberto neste período.</td></tr>`}</tbody></table></div></section>
-    <p class="cash-local-note">Os dados financeiros ficam somente neste navegador e entram no backup do sistema. A planilha do Drive é usada como referência e não recebe sincronização automática.</p>
+    <p class="cash-local-note">Sincronização automática de mão única: edite os registros na planilha do Drive. O site publica a atualização em até ${db.eventSync?.intervalMinutes || 30} minutos.</p>
   `);
 }
 
@@ -1128,6 +1186,7 @@ document.addEventListener("click", e => {
   else if (action === "new-student") studentModal();
   else if (action === "edit-student") studentModal(target.dataset.student);
   else if (action === "new-event") eventModal();
+  else if (action === "sync-events") syncEventCash(true);
   else if (action === "edit-event") eventModal(target.dataset.event);
   else if (action === "receive-event") receiveEventModal(target.dataset.event);
   else if (action === "delete-event") deleteEventModal(target.dataset.event);
@@ -1303,3 +1362,4 @@ document.addEventListener("change", e => {
 });
 window.addEventListener("hashchange", render);
 render();
+syncEventCash();
