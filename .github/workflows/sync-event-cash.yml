@@ -1,6 +1,11 @@
 name: Sincronizar caixa de eventos
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/sync-event-cash.yml"
+      - "scripts/sync-event-cash.ps1"
   schedule:
     - cron: "*/30 * * * *"
   workflow_dispatch:
