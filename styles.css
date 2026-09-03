@@ -700,6 +700,52 @@ select.field { appearance: none; }
 .row-actions { display: flex; justify-content: flex-end; gap: 4px; }
 .empty { padding: 50px 20px; text-align: center; color: #77756f; font-size: 12px; }
 
+/* Event cash flow */
+.cash-source-link { display: inline-flex; align-items: center; gap: 7px; }
+.cash-source-link:hover { color: #9aafff; }
+.cash-source-link .icon { width: 13px; }
+.cash-filters { display: grid; grid-template-columns: 1fr .75fr 1fr 1fr 1fr minmax(220px, 1.6fr); gap: 10px; margin-bottom: 18px; padding: 16px; background: #141414; border: 1px solid var(--line); border-radius: 13px; }
+.cash-filters > label > span { display: block; margin: 0 0 7px; color: #77756f; font: 500 8px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .08em; }
+.cash-filters > label[hidden] { display: none; }
+.cash-search-field, .cash-money-field { position: relative; }
+.cash-search-field > .icon { position: absolute; z-index: 1; left: 13px; top: 50%; transform: translateY(-50%); color: #6f6d67; }
+.cash-search-field > .field { padding-left: 40px; }
+.cash-money-field > span { position: absolute; z-index: 1; left: 13px; top: 50%; transform: translateY(-50%); color: #77756f; font: 500 10px/1 var(--font-mono); }
+.cash-money-field > .field { padding-left: 38px; }
+.cash-period-heading { display: flex; align-items: center; justify-content: space-between; margin: 0 2px 10px; }
+.cash-period-heading span { color: #c7c4bc; font: 500 10px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .08em; }
+.cash-period-heading small { color: #6f6d67; font-size: 9px; }
+.cash-table-wrap { overflow-x: auto; }
+.cash-table { min-width: 1040px; }
+.debtor-table { min-width: 620px; }
+.cash-table td { white-space: nowrap; }
+.cash-table td:nth-child(2) { min-width: 230px; white-space: normal; }
+.cash-table td:nth-child(3) { min-width: 170px; white-space: normal; }
+.event-name strong, .event-name span, .cell-detail { display: block; }
+.event-name span, .cell-detail { margin-top: 4px; color: #6f6d67; font-size: 9px; line-height: 1.45; }
+.cash-negative { color: #ff9f8e; }
+.cash-positive { color: #62dc99; }
+.cash-table .row-actions { min-width: 180px; }
+.cash-table .row-actions .btn { min-height: 33px; padding-inline: 10px; font-size: 9px; }
+.debtor-panel { margin-top: 16px; }
+.cash-local-note { margin: 13px 3px 0; color: #5f5d58; font: 400 8px/1.55 var(--font-mono); }
+.receive-summary { margin-bottom: 20px; padding: 18px; background: rgba(95,124,255,.07); border: 1px solid rgba(95,124,255,.2); border-radius: 12px; }
+.receive-summary > span { color: #8299ff; font: 500 8px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .08em; }
+.receive-summary > strong { display: block; margin-top: 6px; font-size: 14px; }
+.receive-summary > div { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 15px; }
+.receive-summary p { margin: 0; color: #d9d6ce; font: 500 13px/1.2 var(--font-mono); }
+.receive-summary small { display: block; margin-bottom: 5px; color: #68665f; font: 500 7px/1 var(--font-mono); text-transform: uppercase; }
+.receive-summary b { color: #ff9f8e; font-weight: 500; }
+.payment-history { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); }
+.payment-history h3 { margin: 0 0 10px; font-size: 11px; }
+.payment-history > p { margin: 0; color: #6f6d67; font-size: 10px; }
+.payment-history-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.payment-history-row:last-child { border-bottom: 0; }
+.payment-history-row strong, .payment-history-row span { display: block; }
+.payment-history-row strong { font-size: 11px; }
+.payment-history-row span { margin-top: 3px; color: #6f6d67; font-size: 9px; }
+.paid-event-message { display: flex; align-items: center; gap: 10px; padding: 14px; color: #83e5ad; background: rgba(79,218,138,.07); border: 1px solid rgba(79,218,138,.22); border-radius: 10px; font-size: 11px; }
+
 /* Student update workflow */
 .update-student-btn { white-space: nowrap; }
 .update-back { margin: 0 0 20px; }
@@ -949,6 +995,8 @@ select.field { appearance: none; }
   .course-visual { height: clamp(420px, 60vw, 560px); min-height: 0; }
   .artist-grid { grid-template-columns: repeat(2, 1fr); }
   .metrics { grid-template-columns: repeat(2, 1fr); }
+  .cash-filters { grid-template-columns: repeat(3, 1fr); }
+  .cash-search { grid-column: span 2; }
   .dashboard-grid { grid-template-columns: 1fr; }
   .update-layout { grid-template-columns: 1fr; }
   .update-side { position: static; }
@@ -1017,6 +1065,14 @@ select.field { appearance: none; }
   .app-content { padding: 23px 15px 45px; }
   .greeting { align-items: flex-start; flex-direction: column; gap: 13px; }
   .metrics { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .cash-filters { grid-template-columns: 1fr 1fr; padding: 12px; }
+  .cash-search { grid-column: 1 / -1; }
+  .cash-period-heading { align-items: flex-start; flex-direction: column; gap: 5px; }
+  .cash-source-link { margin-top: 3px; }
+  .cash-table { min-width: 720px; }
+  .cash-table th:nth-child(3), .cash-table td:nth-child(3), .cash-table th:nth-child(4), .cash-table td:nth-child(4) { display: none; }
+  .data-table.debtor-table th:nth-child(3), .data-table.debtor-table td:nth-child(3), .data-table.debtor-table th:nth-child(4), .data-table.debtor-table td:nth-child(4) { display: table-cell; }
+  .receive-summary > div { grid-template-columns: 1fr; }
   .metric { padding: 16px; }
   .agenda-item { grid-template-columns: 54px 1fr; }
   .agenda-actions { grid-column: 2; }

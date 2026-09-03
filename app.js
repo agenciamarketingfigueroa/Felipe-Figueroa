@@ -2,6 +2,7 @@ const STORAGE_KEY = "felipe-figueroa-studio-v1";
 const PROFESSOR_AUTH_KEY = "ff-professor-auth";
 const STUDENT_AUTH_KEY = "ff-student-auth";
 const WORKBOOK_URL = "assets/materials/apostila-facilitando-o-violao.pdf";
+const EVENT_SOURCE_URL = "https://drive.google.com/file/d/1W0algsCcY671wriIHv7XLCmq-xt2Iuqk/view";
 const DFV_OFFER = { regularPrice: 67, launchPrice: 47 };
 // TODO(DFV): insira aqui a URL definitiva do checkout. Todos os CTAs usam este único valor.
 const DFV_CHECKOUT_URL = "";
@@ -94,6 +95,7 @@ const seedData = {
     ],
   },
   updates: {},
+  events: [],
   notes: { ana: "Gravar o exercício 2 até sexta. Atenção à dinâmica no segundo ciclo." },
 };
 
@@ -105,6 +107,21 @@ function futureISO(days, hour, minute) {
 }
 
 function cloneSeed() { return JSON.parse(JSON.stringify(seedData)); }
+function normalizeData(data) {
+  if (!data.exercises) data.exercises = {};
+  if (!data.supportMaterials) data.supportMaterials = {};
+  if (!data.updates) data.updates = {};
+  if (!data.notes) data.notes = {};
+  if (!Array.isArray(data.events)) data.events = [];
+  data.events.forEach(event => {
+    if (!Array.isArray(event.payments)) event.payments = [];
+    if (Number(event.received) > 0 && !event.payments.length) {
+      event.payments.push({ id:`p-${event.id || Date.now()}`, date:event.date, amount:Number(event.received), note:"Valor recebido antes da atualização" });
+    }
+    delete event.received;
+  });
+  return data;
+}
 function loadData() {
   try {
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -114,20 +131,25 @@ function loadData() {
         if (!student.studentNumber) student.studentNumber = String(1001 + index);
         if (!student.birthday) student.birthday = demoBirthdays[index] || "2000-01-01";
       });
-      if (!stored.exercises) stored.exercises = {};
-      if (!stored.supportMaterials) stored.supportMaterials = {};
-      if (!stored.updates) stored.updates = {};
-      if (!stored.notes) stored.notes = {};
+      normalizeData(stored);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
       return stored;
     }
   } catch (_) {}
-  const initial = cloneSeed();
+  const initial = normalizeData(cloneSeed());
   localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
   return initial;
 }
 let db = loadData();
 let partiturasCatalogLimit = 18;
+const cashFilters = {
+  mode: "month",
+  year: String(new Date().getFullYear()),
+  month: String(new Date().getMonth() + 1),
+  semester: new Date().getMonth() < 6 ? "1" : "2",
+  search: "",
+  status: "all",
+};
 
 function saveData(message = "Alterações salvas neste dispositivo") {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
@@ -148,6 +170,26 @@ function birthdayPassword(birthday = "") {
 }
 function fmtDate(date, options = {}) { return new Intl.DateTimeFormat("pt-BR", options).format(new Date(date)); }
 function money(value) { return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value); }
+function numberValue(value) { const number = Number(value); return Number.isFinite(number) ? number : 0; }
+function eventById(id) { return db.events.find(event => event.id === id); }
+function eventReceived(event) { return (event.payments || []).reduce((total, payment) => total + numberValue(payment.amount), 0); }
+function eventBalance(event) { return Math.max(0, numberValue(event.expected) - eventReceived(event)); }
+function eventFinancialStatus(event) {
+  if (numberValue(event.expected) <= 0) return "missing";
+  if (eventBalance(event) <= 0) return "paid";
+  return eventReceived(event) > 0 ? "partial" : "pending";
+}
+function eventStatusTag(event) {
+  const map = { paid:["success","Pago"], partial:["warning","Parcial"], pending:["danger","Pendente"], missing:["","A preencher"] };
+  const [cls, label] = map[eventFinancialStatus(event)];
+  return `<span class="tag ${cls}"><i class="dot"></i>${label}</span>`;
+}
+function toDateTimeInput(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 16);
+}
 function dfvCta(label, className = "btn btn-primary") {
   return DFV_CHECKOUT_URL
     ? `<a class="${className}" href="${esc(DFV_CHECKOUT_URL)}" target="_blank" rel="noopener">${label} ${icons.arrow}</a>`
@@ -595,6 +637,7 @@ function salesPage() {
 
 function sidebar(active) {
   const items = [
+    ["eventos", "Caixa de eventos", icons.money],
     ["dashboard", "Visão geral", icons.home], ["agenda", "Agenda", icons.calendar], ["alunos", "Alunos", icons.users], ["materiais", "Materiais", icons.book], ["pagamentos", "Pagamentos", icons.money]
   ];
   return `<aside class="sidebar" id="sidebar"><a class="brand" href="#home"><span class="brand-mark" aria-label="Felipe Figueroa"></span><strong>Studio</strong></a>
@@ -605,7 +648,10 @@ function sidebar(active) {
 }
 
 function appShell(active, title, content) {
-  return `<div class="app-shell">${sidebar(active)}<main class="app-main"><header class="app-topbar"><div style="display:flex;align-items:center;gap:12px"><button class="icon-btn mobile-menu" data-action="toggle-sidebar" aria-label="Menu">${icons.menu}</button><h1>${title}</h1></div><div class="top-actions"><button class="btn btn-ghost" data-action="export">${icons.download}<span>Backup</span></button><button class="btn btn-primary" data-action="new-lesson">${icons.plus}<span>Nova aula</span></button></div></header><div class="app-content">${content}</div></main></div>`;
+  const primaryAction = active === "eventos"
+    ? `<button class="btn btn-primary" data-action="new-event">${icons.plus}<span>Novo evento</span></button>`
+    : `<button class="btn btn-primary" data-action="new-lesson">${icons.plus}<span>Nova aula</span></button>`;
+  return `<div class="app-shell">${sidebar(active)}<main class="app-main"><header class="app-topbar"><div style="display:flex;align-items:center;gap:12px"><button class="icon-btn mobile-menu" data-action="toggle-sidebar" aria-label="Menu">${icons.menu}</button><h1>${title}</h1></div><div class="top-actions"><button class="btn btn-ghost" data-action="export">${icons.download}<span>Backup</span></button>${primaryAction}</div></header><div class="app-content">${content}</div></main></div>`;
 }
 
 function dashboardPage() {
@@ -656,6 +702,74 @@ function paymentTag(status) {
 function paymentsPage() {
   const rows = db.students.map(s => `<tr><td><div class="student-name"><span class="mini-avatar">${initials(s.name)}</span><div><strong>${esc(s.name)}</strong><span>${esc(s.plan)}</span></div></div></td><td>${money(s.plan === "Avulso" ? 120 : 320)}</td><td>${paymentTag(s.payment)}</td><td><div class="row-actions"><button class="btn btn-ghost" data-action="toggle-payment" data-student="${s.id}">${s.payment === "paid" ? "Marcar pendente" : "Marcar como pago"}</button></div></td></tr>`).join("");
   return appShell("pagamentos", "Pagamentos", `<div class="greeting"><div><span class="eyebrow">Financeiro local</span><h2>Controle mensal</h2><p>Acompanhe os recebimentos. Valores são demonstrativos e podem ser ajustados.</p></div></div><section class="panel"><div class="panel-head"><div><h3>Mensalidades</h3><p>${db.students.filter(s=>s.payment === "paid").length} pagamentos confirmados</p></div><span class="tag lime">${money(db.students.filter(s=>s.payment === "paid").length*320)} recebido</span></div><div style="overflow-x:auto"><table class="data-table"><thead><tr><th>Aluno / Plano</th><th>Valor</th><th>Status</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`);
+}
+
+const MONTH_NAMES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+function eventMatchesPeriod(event) {
+  const date = new Date(event.date);
+  if (Number.isNaN(date.getTime()) || date.getFullYear() !== Number(cashFilters.year)) return false;
+  if (cashFilters.mode === "year") return true;
+  if (cashFilters.mode === "semester") return Math.floor(date.getMonth() / 6) + 1 === Number(cashFilters.semester);
+  return date.getMonth() + 1 === Number(cashFilters.month);
+}
+
+function cashPeriodLabel() {
+  if (cashFilters.mode === "year") return `Ano de ${cashFilters.year}`;
+  if (cashFilters.mode === "semester") return `${cashFilters.semester}º semestre de ${cashFilters.year}`;
+  return `${MONTH_NAMES[Number(cashFilters.month) - 1]} de ${cashFilters.year}`;
+}
+
+function cashPage() {
+  const periodEvents = db.events.filter(eventMatchesPeriod);
+  const query = normalizeCatalogSearch(cashFilters.search);
+  const events = periodEvents.filter(event => {
+    const searchable = normalizeCatalogSearch([event.title, event.client, event.debtor, event.group, event.type, event.venue].join(" "));
+    const status = eventFinancialStatus(event);
+    const matchesStatus = cashFilters.status === "all" || cashFilters.status === status || (cashFilters.status === "open" && status !== "paid");
+    return (!query || searchable.includes(query)) && matchesStatus;
+  }).sort((a, b) => new Date(a.date) - new Date(b.date));
+  const expected = periodEvents.reduce((total, event) => total + numberValue(event.expected), 0);
+  const received = periodEvents.reduce((total, event) => total + eventReceived(event), 0);
+  const balance = periodEvents.reduce((total, event) => total + eventBalance(event), 0);
+  const debtors = Object.values(periodEvents.reduce((list, event) => {
+    const debtor = String(event.debtor || "A identificar").trim() || "A identificar";
+    const key = normalizeCatalogSearch(debtor);
+    list[key] ||= { debtor, groups:new Set(), expected:0, received:0, balance:0 };
+    if (event.group) list[key].groups.add(event.group);
+    list[key].expected += numberValue(event.expected);
+    list[key].received += eventReceived(event);
+    list[key].balance += eventBalance(event);
+    return list;
+  }, {})).filter(item => item.balance > 0.009).sort((a, b) => b.balance - a.balance);
+  const rows = events.map(event => {
+    const date = new Date(event.date);
+    const receivedValue = eventReceived(event);
+    const balanceValue = eventBalance(event);
+    return `<tr><td><strong>${fmtDate(date,{day:"2-digit",month:"short",year:"numeric"})}</strong><span class="cell-detail">${fmtDate(date,{hour:"2-digit",minute:"2-digit"})}</span></td><td><div class="event-name"><strong>${esc(event.title || event.type || "Evento")}</strong><span>${esc([event.client,event.venue].filter(Boolean).join(" · ") || "Sem detalhes")}</span></div></td><td><strong>${esc(event.debtor || "A identificar")}</strong><span class="cell-detail">${esc(event.group || "Sem grupo")}</span></td><td>${money(numberValue(event.expected))}</td><td>${money(receivedValue)}</td><td><strong class="${balanceValue > 0 ? "cash-negative" : "cash-positive"}">${money(balanceValue)}</strong></td><td>${eventStatusTag(event)}</td><td><div class="row-actions">${event.calendarUrl ? `<a class="icon-btn" href="${safeHref(event.calendarUrl)}" target="_blank" rel="noopener" title="Abrir no Calendar">${icons.calendar}</a>` : ""}<button class="btn btn-ghost" data-action="receive-event" data-event="${event.id}">${icons.money} Receber</button><button class="icon-btn" data-action="edit-event" data-event="${event.id}" title="Editar evento">${icons.more}</button></div></td></tr>`;
+  }).join("");
+  const debtorRows = debtors.map(item => `<tr><td><strong>${esc(item.debtor)}</strong><span class="cell-detail">${esc([...item.groups].join(" · ") || "Sem grupo")}</span></td><td>${money(item.expected)}</td><td>${money(item.received)}</td><td><strong class="cash-negative">${money(item.balance)}</strong></td></tr>`).join("");
+  return appShell("eventos", "Caixa de eventos", `
+    <div class="greeting"><div><span class="eyebrow">Financeiro de eventos</span><h2>Previsão e recebimentos</h2><p>Veja quanto deve entrar, o que já entrou e quem ainda possui saldo em aberto.</p></div><a class="date-chip cash-source-link" href="${EVENT_SOURCE_URL}" target="_blank" rel="noopener">Abrir planilha-base ${icons.external}</a></div>
+    <section class="cash-filters" aria-label="Filtros do caixa">
+      <label><span>Período</span><select class="field" id="cash-mode"><option value="month" ${cashFilters.mode === "month" ? "selected" : ""}>Mensal</option><option value="semester" ${cashFilters.mode === "semester" ? "selected" : ""}>Semestral</option><option value="year" ${cashFilters.mode === "year" ? "selected" : ""}>Anual</option></select></label>
+      <label><span>Ano</span><input class="field" id="cash-year" type="number" min="2020" max="2100" value="${esc(cashFilters.year)}"></label>
+      <label ${cashFilters.mode !== "month" ? "hidden" : ""}><span>Mês</span><select class="field" id="cash-month">${MONTH_NAMES.map((month,index) => `<option value="${index + 1}" ${Number(cashFilters.month) === index + 1 ? "selected" : ""}>${month}</option>`).join("")}</select></label>
+      <label ${cashFilters.mode !== "semester" ? "hidden" : ""}><span>Semestre</span><select class="field" id="cash-semester"><option value="1" ${cashFilters.semester === "1" ? "selected" : ""}>1º semestre</option><option value="2" ${cashFilters.semester === "2" ? "selected" : ""}>2º semestre</option></select></label>
+      <label><span>Status</span><select class="field" id="cash-status"><option value="all" ${cashFilters.status === "all" ? "selected" : ""}>Todos</option><option value="open" ${cashFilters.status === "open" ? "selected" : ""}>Em aberto</option><option value="paid" ${cashFilters.status === "paid" ? "selected" : ""}>Pagos</option><option value="partial" ${cashFilters.status === "partial" ? "selected" : ""}>Parciais</option><option value="pending" ${cashFilters.status === "pending" ? "selected" : ""}>Pendentes</option></select></label>
+      <label class="cash-search"><span>Buscar</span><div class="cash-search-field">${icons.search}<input class="field" id="cash-search" value="${esc(cashFilters.search)}" placeholder="Evento, cliente, grupo..."></div></label>
+    </section>
+    <div class="cash-period-heading"><span>${cashPeriodLabel()}</span><small>${periodEvents.length} ${periodEvents.length === 1 ? "evento" : "eventos"} no período</small></div>
+    <section class="metrics cash-metrics">
+      <div class="metric"><div class="metric-top">${icons.money}<span>previsto</span></div><strong>${money(expected)}</strong><span>valor total dos eventos</span></div>
+      <div class="metric"><div class="metric-top">${icons.check}<span class="trend">confirmado</span></div><strong>${money(received)}</strong><span>valor já recebido</span></div>
+      <div class="metric"><div class="metric-top">${icons.clock}<span>em aberto</span></div><strong class="cash-negative">${money(balance)}</strong><span>ainda falta receber</span></div>
+      <div class="metric"><div class="metric-top">${icons.users}<span>devedores</span></div><strong>${debtors.length}</strong><span>pessoas ou empresas com saldo</span></div>
+    </section>
+    <section class="panel"><div class="panel-head"><div><h3>Eventos do período</h3><p>${events.length} registros exibidos</p></div><button class="btn btn-primary" data-action="new-event">${icons.plus} Novo evento</button></div><div class="cash-table-wrap"><table class="data-table cash-table"><thead><tr><th>Data</th><th>Evento</th><th>Contratante / devedor</th><th>Previsto</th><th>Recebido</th><th>Saldo</th><th>Status</th><th></th></tr></thead><tbody>${rows || `<tr><td colspan="8" class="empty">Nenhum evento encontrado neste período.</td></tr>`}</tbody></table></div></section>
+    <section class="panel debtor-panel"><div class="panel-head"><div><h3>Quem deve o quê</h3><p>Saldos agrupados por contratante no período selecionado.</p></div><span class="tag warning">${money(balance)} em aberto</span></div><div class="cash-table-wrap"><table class="data-table debtor-table"><thead><tr><th>Contratante / devedor</th><th>Previsto</th><th>Recebido</th><th>Saldo</th></tr></thead><tbody>${debtorRows || `<tr><td colspan="4" class="empty">Nenhum saldo em aberto neste período.</td></tr>`}</tbody></table></div></section>
+    <p class="cash-local-note">Os dados financeiros ficam somente neste navegador e entram no backup do sistema. A planilha do Drive é usada como referência e não recebe sincronização automática.</p>
+  `);
 }
 
 function materialsPage() {
@@ -772,7 +886,7 @@ function render() {
   const [route, id, detailId] = hash.split("/");
   const app = document.querySelector("#app");
   document.title = route === "aulas" ? "Aulas de Guitarra e Violão — Felipe Figueroa" : route === "dfv" ? "De Férias com o Violão | Felipe Figueroa" : route === "partituras" ? "Cifras em Partitura | Felipe Figueroa" : "Felipe Figueroa — Guitarrista & Professor";
-  const professorRoute = ["admin", "dashboard", "agenda", "alunos", "atualizar", "materiais", "pagamentos"].includes(route);
+  const professorRoute = ["admin", "dashboard", "agenda", "alunos", "atualizar", "materiais", "pagamentos", "eventos"].includes(route);
   if (route === "login") app.innerHTML = loginPage(id === "professor" ? "professor" : "aluno");
   else if (route === "aulas") app.innerHTML = salesPage();
   else if (route === "dfv") app.innerHTML = dfvPage();
@@ -784,6 +898,7 @@ function render() {
   else if (route === "atualizar") app.innerHTML = updateStudentPage(id, detailId);
   else if (route === "materiais") app.innerHTML = materialsPage();
   else if (route === "pagamentos") app.innerHTML = paymentsPage();
+  else if (route === "eventos") app.innerHTML = cashPage();
   else if (route === "aluno" && (isProfessorAuthenticated() || authenticatedStudentId() === id)) app.innerHTML = studentPortal(id);
   else if (route === "aluno") app.innerHTML = loginPage("aluno");
   else app.innerHTML = publicPage();
@@ -839,6 +954,44 @@ function deleteStudent(id) {
 
 function lessonModal() {
   openModal("Agendar aula", `<form id="lesson-form" class="form-grid"><div class="form-group full"><label>Aluno</label><select required class="field" name="studentId"><option value="">Selecione...</option>${db.students.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join("")}</select></div><div class="form-group"><label>Data e hora</label><input required class="field" type="datetime-local" name="date"></div><div class="form-group"><label>Duração</label><select class="field" name="duration"><option value="50">50 minutos</option><option value="60" selected>60 minutos</option><option value="90">90 minutos</option></select></div><div class="form-group"><label>Modalidade</label><select class="field" name="mode"><option>Online</option><option>Presencial</option></select></div><div class="form-group"><label>Link da aula</label><input class="field" type="url" name="link" placeholder="https://meet.google.com/..."></div><div class="form-group full"><label>Conteúdo / foco</label><input class="field" name="topic" placeholder="Ex.: improvisação, repertório..."></div></form>`, `<button class="btn btn-ghost" data-action="close-modal">Cancelar</button><button class="btn btn-primary" type="submit" form="lesson-form">Agendar</button>`);
+}
+
+function eventModal(id) {
+  const event = eventById(id) || {};
+  const groups = [...new Set(db.events.map(item => item.group).filter(Boolean))];
+  const debtors = [...new Set(db.events.map(item => item.debtor).filter(Boolean))];
+  openModal(event.id ? "Editar evento" : "Novo evento", `<form id="event-form" class="form-grid">
+    <input type="hidden" name="id" value="${esc(event.id || "")}">
+    <div class="form-group"><label>Data e hora</label><input required class="field" type="datetime-local" name="date" value="${esc(toDateTimeInput(event.date))}"></div>
+    <div class="form-group"><label>Tipo</label><select class="field" name="type">${["Casamento","Casamento/Recepção","Recepção","Show","Outro"].map(type => `<option ${event.type === type ? "selected" : ""}>${type}</option>`).join("")}</select></div>
+    <div class="form-group full"><label>Nome do evento</label><input required class="field" name="title" value="${esc(event.title || "")}" placeholder="Ex.: Casamento Ana e João"></div>
+    <div class="form-group"><label>Grupo</label><input class="field" name="group" list="event-groups" value="${esc(event.group || "")}" placeholder="Ex.: Grupo Duane"><datalist id="event-groups">${groups.map(group => `<option value="${esc(group)}">`).join("")}</datalist></div>
+    <div class="form-group"><label>Contratante / devedor</label><input required class="field" name="debtor" list="event-debtors" value="${esc(event.debtor || "")}" placeholder="Quem fará o pagamento"><datalist id="event-debtors">${debtors.map(debtor => `<option value="${esc(debtor)}">`).join("")}</datalist></div>
+    <div class="form-group"><label>Noivos / cliente</label><input class="field" name="client" value="${esc(event.client || "")}" placeholder="Nome do cliente final"></div>
+    <div class="form-group"><label>Status da agenda</label><select class="field" name="scheduleStatus">${["Confirmado","Aceito","Convite pendente","Cancelado"].map(status => `<option ${event.scheduleStatus === status ? "selected" : ""}>${status}</option>`).join("")}</select></div>
+    <div class="form-group full"><label>Local</label><input class="field" name="venue" value="${esc(event.venue || "")}" placeholder="Espaço, cidade..."></div>
+    <div class="form-group"><label>Valor previsto</label><div class="cash-money-field"><span>R$</span><input required class="field" type="number" min="0" step="0.01" name="expected" value="${event.expected ?? ""}" placeholder="0,00"></div></div>
+    <div class="form-group"><label>Link do Google Calendar</label><input class="field" type="url" name="calendarUrl" value="${esc(event.calendarUrl || "")}" placeholder="https://calendar.google.com/..."></div>
+    <div class="form-group full"><label>Observações</label><textarea class="field" name="notes" placeholder="Formação, instrumentos, condições de pagamento...">${esc(event.notes || "")}</textarea></div>
+  </form>`, `${event.id ? `<button class="btn btn-danger modal-delete-button" data-action="delete-event" data-event="${event.id}">${icons.trash} Excluir evento</button>` : ""}<button class="btn btn-ghost" data-action="close-modal">Cancelar</button><button class="btn btn-primary" type="submit" form="event-form">Salvar evento</button>`);
+}
+
+function receiveEventModal(id) {
+  const event = eventById(id);
+  if (!event) { toast("Evento não encontrado"); return; }
+  const balance = eventBalance(event);
+  const payments = [...(event.payments || [])].sort((a,b) => new Date(b.date) - new Date(a.date));
+  const paymentRows = payments.map(payment => `<div class="payment-history-row"><div><strong>${money(numberValue(payment.amount))}</strong><span>${fmtDate(payment.date,{day:"2-digit",month:"short",year:"numeric"})}${payment.note ? ` · ${esc(payment.note)}` : ""}</span></div><button class="icon-btn row-delete-button" type="button" data-action="remove-event-payment" data-event="${event.id}" data-payment="${payment.id}" aria-label="Excluir recebimento">${icons.trash}</button></div>`).join("");
+  openModal("Registrar recebimento", `<div class="receive-summary"><span>Evento</span><strong>${esc(event.title)}</strong><div><p><small>Previsto</small>${money(numberValue(event.expected))}</p><p><small>Já recebido</small>${money(eventReceived(event))}</p><p><small>Em aberto</small><b>${money(balance)}</b></p></div></div>
+    ${balance > 0 ? `<form id="event-payment-form" class="form-grid" data-event="${event.id}"><div class="form-group"><label>Valor recebido</label><div class="cash-money-field"><span>R$</span><input required class="field" type="number" min="0.01" max="${balance}" step="0.01" name="amount" value="${balance.toFixed(2)}"></div></div><div class="form-group"><label>Data do recebimento</label><input required class="field" type="date" name="date" value="${toDateTimeInput(new Date()).slice(0,10)}"></div><div class="form-group full"><label>Observação</label><input class="field" name="note" placeholder="Ex.: Pix, sinal, parcela final..."></div></form>` : `<div class="paid-event-message">${icons.check}<span>Este evento está totalmente pago.</span></div>`}
+    <section class="payment-history"><h3>Histórico de recebimentos</h3>${paymentRows || `<p>Nenhum recebimento registrado.</p>`}</section>`, `<button class="btn btn-ghost" data-action="close-modal">Fechar</button>${balance > 0 ? `<button class="btn btn-primary" type="submit" form="event-payment-form">Confirmar recebimento</button>` : ""}`);
+}
+
+function deleteEventModal(id) {
+  const event = eventById(id);
+  if (!event) return;
+  closeModal();
+  openModal("Excluir evento", `<div class="delete-warning">${icons.trash}<div><strong>Excluir ${esc(event.title)}?</strong><p>O evento e todo o histórico de recebimentos dele serão removidos deste dispositivo.</p><small>Essa ação só poderá ser desfeita restaurando um backup anterior.</small></div></div>`, `<button class="btn btn-ghost" data-action="close-modal">Cancelar</button><button class="btn btn-danger" data-action="confirm-delete-event" data-event="${event.id}">${icons.trash} Sim, excluir evento</button>`);
 }
 
 function reminderModal(lessonId) {
@@ -920,7 +1073,7 @@ function exportData() {
 
 function importData() {
   const input = document.createElement("input"); input.type = "file"; input.accept = ".json,application/json";
-  input.onchange = () => { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { try { const parsed = JSON.parse(reader.result); if (!Array.isArray(parsed.students) || !Array.isArray(parsed.lessons)) throw new Error(); db = parsed; saveData(null); toast("Backup importado. Seus dados foram restaurados."); render(); } catch (_) { toast("Arquivo inválido. Escolha um backup deste sistema."); } }; reader.readAsText(file); }; input.click();
+  input.onchange = () => { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { try { const parsed = JSON.parse(reader.result); if (!Array.isArray(parsed.students) || !Array.isArray(parsed.lessons)) throw new Error(); db = normalizeData(parsed); saveData(null); toast("Backup importado. Seus dados foram restaurados."); render(); } catch (_) { toast("Arquivo inválido. Escolha um backup deste sistema."); } }; reader.readAsText(file); }; input.click();
 }
 
 function normalizeCatalogSearch(value = "") {
@@ -974,6 +1127,29 @@ document.addEventListener("click", e => {
   else if (action === "close-modal") closeModal();
   else if (action === "new-student") studentModal();
   else if (action === "edit-student") studentModal(target.dataset.student);
+  else if (action === "new-event") eventModal();
+  else if (action === "edit-event") eventModal(target.dataset.event);
+  else if (action === "receive-event") receiveEventModal(target.dataset.event);
+  else if (action === "delete-event") deleteEventModal(target.dataset.event);
+  else if (action === "confirm-delete-event") {
+    const event = eventById(target.dataset.event);
+    if (event) {
+      db.events = db.events.filter(item => item.id !== event.id);
+      saveData(`${event.title} foi excluído`);
+      closeModal();
+      render();
+    }
+  }
+  else if (action === "remove-event-payment") {
+    const event = eventById(target.dataset.event);
+    if (event && window.confirm("Excluir este recebimento?")) {
+      event.payments = (event.payments || []).filter(payment => payment.id !== target.dataset.payment);
+      saveData("Recebimento excluído");
+      closeModal();
+      render();
+      receiveEventModal(event.id);
+    }
+  }
   else if (action === "quote-student") quoteModal(target.dataset.student);
   else if (action === "send-quote") sendQuote(target.dataset.student);
   else if (action === "delete-student") deleteStudentModal(target.dataset.student);
@@ -1022,6 +1198,49 @@ document.addEventListener("submit", e => {
   }
   if (e.target.id === "student-form") { e.preventDefault(); const values=Object.fromEntries(new FormData(e.target)); const duplicate=db.students.find(student=>student.studentNumber===values.studentNumber && student.id!==values.id); if(duplicate){toast("Este número de aluno já está em uso");return;} const existing=studentById(values.id); if(existing) Object.assign(existing,values); else { values.id=slugify(values.name)+"-"+Date.now().toString(36); values.streak=0; db.students.push(values); db.exercises[values.id]=[]; } saveData("Aluno salvo com sucesso"); closeModal(); location.hash="alunos"; render(); }
   if (e.target.id === "lesson-form") { e.preventDefault(); const values=Object.fromEntries(new FormData(e.target)); values.id="l"+Date.now().toString(36); values.date=new Date(values.date).toISOString(); values.duration=Number(values.duration); values.status="scheduled"; db.lessons.push(values); saveData("Aula agendada com sucesso"); closeModal(); location.hash="agenda"; render(); }
+  if (e.target.id === "event-form") {
+    e.preventDefault();
+    const values = Object.fromEntries(new FormData(e.target));
+    const date = new Date(values.date);
+    if (Number.isNaN(date.getTime())) { toast("Informe uma data válida"); return; }
+    const expected = numberValue(values.expected);
+    const existing = eventById(values.id);
+    const event = {
+      id: existing?.id || `ev-${Date.now().toString(36)}`,
+      date: date.toISOString(),
+      type: String(values.type || "Outro").trim(),
+      title: String(values.title || "").trim(),
+      group: String(values.group || "").trim(),
+      debtor: String(values.debtor || "").trim(),
+      client: String(values.client || "").trim(),
+      scheduleStatus: String(values.scheduleStatus || "Confirmado").trim(),
+      venue: String(values.venue || "").trim(),
+      expected,
+      calendarUrl: String(values.calendarUrl || "").trim(),
+      notes: String(values.notes || "").trim(),
+      payments: existing?.payments || [],
+    };
+    if (existing) Object.assign(existing, event); else db.events.push(event);
+    cashFilters.year = String(date.getFullYear());
+    cashFilters.month = String(date.getMonth() + 1);
+    cashFilters.semester = date.getMonth() < 6 ? "1" : "2";
+    saveData(existing ? "Evento atualizado" : "Evento cadastrado");
+    closeModal();
+    location.hash = "eventos";
+    render();
+  }
+  if (e.target.id === "event-payment-form") {
+    e.preventDefault();
+    const event = eventById(e.target.dataset.event);
+    const values = Object.fromEntries(new FormData(e.target));
+    const amount = numberValue(values.amount);
+    if (!event || amount <= 0 || amount - eventBalance(event) > 0.009) { toast("Confira o valor do recebimento"); return; }
+    event.payments ||= [];
+    event.payments.push({ id:`pay-${Date.now().toString(36)}`, date:new Date(`${values.date}T12:00:00`).toISOString(), amount, note:String(values.note || "").trim() });
+    saveData("Recebimento registrado");
+    closeModal();
+    render();
+  }
   if (e.target.id === "update-student-form") {
     e.preventDefault();
     const form = e.target;
@@ -1070,6 +1289,7 @@ document.addEventListener("submit", e => {
 
 document.addEventListener("input", e => {
   if (e.target.id === "student-search") { const value=e.target.value; document.querySelector("#app").innerHTML=studentsPage(value); const input=document.querySelector("#student-search"); input.focus(); input.setSelectionRange(value.length,value.length); }
+  if (e.target.id === "cash-search") { cashFilters.search=e.target.value; document.querySelector("#app").innerHTML=cashPage(); const input=document.querySelector("#cash-search"); input.focus(); input.setSelectionRange(input.value.length,input.value.length); }
   if (e.target.matches("[data-catalog-search]")) updatePartiturasCatalog(true);
   if (e.target.matches("[data-student-note]")) { const id=e.target.dataset.studentNote; db.notes[id]=e.target.value; localStorage.setItem(STORAGE_KEY,JSON.stringify(db)); }
   const quoteForm = e.target.closest("#quote-form");
@@ -1078,6 +1298,8 @@ document.addEventListener("input", e => {
 });
 document.addEventListener("change", e => {
   if (e.target.matches("[data-catalog-artist], [data-catalog-key], [data-catalog-feature]")) updatePartiturasCatalog(true);
+  const filterMap = { "cash-mode":"mode", "cash-year":"year", "cash-month":"month", "cash-semester":"semester", "cash-status":"status" };
+  if (filterMap[e.target.id]) { cashFilters[filterMap[e.target.id]]=e.target.value; render(); }
 });
 window.addEventListener("hashchange", render);
 render();

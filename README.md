@@ -25,6 +25,7 @@ Depois acesse `http://localhost:4173`.
 - `#atualizar/{id}` — atualização pedagógica com resumo, exercícios e materiais do aluno
 - `#materiais` — biblioteca didática e mapa da apostila
 - `#pagamentos` — controle local dos pagamentos
+- `#eventos` — caixa de eventos com previsão, recebimentos, devedores e filtros por período
 - `#aluno/{id}` — sala individual, liberada depois do login
 
 ## Acessos
@@ -37,7 +38,7 @@ As sessões usam `sessionStorage` e são encerradas ao clicar em **Sair** ou ao 
 
 ## Backup
 
-Use **Exportar dados** ao final do expediente. O sistema baixa um arquivo JSON com alunos, aulas, exercícios, pagamentos e anotações. Para restaurar os dados, use **Importar backup** e selecione esse arquivo.
+Use **Exportar dados** ao final do expediente. O sistema baixa um arquivo JSON com alunos, aulas, exercícios, pagamentos, eventos, recebimentos e anotações. Para restaurar os dados, use **Importar backup** e selecione esse arquivo.
 
 Os dados ficam somente no navegador/dispositivo atual. Limpar os dados do navegador antes de exportar o backup pode apagar as alterações.
 
@@ -67,6 +68,14 @@ Na agenda, use **Finalizar aula** para abrir a atualização pedagógica daquele
 
 Na lista de alunos, o botão com o ícone do WhatsApp abre uma proposta pronta. Escolha o plano e a modalidade, revise a mensagem e, se necessário, edite o preço final para condições especiais. Os preços da página pública e do orçamento são definidos uma única vez em `LESSON_PLANS`, no início de `app.js`.
 
+## Caixa de eventos
+
+A rota `#eventos` reúne os eventos profissionais em um caixa separado das mensalidades dos alunos. É possível cadastrar e editar evento, contratante/devedor, grupo, cliente, local, valor previsto, status da agenda, observações e link do Google Calendar.
+
+Os recebimentos são registrados individualmente e mantêm um histórico por evento. O painel calcula automaticamente valor previsto, total recebido, saldo em aberto e devedores agrupados. Os filtros permitem consultar mês, semestre ou ano, além de busca e situação financeira.
+
+A estrutura foi baseada no arquivo `Controle de Caixa - Eventos - Felipe Figueroa.xlsm` do Google Drive. O link para a planilha-base aparece na tela, mas não há sincronização automática: site e planilha continuam sendo fontes separadas.
+
 ## Personalização rápida
 
 - Fotos e nomes de artistas: lista `ARTIST_SHOWCASE` em `app.js` e arquivos em `assets/artists/`.
@@ -78,6 +87,6 @@ Na lista de alunos, o botão com o ícone do WhatsApp abre uma proposta pronta. 
 
 ## Limite do site estático
 
-Os botões de lembrete abrem o WhatsApp ou o aplicativo de e-mail com a mensagem preenchida. Envio automático em segundo plano e sincronização entre dispositivos exigem um backend ou um serviço externo de automação.
+Os botões de lembrete abrem o WhatsApp ou o aplicativo de e-mail com a mensagem preenchida. Envio automático em segundo plano, sincronização com o Google Drive e sincronização entre dispositivos exigem um backend ou um serviço externo de automação.
 
 O login incluído controla a navegação na interface, mas não é autenticação segura: em um site puramente estático, a senha e os dados existem no navegador e podem ser inspecionados. Para publicar dados pessoais ou financeiros reais na internet, use um backend com autenticação e banco de dados.
