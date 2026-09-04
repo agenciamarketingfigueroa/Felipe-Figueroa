@@ -9,9 +9,11 @@ const SCORES_CATALOG_URL = "assets/partituras-catalog.js?v=4";
 const PDFJS_MODULE_URL = "https://cdn.jsdelivr.net/npm/pdfjs-dist@5.7.284/build/pdf.min.mjs";
 const PDFJS_WORKER_URL = "https://cdn.jsdelivr.net/npm/pdfjs-dist@5.7.284/build/pdf.worker.min.mjs";
 const TESSERACT_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/tesseract.min.js";
-const DFV_OFFER = { regularPrice: 67, launchPrice: 47 };
-// TODO(DFV): insira aqui a URL definitiva do checkout. Todos os CTAs usam este único valor.
-const DFV_CHECKOUT_URL = "";
+const DFV_EVENT_START = "2026-09-21T21:00:00-03:00";
+// Configure estes dois endereços antes de remover o noindex da página do DFV.
+const DFV_LEAD_ENDPOINT = "";
+const DFV_WHATSAPP_GROUP_URL = "";
+let dfvCountdownTimer = null;
 // Altere para true somente quando o card do DFV puder aparecer na página inicial.
 const SHOW_DFV_COURSE = false;
 const LESSON_PLANS = [
@@ -344,13 +346,34 @@ function toDateTimeInput(value) {
   const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
   return local.toISOString().slice(0, 16);
 }
-function dfvCta(label, className = "btn btn-primary") {
-  return DFV_CHECKOUT_URL
-    ? `<a class="${className}" href="${esc(DFV_CHECKOUT_URL)}" target="_blank" rel="noopener">${label} ${icons.arrow}</a>`
-    : `<button class="${className}" type="button" data-action="dfv-checkout">${label} ${icons.arrow}</button>`;
+function dfvGroupHref() {
+  return DFV_WHATSAPP_GROUP_URL || `https://wa.me/5531999427901?text=${encodeURIComponent("Olá, Felipe! Fiz minha inscrição e quero entrar no grupo oficial do DFV.")}`;
 }
-function dfvCheckoutNote() {
-  return DFV_CHECKOUT_URL ? "" : `<span class="dfv-cta-note">Inscrições em breve</span>`;
+
+function dfvGoogleCalendarHref() {
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: "Desafio De Férias com o Violão - DFV",
+    dates: "20260922T000000Z/20260922T011500Z",
+    recur: "RRULE:FREQ=DAILY;COUNT=5",
+    ctz: "America/Sao_Paulo",
+    details: "Cinco encontros gratuitos e ao vivo com Felipe Figueroa. De 21 a 25 de setembro de 2026, sempre às 21h (horário de Brasília).",
+  });
+  return `https://calendar.google.com/calendar/render?${params}`;
+}
+
+function dfvSignupForm() {
+  return `<form class="dfv-signup-card" id="dfv-signup-form" novalidate>
+    <span class="tag lime">Inscrição gratuita</span>
+    <h2>Garanta seu lugar no DFV.</h2>
+    <p>Receba os avisos, links das aulas e materiais do desafio.</p>
+    <label><span>Nome</span><input class="field" name="name" autocomplete="name" required placeholder="Como você quer ser chamado?"></label>
+    <label><span>E-mail</span><input class="field" type="email" name="email" autocomplete="email" required placeholder="voce@email.com"></label>
+    <label><span>WhatsApp</span><input class="field" type="tel" name="whatsapp" autocomplete="tel" inputmode="tel" required placeholder="(31) 99999-9999"></label>
+    <p class="dfv-form-error" data-dfv-form-error role="alert" hidden></p>
+    <button class="btn btn-primary" type="submit">Garantir minha inscrição gratuita ${icons.arrow}</button>
+    <small>Seus dados serão usados apenas para a comunicação desta edição do DFV.</small>
+  </form>`;
 }
 function slugify(s) { return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
 function safeHref(value = "") {
@@ -466,114 +489,148 @@ function agendaPublicaPage() {
 }
 
 function dfvPage() {
-  const benefits = [
-    [icons.music, "Aulas em vídeo", "Conteúdo direto ao ponto para aprender acompanhando o professor."],
-    [icons.check, "Método passo a passo", "Uma sequência organizada para saber exatamente o que estudar."],
-    [icons.book, "Apostila DFV", "Material de apoio para acompanhar o curso e consultar quando precisar."],
-    [icons.users, "Suporte com o professor", "Um canal direto para tirar dúvidas durante o aprendizado."],
-    [icons.timer, "Estude no seu ritmo", "Assista e reveja as aulas conforme precisar."],
+  const days = [
+    ["Dia 1", "Faça o violão obedecer", "Preparação, afinação, postura e primeiros movimentos para começar a controlar as mãos.", "Eu consigo fazer isso."],
+    ["Dia 2", "Seus primeiros acordes", "Vamos montar os primeiros acordes e resolver o clássico problema dos dedos que não querem ficar no lugar.", "Já consigo formar acordes."],
+    ["Dia 3", "Faça os acordes conversarem", "Você vai começar a trocar acordes e tocar sequências presentes em inúmeras músicas.", "Isso já está começando a soar familiar."],
+    ["Dia 4", "Isso já parece música", "O ritmo entra em cena e tudo começa a ganhar forma dentro de uma música real.", "Caramba. Estou tocando."],
+    ["Dia 5", "Sua primeira música", "Acordes, trocas e ritmo se encontram em uma música completa - e na nossa formatura.", "Eu consegui."],
+  ];
+  const stories = [
+    ["Giovana", "Começou aos 13 anos dizendo que não sabia absolutamente nada de violão. Ao final da edição, estava tocando.", "Progresso"],
+    ["Sirlei", "Mãe da Giovana e violonista, percebeu a filha vencendo um desafio pessoal que antes parecia difícil demais.", "Você no Dia 1 contra você no último dia."],
+    ["Anne Caroline", "Tinha um violão havia cerca de seis anos e o via como um “bicho de sete cabeças”. Participou e conseguiu tocar.", "O instrumento deixou de parecer impossível."],
   ];
   const audience = [
-    "Nunca tocou violão",
-    "Já tentou aprender sozinho e desistiu",
-    "Quer aprender sem complicação",
-    "Tem pouco tempo disponível",
-    "Quer aproveitar aquele violão parado em casa",
-    "Quer tocar antes de avançar para conteúdos mais complexos",
+    ["Eu nunca toquei nada.", "Perfeito. Vamos começar do começo."],
+    ["Eu já tentei e desisti.", "Então você provavelmente é exatamente quem eu quero nesta turma."],
+    ["Meus dedos são duros.", "Essa é uma das reclamações mais comuns de quem começa."],
+    ["Eu não entendo teoria musical.", "Você não precisa de teoria avançada para começar o desafio."],
+    ["Meu violão está parado há anos.", "Melhor ainda. Está na hora de descobrir se ele ainda vai virar música."],
+  ];
+  const faq = [
+    ["Eu nunca toquei absolutamente nada. Posso participar?", "Sim. Esse é justamente o principal ponto de partida do desafio."],
+    ["Preciso ter um violão?", "O ideal é ter acesso a um durante os cinco dias. Pode ser seu ou emprestado."],
+    ["Violão de nylon ou de aço?", "Os dois servem."],
+    ["Tenho guitarra. Consigo acompanhar?", "Boa parte dos fundamentos pode ser executada na guitarra, embora o desafio tenha sido pensado para violão."],
+    ["Tenho dedos ou mãos pequenas. Isso atrapalha?", "Isso não deve impedir sua participação. Posição e exercício podem ser ajustados para cada pessoa."],
+    ["Preciso saber ler partitura?", "Não."],
+    ["Vou aprender teoria musical?", "Alguns conceitos aparecem quando forem necessários, mas a prioridade destes cinco dias é tocar."],
+    ["E se eu perder uma aula ao vivo?", "A previsão é manter o replay de cada encontro disponível temporariamente, somente até a aula seguinte."],
+    ["Quanto custa?", "Nada. A participação no DFV é gratuita."],
+    ["Quanto tempo dura cada encontro?", "Aproximadamente 60 a 75 minutos, com pequena variação conforme as dúvidas e a dinâmica da turma."],
   ];
   return `
-    <header class="site-nav dfv-nav">
+    <header class="site-nav dfv-nav dfv-capture-nav">
       <div class="container site-nav-inner">
         <a class="brand" href="./"><span class="brand-mark" aria-label="Felipe Figueroa"></span><strong>Felipe Figueroa</strong><span>/ DFV</span></a>
-        <nav class="nav-links" aria-label="Navegação da página De Férias com o Violão">
-          <a href="de-ferias-com-violao/#dfv/metodo">O método</a><a href="de-ferias-com-violao/#dfv/conteudo">O que você recebe</a><a href="de-ferias-com-violao/#dfv/duvidas">Dúvidas</a>
-          <span class="nav-access"><a class="btn btn-outline" href="./">Voltar ao site</a><a class="btn btn-primary" href="de-ferias-com-violao/#dfv/oferta">Ver oferta ${icons.arrow}</a></span>
-        </nav>
-        <div class="nav-mobile-access"><a class="icon-btn" href="./" aria-label="Voltar ao site">${icons.home}</a><a class="icon-btn" href="de-ferias-com-violao/#dfv/oferta" aria-label="Ver oferta do DFV">${icons.money}</a></div>
+        <span class="dfv-nav-date">21 a 25 de setembro · 21h</span>
+        <a class="btn btn-primary" href="de-ferias-com-violao/#dfv/inscricao">Participar gratuitamente ${icons.arrow}</a>
       </div>
     </header>
-    <main class="dfv-page">
-      <section class="dfv-hero">
-        <div class="container dfv-hero-grid">
-          <div class="dfv-hero-copy">
-            <span class="eyebrow">Curso rápido de violão para iniciantes</span>
-            <h1>Suas primeiras músicas no violão. <span>Sem complicação.</span></h1>
-            <p>Um método prático para quem quer sair do zero e finalmente começar a tocar violão — mesmo que nunca tenha encostado no instrumento antes.</p>
-            <div class="dfv-hero-proof">${icons.check}<span>Método testado com alunos de diferentes idades em um desafio prático de 7 dias.</span></div>
-            <div class="dfv-cta-group">${dfvCta("Quero aprender violão")} ${dfvCheckoutNote()}</div>
-            <small>Curso online + apostila + suporte direto com o professor</small>
+    <main class="dfv-page dfv-capture-page">
+      <section class="dfv-capture-hero">
+        <div class="container dfv-capture-hero-grid">
+          <div class="dfv-capture-copy">
+            <span class="eyebrow">Evento gratuito e ao vivo · 21 a 25 de setembro · às 21h</span>
+            <h1>5 dias para tirar o violão do canto <span>e tocar sua primeira música.</span></h1>
+            <p>Mesmo que você nunca tenha tocado, já tenha tentado aprender e desistido ou ache que seus dedos simplesmente “não obedecem”.</p>
+            <div class="dfv-five-days" aria-label="Progressão do primeiro ao quinto dia"><span>Dia 1</span><i></i><i></i><i></i><i></i><strong>Dia 5</strong></div>
+            <p class="dfv-hero-support">Durante cinco encontros ao vivo, Felipe Figueroa vai ensinar somente o que você precisa para começar a fazer música - sem te afogar em teoria antes da hora.</p>
+            <small>Online · Ao vivo · Gratuito · 21 a 25 de setembro · 21h, horário de Brasília</small>
           </div>
-          <div class="dfv-hero-visual">
-            <img src="assets/hero-guitar.png" alt="Pessoa tocando um violão acústico" width="1823" height="863" decoding="async">
-            <div class="dfv-product-mark" aria-hidden="true"><span>De férias com o</span><strong>Violão</strong><small>DFV · Felipe Figueroa</small></div>
-          </div>
+          <div id="dfv-inscricao">${dfvSignupForm()}</div>
         </div>
       </section>
 
-      <section class="sales-section dfv-problem">
-        <div class="container dfv-split">
-          <div><span class="eyebrow">Se isso parece familiar…</span><h2>Talvez você já tenha um violão em casa há anos.</h2></div>
-          <div class="dfv-problem-copy"><p>Você comprou um violão, mas nunca conseguiu começar. Tentou aprender com vídeos soltos, ficou perdido, encontrou teoria demais e perdeu a motivação.</p><ul><li>${icons.check} “Será que é preciso ter dom?”</li><li>${icons.check} “Vou levar meses até tocar uma música?”</li><li>${icons.check} “Por onde eu deveria começar?”</li></ul><strong>O problema muitas vezes não é falta de capacidade. É começar pelo caminho errado.</strong></div>
+      <section class="dfv-event-strip" aria-label="Informações do evento">
+        <div class="container"><div><span>Quando</span><strong>21 a 25 de setembro</strong></div><div><span>Horário</span><strong>21h · Brasília</strong></div><div><span>Formato</span><strong>Online e ao vivo</strong></div><div><span>Investimento</span><strong>Gratuito</strong></div></div>
+      </section>
+
+      <section class="sales-section dfv-identification">
+        <div class="container dfv-identification-grid">
+          <div><span class="eyebrow">Talvez isso seja familiar</span><h2>Talvez o problema nunca tenha sido “falta de talento”.</h2></div>
+          <div class="dfv-story-copy"><p>Talvez exista um violão na sua casa há meses - ou anos. Você olha para ele e pensa: <strong>“Um dia eu ainda aprendo.”</strong></p><p>Talvez você já tenha aberto vídeos, decorado um ou dois acordes, sentido dor nos dedos, tentado trocar as posições... e parado.</p><p>Muita gente começa tentando aprender o violão inteiro antes de experimentar o principal motivo pelo qual pegou o instrumento: <strong>tocar.</strong></p><blockquote>Você não precisa aprender tudo. Precisa aprender as coisas certas, na ordem certa.</blockquote></div>
         </div>
       </section>
 
-      <section class="sales-section dfv-method" id="dfv-metodo">
-        <div class="container dfv-method-grid">
-          <div class="dfv-method-number" aria-hidden="true">01</div>
-          <div><span class="eyebrow">Um começo possível</span><h2>Foi por isso que nasceu o De Férias com o Violão.</h2></div>
-          <div><p>O DFV prioriza o que um iniciante precisa aprender primeiro para entender o instrumento e começar a tocar. Sem transformar o início em uma longa espera até a música acontecer.</p><p>Não é uma formação musical completa nem uma promessa de profissionalização em poucos dias.</p><blockquote>Tirar você do zero e fazer você experimentar o prazer de tocar suas primeiras músicas o mais rápido possível.</blockquote></div>
-        </div>
-      </section>
-
-      <section class="sales-section dfv-challenge">
-        <div class="container dfv-challenge-card">
-          <div class="dfv-challenge-copy"><span class="tag lime">Experiência real · desafio de 7 dias</span><h2>Antes de virar curso, esse método foi colocado à prova.</h2><p>O método do De Férias com o Violão foi testado através de um desafio de 7 dias, reunindo alunos de diferentes idades e de várias regiões do Brasil.</p><p>Durante o desafio, pessoas que estavam começando do zero conseguiram dar seus primeiros passos no instrumento e tocar suas primeiras músicas. Essa experiência ajudou a transformar o conteúdo em um caminho ainda mais simples e organizado para novos alunos.</p></div>
-          <div class="dfv-challenge-visual" aria-label="Espaço preparado para futuros registros do desafio"><strong>7</strong><span>dias de prática</span><div><small>Depoimentos</small><small>Vídeos</small><small>Fotos</small></div><p>Espaço preparado para os registros reais do desafio.</p></div>
-          <!-- TODO(DFV): substituir este espaço por prints, vídeos, fotos e depoimentos reais do desafio. -->
-        </div>
-      </section>
-
-      <section class="sales-section dfv-benefits-section" id="dfv-conteudo">
+      <section class="sales-section dfv-days-section" id="dfv-progresso">
         <div class="container">
-          <div class="sales-section-head"><span class="eyebrow">O que você recebe</span><h2>O necessário para começar com direção.</h2><p>Um treinamento online organizado para você aprender com clareza, praticar e consultar o conteúdo sempre que precisar.</p></div>
-          <div class="dfv-benefits">${benefits.map((item, index) => `<article><span>${String(index + 1).padStart(2, "0")}</span>${item[0]}<h3>${item[1]}</h3><p>${item[2]}</p></article>`).join("")}</div>
+          <div class="dfv-section-head"><span class="eyebrow">A jornada dos cinco dias</span><h2>Não é uma grade de matérias. É uma sequência de pequenas vitórias.</h2><p>Você entra perguntando “será que eu consigo?” e avança, encontro após encontro, até conseguir ouvir música saindo das próprias mãos.</p></div>
+          <div class="dfv-days">${days.map((day, index) => `<article class="dfv-day-card"><header><span>${day[0]}</span><b>0${index + 1}</b></header><h3>${day[1]}</h3><p>${day[2]}</p><blockquote>“${day[3]}”</blockquote></article>`).join("")}</div>
         </div>
       </section>
 
-      <section class="sales-section dfv-audience-section">
-        <div class="container dfv-audience-grid">
-          <div><span class="eyebrow">Feito para começar</span><h2>O DFV é para você que…</h2></div>
-          <div class="dfv-check-grid">${audience.map(item => `<div>${icons.check}<span>${item}</span></div>`).join("")}</div>
-        </div>
-        <div class="container dfv-not-for"><span class="tag">Uma escolha consciente</span><p>O DFV não é um curso avançado de guitarra ou uma formação profissional de músicos. Ele foi criado especificamente para quem quer <strong>começar no violão de maneira simples, prática e organizada.</strong></p></div>
-      </section>
-
-      <section class="sales-section dfv-offer-section" id="dfv-oferta">
-        <div class="container dfv-offer-grid">
-          <div class="dfv-offer-copy"><span class="eyebrow">Oferta de lançamento</span><h2>Seu primeiro passo pode começar agora.</h2><p>Você não precisa passar meses estudando para começar a tocar violão. Tenha um caminho claro e avance no seu ritmo.</p></div>
-          <article class="dfv-price-card">
-            <span class="tag lime">De Férias com o Violão · DFV</span>
-            <h3>Comece pelo que faz a música acontecer.</h3>
-            <ul><li>${icons.check} Curso completo em vídeo</li><li>${icons.check} Apostila DFV</li><li>${icons.check} Suporte direto com o professor</li></ul>
-            <div class="dfv-price"><span>De <del>${money(DFV_OFFER.regularPrice)}</del> por</span><strong>${money(DFV_OFFER.launchPrice)}</strong><small>Condição especial de lançamento</small></div>
-            <div class="dfv-cta-group">${dfvCta("Quero começar a tocar", "btn btn-primary dfv-wide-cta")} ${dfvCheckoutNote()}</div>
-          </article>
+      <section class="sales-section dfv-proof-section">
+        <div class="container">
+          <div class="dfv-section-head"><span class="eyebrow">Pessoas reais, começos reais</span><h2>Parece rápido demais? Eu também entenderia se você pensasse isso.</h2><p>O DFV já teve edições anteriores nas quais pessoas começando do zero conseguiram tocar. Os relatos abaixo são de edições realizadas no formato de <strong>sete dias</strong> - não são apresentados como resultados obtidos em cinco dias.</p></div>
+          <div class="dfv-proof-grid">${stories.map(story => `<article><div class="dfv-video-slot" aria-label="Espaço reservado para o depoimento em vídeo de ${story[0]}">${icons.music}<span>Depoimento em vídeo</span><small>Arquivo original a inserir</small></div><div><span class="eyebrow">${story[0]}</span><p>${story[1]}</p><blockquote>“${story[2]}”</blockquote></div></article>`).join("")}</div>
+          <a class="btn btn-primary dfv-inline-cta" href="de-ferias-com-violao/#dfv/inscricao">Quero viver meu próprio progresso ${icons.arrow}</a>
         </div>
       </section>
 
-      <section class="sales-section faq-section" id="dfv-duvidas">
-        <div class="container faq-grid"><div><span class="eyebrow">Dúvidas frequentes</span><h2>Antes de começar.</h2><p>Respostas diretas para você entender se o DFV combina com o seu momento.</p></div><div class="faq-list">
-          <details><summary>Nunca toquei violão. Esse curso serve para mim?</summary><p>Sim. O DFV foi pensado principalmente para quem está começando do zero.</p></details>
-          <details><summary>Preciso saber teoria musical?</summary><p>Não. O conteúdo foi organizado para você começar de maneira prática.</p></details>
-          <details><summary>Preciso ter um violão?</summary><p>Sim. Para acompanhar as aulas e praticar, será necessário ter acesso a um violão.</p></details>
-          <details><summary>O curso tem material de apoio?</summary><p>Sim. O aluno recebe uma apostila para acompanhar o treinamento.</p></details>
-          <details><summary>Posso tirar dúvidas?</summary><p>Sim. O curso inclui suporte direto com o professor.</p></details>
-          <details><summary>Consigo aprender em 7 dias?</summary><p>O método foi testado em um desafio de 7 dias no qual alunos conseguiram tocar suas primeiras músicas nesse período. O resultado de cada aluno depende de fatores como dedicação e tempo de prática.</p></details>
-        </div></div>
+      <section class="sales-section dfv-audience-capture">
+        <div class="container dfv-audience-capture-grid">
+          <div><span class="eyebrow">Feito para quem está começando</span><h2>Você não precisa “levar jeito”.</h2><p>O ponto de partida não é talento. É ter acesso a um violão e disposição para acompanhar um passo de cada vez.</p></div>
+          <div class="dfv-audience-list">${audience.map(item => `<article><strong>“${item[0]}”</strong><span>${item[1]}</span></article>`).join("")}</div>
+        </div>
       </section>
 
-      <section class="sales-final dfv-final"><div class="container"><span class="eyebrow">Um começo simples</span><h2>Talvez esteja na hora de finalmente tirar o violão do canto.</h2><p>Você não precisa esperar o momento perfeito, estudar meses de teoria ou achar que nasceu sem talento. Comece pelo básico, aprenda no seu ritmo e descubra como é tocar sua primeira música.</p><div>${dfvCta("Quero aprender a tocar")}</div>${dfvCheckoutNote()}</div></section>
-      <footer class="sales-footer"><div class="container"><span>© ${new Date().getFullYear()} Felipe Figueroa</span><span>De Férias com o Violão · Curso online para iniciantes</span><a href="./">Voltar ao site</a></div></footer>
+      <section class="sales-section dfv-teacher-section">
+        <div class="container dfv-teacher-grid">
+          <figure><img src="assets/hero-felipe.jpg" alt="Felipe Figueroa tocando guitarra no palco" loading="lazy" decoding="async"><figcaption>Felipe Figueroa · músico e professor</figcaption></figure>
+          <div><span class="eyebrow">Quem vai tocar com você</span><h2>Alguém que sabe muito, mas começa explicando do zero.</h2><p>Meu nome é Felipe Figueroa. Sou violonista, guitarrista, professor e produtor musical e trabalho profissionalmente com música desde 2007.</p><p>Mas existe uma coisa que aprendi dando aula: o iniciante não precisa de alguém mostrando o quanto sabe. Precisa de alguém capaz de transformar o complicado em um próximo passo simples.</p><blockquote>Não quero que você termine os cinco dias sabendo explicar tudo sobre música. Quero que termine olhando para o seu violão de uma forma diferente - porque agora você consegue tocar.</blockquote>
+          <div class="dfv-teacher-proof"><span><strong>500+</strong> alunos</span><span><strong>2007</strong> na música profissional</span><span><strong>Online</strong> para todo o Brasil</span></div></div>
+        </div>
+      </section>
+
+      <section class="sales-section dfv-how-section">
+        <div class="container">
+          <div class="dfv-section-head"><span class="eyebrow">Como funciona</span><h2>Você só precisa reservar a noite e deixar o violão por perto.</h2></div>
+          <div class="dfv-how-grid">
+            <article>${icons.calendar}<span>Datas</span><strong>21 a 25 de setembro</strong><p>Cinco dias consecutivos.</p></article>
+            <article>${icons.clock}<span>Horário</span><strong>Todos os dias às 21h</strong><p>Horário de Brasília.</p></article>
+            <article>${icons.external}<span>Formato</span><strong>Online e ao vivo</strong><p>Com espaço para acompanhar e praticar.</p></article>
+            <article>${icons.book}<span>Depois da aula</span><strong>Material + missão prática</strong><p>Um próximo passo claro para o dia seguinte.</p></article>
+            <article>${icons.users}<span>Comunicação</span><strong>Canal oficial de avisos</strong><p>Links, materiais e orientações em um só lugar.</p></article>
+            <article>${icons.timer}<span>Replay</span><strong>Disponibilidade temporária</strong><p>A previsão é que cada replay fique disponível somente até a aula seguinte.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="sales-section dfv-compare-section">
+        <div class="container">
+          <div class="dfv-compare-title"><span class="eyebrow">Você contra você</span><h2>O verdadeiro desafio não é contra o violão. É contra a versão de você que acha que não consegue.</h2></div>
+          <div class="dfv-compare-grid"><article><span>Você no Dia 1</span><ul><li>Tentando entender o instrumento</li><li>Dedos sem coordenação</li><li>Medo de errar</li><li>“Será que eu consigo?”</li></ul></article><div class="dfv-versus" aria-hidden="true">×</div><article><span>Você no Dia 5</span><ul><li>Montando acordes</li><li>Entendendo trocas</li><li>Fazendo ritmo</li><li>Tocando uma música</li><li>“Eu consegui.”</li></ul></article></div>
+        </div>
+      </section>
+
+      <section class="sales-section faq-section dfv-faq" id="dfv-duvidas">
+        <div class="container faq-grid"><div><span class="eyebrow">Dúvidas frequentes</span><h2>Pergunte sem medo.</h2><p>Se a sua dúvida é “será que é para alguém como eu?”, provavelmente a resposta está aqui.</p></div><div class="faq-list">${faq.map(item => `<details><summary>${item[0]}</summary><p>${item[1]}</p></details>`).join("")}</div></div>
+      </section>
+
+      <section class="sales-final dfv-capture-final">
+        <div class="container"><span class="eyebrow">O desafio começa em</span><div class="dfv-countdown" data-dfv-countdown aria-live="polite"><span><strong>--</strong>dias</span><span><strong>--</strong>horas</span><span><strong>--</strong>min</span><span><strong>--</strong>seg</span></div><h2>Daqui a cinco dias você pode continuar dizendo “um dia eu aprendo”... <span>ou descobrir como é tocar sua primeira música.</span></h2><p>O desafio começa no dia 21 de setembro, às 21h. A inscrição é gratuita.</p><a class="btn btn-primary" href="de-ferias-com-violao/#dfv/inscricao">Quero entrar no desafio DFV ${icons.arrow}</a></div>
+      </section>
+
+      <a class="dfv-mobile-cta" href="de-ferias-com-violao/#dfv/inscricao">Participar gratuitamente ${icons.arrow}</a>
+      <footer class="sales-footer dfv-capture-footer"><div class="container"><span>© ${new Date().getFullYear()} Felipe Figueroa</span><span>DFV · Evento gratuito · 21 a 25 de setembro de 2026</span><a href="mailto:contato@felipefigueroa.com.br">Contato e privacidade</a></div></footer>
+    </main>`;
+}
+
+function dfvConfirmationPage() {
+  const signup = JSON.parse(localStorage.getItem("dfv-last-registration") || "{}");
+  const firstName = signup.name ? `, ${esc(String(signup.name).trim().split(" ")[0])}` : "";
+  return `
+    <header class="site-nav dfv-nav dfv-capture-nav"><div class="container site-nav-inner"><a class="brand" href="de-ferias-com-violao/"><span class="brand-mark" aria-label="Felipe Figueroa"></span><strong>Felipe Figueroa</strong><span>/ DFV</span></a><span class="dfv-nav-date">21 a 25 de setembro · 21h</span></div></header>
+    <main class="dfv-confirm-page">
+      <section class="dfv-confirm-hero"><div class="container dfv-confirm-grid"><div><span class="tag lime">Inscrição confirmada</span><h1>Você está dentro${firstName}! <span>Agora falta um passo importante.</span></h1><p>Entre no canal oficial para não perder os links das aulas, materiais e avisos do desafio.</p><a class="btn btn-primary dfv-group-button" href="${dfvGroupHref()}" target="_blank" rel="noopener">Entrar no grupo oficial do DFV ${icons.whatsapp}</a>${DFV_WHATSAPP_GROUP_URL ? "" : `<small>Enquanto o link direto do grupo não está configurado, este botão abre uma conversa com Felipe.</small>`}</div><div class="dfv-welcome-video">${icons.music}<strong>“Você está dentro. Agora eu tenho uma missão para você...”</strong><span>Espaço preparado para o vídeo de boas-vindas do Felipe.</span></div></div></section>
+      <section class="dfv-confirm-steps"><div class="container">
+        <article><span>Passo 1</span><div><h2>Entre no canal oficial.</h2><p>É por lá que você receberá os links, materiais e lembretes de cada encontro.</p><a class="btn btn-primary" href="${dfvGroupHref()}" target="_blank" rel="noopener">Abrir WhatsApp ${icons.whatsapp}</a></div></article>
+        <article><span>Passo 2</span><div><h2>Salve o desafio na agenda.</h2><p>21 a 25 de setembro de 2026, todos os dias às 21h, no horário de Brasília.</p><div class="dfv-calendar-actions"><a class="btn btn-outline" href="${dfvGoogleCalendarHref()}" target="_blank" rel="noopener">Google Calendar ${icons.external}</a><button class="btn btn-outline" type="button" data-action="dfv-download-ics">Apple Calendar / arquivo .ics ${icons.download}</button></div></div></article>
+        <article><span>Passo 3</span><div><h2>Prepare o violão.</h2><ul class="dfv-confirm-checklist"><li>${icons.check} Separar seu violão</li><li>${icons.check} Verificar se possui afinador ou celular disponível</li><li>${icons.check} Entrar no grupo</li><li>${icons.check} Reservar 21h na agenda</li><li>${icons.check} Chegar ao Dia 1 disposto a tocar</li></ul></div></article>
+      </div></section>
+      <footer class="sales-footer"><div class="container"><span>© ${new Date().getFullYear()} Felipe Figueroa</span><span>DFV · 21 a 25 de setembro · 21h</span><a href="de-ferias-com-violao/">Voltar à página do desafio</a></div></footer>
     </main>`;
 }
 

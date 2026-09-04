@@ -472,6 +472,40 @@ img { display: block; max-width: 100%; }
 .dfv-public-card .course-copy h2 { line-height: 1.04; }
 .dfv-final .dfv-cta-note { display: block; margin-top: 14px; }
 
+/* DFV 2026 - primeira dobra da página de captura */
+.dfv-capture-page { background: #090909; }
+.dfv-capture-nav .site-nav-inner > .btn { min-height: 40px; }
+.dfv-capture-hero { position: relative; min-height: 100vh; padding: 130px 0 72px; display: grid; align-items: center; overflow: hidden; background: radial-gradient(circle at 82% 20%, rgba(95,124,255,.2), transparent 30%), #090909; }
+.dfv-capture-hero::before { content: ""; position: absolute; inset: 0; opacity: .08; background-image: linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px); background-size: 68px 68px; mask-image: linear-gradient(to bottom, black, transparent 90%); }
+.dfv-capture-hero-grid { position: relative; display: grid; grid-template-columns: 1.08fr minmax(370px,.72fr); align-items: center; gap: clamp(45px,7vw,100px); }
+.dfv-capture-copy h1 { max-width: 760px; margin: 22px 0 26px; font: 600 clamp(59px,6.8vw,100px)/.91 var(--font-display); letter-spacing: -.045em; text-transform: uppercase; }
+.dfv-capture-copy h1 span { display: block; color: #8299ff; }
+.dfv-capture-copy > p { max-width: 690px; margin: 0; color: #bbb9b2; font-size: clamp(16px,1.45vw,19px); line-height: 1.7; }
+.dfv-capture-copy > small { display: block; margin-top: 20px; color: #888680; font: 500 9px/1.5 var(--font-mono); letter-spacing: .07em; text-transform: uppercase; }
+.dfv-five-days { max-width: 530px; display: grid; grid-template-columns: auto repeat(4,1fr) auto; align-items: center; gap: 9px; margin-top: 31px; color: #c8c6bf; font: 500 9px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
+.dfv-five-days i { height: 2px; background: linear-gradient(90deg,#3d5bb8,#8299ff); }
+.dfv-five-days strong { color: #9aafff; }
+.dfv-signup-card { padding: clamp(27px,3.5vw,45px); display: grid; gap: 15px; border: 1px solid rgba(130,153,255,.4); border-radius: var(--radius); background: rgba(17,17,21,.94); box-shadow: var(--shadow); }
+.dfv-signup-card h2 { margin: 7px 0 0; font: 500 clamp(36px,3.8vw,54px)/1 var(--font-display); text-transform: uppercase; }
+.dfv-signup-card > p { margin: -4px 0 7px; color: #8e8c86; font-size: 11px; line-height: 1.6; }
+.dfv-signup-card label > span { display: block; margin-bottom: 7px; color: #aaa8a1; font: 500 8px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
+.dfv-signup-card .field { width: 100%; min-height: 50px; background: #101010; }
+.dfv-signup-card .btn { width: 100%; min-height: 52px; margin-top: 3px; }
+.dfv-signup-card > small { color: #65645f; font-size: 8px; line-height: 1.5; text-align: center; }
+
+@media (max-width: 980px) {
+  .dfv-capture-hero-grid { grid-template-columns: 1fr; }
+  .dfv-signup-card { max-width: 680px; }
+}
+
+@media (max-width: 680px) {
+  .dfv-capture-nav .brand span:last-child { display: none; }
+  .dfv-capture-nav .site-nav-inner > .btn { min-height: 38px; padding-inline: 12px; font-size: 8px; }
+  .dfv-capture-hero { min-height: 0; padding: 105px 0 55px; }
+  .dfv-capture-copy h1 { font-size: clamp(44px,13.1vw,61px); }
+  .dfv-signup-card { padding: 24px; }
+}
+
 /* Cifras em partitura */
 .charts-page { --chart-blue: #7892ff; background: #090909; }
 .charts-page h2 { letter-spacing: -.035em; }
