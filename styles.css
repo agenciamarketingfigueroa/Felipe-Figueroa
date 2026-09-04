@@ -966,7 +966,7 @@ select.field { appearance: none; }
 .login-card > p { margin: 0 0 30px; color: #8c8a84; font-size: 12px; }
 .login-form { display: grid; gap: 15px; }
 .login-form label > span { display: block; margin-bottom: 8px; color: #85837c; font: 500 9px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
-.login-form .field { min-height: 52px; background: #131313; }
+.login-form .field { min-height: 52px; background: #131313; font-size: 16px; }
 .login-form .btn { width: 100%; min-height: 52px; margin-top: 5px; }
 .login-error { margin: -12px 0 20px; padding: 12px 14px; color: #ff9a98; background: rgba(255,90,88,.08); border: 1px solid rgba(255,90,88,.25); border-radius: 9px; font-size: 10px; }
 .login-switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 27px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 10px; }
