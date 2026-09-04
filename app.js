@@ -380,7 +380,7 @@ function publicPage() {
             <p class="hero-lead">Música feita com intenção — no palco, no estúdio e na sala de aula. Uma carreira dedicada à guitarra e a transformar conhecimento em som.</p>
             <div class="hero-actions">
               <a class="btn btn-primary" href="#contato">Vamos trabalhar juntos ${icons.arrow}</a>
-              <button class="btn btn-outline" data-action="print-kit">Baixar mídia kit ${icons.download}</button>
+              <a class="btn btn-outline" href="assets/media-kit-felipe-figueroa-2026.pdf" download>Baixar mídia kit ${icons.download}</a>
             </div>
           </div>
           <div class="hero-side-note">Belo Horizonte · Brasil / Disponível para turnês e sessões</div>

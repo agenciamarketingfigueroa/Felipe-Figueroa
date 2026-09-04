@@ -9,9 +9,9 @@
     :root {
       --ink: #08111f;
       --navy: #0b1427;
-      --blue: #315bff;
-      --violet: #7357ff;
-      --gold: #f2d765;
+      --blue: #5f7cff;
+      --violet: #435cdf;
+      --gold: #8299ff;
       --paper: #f4f0e9;
       --white: #ffffff;
       --muted: #9fa9bc;
@@ -29,7 +29,7 @@
     p { font-size: 10.2pt; line-height: 1.45; color: #d7dce6; }
     .muted { color: var(--muted); }
     .gold { color: var(--gold); }
-    .blue { color: #7f9aff; }
+    .blue { color: #8299ff; }
     .rule { height: 1px; background: var(--line); }
     .topline { position: absolute; left: 18mm; right: 18mm; top: 10mm; display: flex; align-items: center; justify-content: space-between; z-index: 10; }
     .topline .brand { font-size: 8pt; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
@@ -48,7 +48,7 @@
     .cover .year { position:absolute; z-index:2; right:18mm; bottom:14mm; text-align:right; }
     .cover .year strong { font-size: 24pt; letter-spacing: -.04em; }
     .cover .year span { display:block; font-size: 8pt; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
-    .logo { width: 20mm; height: 20mm; object-fit: cover; border-radius: 50%; mix-blend-mode: screen; }
+    .logo { width: 20mm; height: 20mm; object-fit: cover; border-radius: 50%; mix-blend-mode: screen; filter: hue-rotate(168deg) saturate(145%) brightness(1.08); }
 
     /* page 2 */
     .intro-grid { position:absolute; left:18mm; right:18mm; top:32mm; bottom:18mm; display:grid; grid-template-columns: 1.12fr .88fr; gap:13mm; }
@@ -66,12 +66,12 @@
     .stats-head { position:absolute; left:18mm; top:31mm; width:130mm; }
     .stats-head h2 { font-size:37pt; }
     .stats-head p { display:none; }
-    .stats-grid { position:absolute; left:18mm; right:18mm; top:92mm; bottom:20mm; display:grid; grid-template-columns:repeat(4,1fr); gap:5mm; }
-    .stat { border:1px solid var(--line); border-radius:5mm; padding:7mm; background:linear-gradient(145deg,rgba(49,91,255,.14),rgba(255,255,255,.025)); display:flex; flex-direction:column; justify-content:space-between; }
+    .stats-grid { position:absolute; left:18mm; right:18mm; top:92mm; bottom:20mm; display:grid; grid-template-columns:repeat(5,1fr); gap:4mm; }
+    .stat { border:1px solid var(--line); border-radius:5mm; padding:5.5mm; background:linear-gradient(145deg,rgba(49,91,255,.14),rgba(255,255,255,.025)); display:flex; flex-direction:column; justify-content:space-between; }
     .stat:nth-child(2),.stat:nth-child(6) { background:linear-gradient(145deg,rgba(115,87,255,.16),rgba(255,255,255,.025)); }
     .stat:nth-child(3),.stat:nth-child(7) { background:linear-gradient(145deg,rgba(242,215,101,.10),rgba(255,255,255,.025)); }
-    .stat .num { font-size:31pt; font-weight:800; letter-spacing:-.055em; }
-    .stat .label { font-size:9pt; line-height:1.25; color:#cbd2df; }
+    .stat .num { font-size:28pt; font-weight:800; letter-spacing:-.055em; }
+    .stat .label { font-size:8.2pt; line-height:1.25; color:#cbd2df; }
     .stat .source { margin-top:3mm; font-size:6.5pt; color:#758096; }
     .halo { position:absolute; width:100mm; height:100mm; border-radius:50%; filter:blur(35px); opacity:.18; background:var(--violet); right:-25mm; top:-25mm; }
 
@@ -216,10 +216,12 @@
       <div class="stat"><div class="num">144</div><div class="label">casamentos realizados</div><div class="source">Histórico de agenda</div></div>
       <div class="stat"><div class="num">95</div><div class="label">shows realizados</div><div class="source">Histórico de agenda</div></div>
       <div class="stat"><div class="num">15</div><div class="label">festas e recepções</div><div class="source">Histórico de agenda</div></div>
+      <div class="stat"><div class="num">500+</div><div class="label">alunos no Brasil e no exterior</div><div class="source">Portfólio oficial</div></div>
       <div class="stat"><div class="num">4,72 mil</div><div class="label">inscritos no YouTube</div><div class="source">Canal público</div></div>
       <div class="stat"><div class="num">492 mil</div><div class="label">visualizações no YouTube</div><div class="source">Canal público</div></div>
       <div class="stat"><div class="num">98</div><div class="label">vídeos publicados no canal</div><div class="source">Canal público</div></div>
-      <div class="stat"><div class="num">676</div><div class="label">seguidores no Instagram</div><div class="source">Perfil público</div></div>
+      <div class="stat"><div class="num">5.903</div><div class="label">seguidores no Instagram</div><div class="source">Instagram Insights</div></div>
+      <div class="stat"><div class="num">294 mil</div><div class="label">visualizações no Instagram em 30 dias</div><div class="source">Instagram Insights</div></div>
     </div>
     <div class="footer"><span>Alcance com contexto: músicos, alunos e público de apresentações | Recorte: 04/09/2026</span><span>03</span></div>
   </section>
@@ -358,7 +360,7 @@
           <div class="contact-item"><span>Base</span><a>Belo Horizonte - MG</a></div>
         </div>
       </div>
-      <div class="sources"><b>Notas e fontes:</b> números de eventos calculados a partir do histórico profissional publicado no site; alunos e artistas conforme portfólio oficial. YouTube: canal público @FelipeFigueroaGT. Instagram: perfil público @felipefigueroagt. Referências de estrutura: Apple Music for Artists, Shopify, Later, Fender, Paiste, Zildjian, Strandberg e Izzo Musical. Dados sociais consultados em 04/09/2026 e sujeitos a variação.</div>
+      <div class="sources"><b>Notas e fontes:</b> números de eventos calculados a partir do histórico profissional publicado no site; alunos e artistas conforme portfólio oficial. YouTube: canal público @FelipeFigueroaGT. Instagram: dados do Insights fornecidos pelo artista. Referências de estrutura: Apple Music for Artists, Shopify, Later, Fender, Paiste, Zildjian, Strandberg e Izzo Musical. Dados sociais atualizados em 04/09/2026 e sujeitos a variação.</div>
     </div>
   </section>
 
