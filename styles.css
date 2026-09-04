@@ -101,9 +101,8 @@ img { display: block; max-width: 100%; }
 .brand { display: flex; align-items: center; gap: 11px; font: 600 17px/1 var(--font-display); letter-spacing: .04em; text-transform: uppercase; }
 .brand-mark {
   width: 39px; height: 39px; flex: 0 0 39px; display: block; overflow: hidden;
-  background: #050505 url("assets/Logo Azul Felipe.png") center / cover no-repeat;
+  background: #050505 url("assets/Logo Azul Felipe.png?v=3") center / cover no-repeat;
   border-radius: 4px; box-shadow: 0 0 0 1px rgba(255,255,255,.16);
-  filter: hue-rotate(180deg) saturate(1.45);
 }
 .brand span:last-child { color: #8c8b86; font-weight: 400; }
 .nav-links { display: flex; align-items: center; gap: 24px; }
@@ -672,8 +671,8 @@ img { display: block; max-width: 100%; }
 .user-chip { display: flex; align-items: center; gap: 10px; padding: 12px 8px 0; border-top: 1px solid var(--line); }
 .avatar { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: white; font: 600 11px/1 var(--font-mono); }
 .professor-avatar {
-  background: #050505 url("assets/Logo Azul Felipe.png") center / cover no-repeat;
-  border-radius: 4px; filter: hue-rotate(180deg) saturate(1.45);
+  background: #050505 url("assets/Logo Azul Felipe.png?v=3") center / cover no-repeat;
+  border-radius: 4px;
 }
 .user-chip strong { display: block; font-size: 11px; }
 .user-chip span { display: block; color: #74726c; font-size: 9px; }
