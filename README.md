@@ -65,7 +65,7 @@ deno run --allow-read="<diretorio-das-partituras>" --allow-write="assets/partitu
 
 ## Conferência de repertório
 
-A rota interna `#repertorio` aceita texto colado, imagens, PDFs, TXT e CSV. A lista extraída é comparada com os títulos de `assets/partituras-catalog.js` e separada entre partituras disponíveis, correspondências que precisam de revisão e músicas ainda ausentes. PDFs com texto usam PDF.js; imagens e PDFs escaneados usam Tesseract.js para OCR em português. Essas bibliotecas são carregadas sob demanda e o documento permanece no navegador do usuário.
+A rota interna `#repertorio` aceita texto colado, imagens, PDFs, TXT e CSV. A lista extraída é comparada com os títulos e artistas de `assets/partituras-catalog.js` e separada entre partituras disponíveis, correspondências que precisam de revisão e músicas ainda ausentes. Cabeçalhos, datas, horários, contatos, nomes isolados de artistas e outras informações do evento são retirados da comparação e ficam disponíveis em uma seção auditável de linhas ignoradas. PDFs com texto usam PDF.js; imagens e PDFs escaneados usam Tesseract.js para OCR em português. Essas bibliotecas são carregadas sob demanda e o documento permanece no navegador do usuário.
 
 ## Finalização da aula
 

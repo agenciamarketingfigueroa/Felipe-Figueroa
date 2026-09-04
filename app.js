@@ -962,7 +962,7 @@ function repertoireToolPage() {
       </div>
       <aside class="panel repertoire-help-panel">
         <div class="panel-head"><div><span class="eyebrow">Como funciona</span><h3>Do repertório à preparação</h3></div></div>
-        <ol><li><span>1</span><div><strong>Envie ou cole</strong><small>Fotos e PDFs escaneados passam por leitura de texto.</small></div></li><li><span>2</span><div><strong>Revise a leitura</strong><small>O texto extraído aparece no campo e pode ser corrigido.</small></div></li><li><span>3</span><div><strong>Confira o resultado</strong><small>A ferramenta separa o que existe e o que precisa ser tirado.</small></div></li></ol>
+        <ol><li><span>1</span><div><strong>Envie ou cole</strong><small>Fotos e PDFs escaneados passam por leitura de texto.</small></div></li><li><span>2</span><div><strong>Revise a leitura</strong><small>O texto extraído aparece no campo e pode ser corrigido.</small></div></li><li><span>3</span><div><strong>Confira o resultado</strong><small>A ferramenta separa as músicas e mostra o que foi ignorado.</small></div></li></ol>
         <div class="repertoire-help-note"><strong>Correspondência segura</strong><p>Nomes parecidos ficam em “revisar” para evitar que uma partitura seja marcada como disponível por engano.</p></div>
       </aside>
     </section>
@@ -974,22 +974,89 @@ function normalizeRepertoireText(value = "") {
   return String(value).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[’']/g, "").replace(/&/g, " e ").replace(/[^a-z0-9]+/g, " ").trim().replace(/\s+/g, " ");
 }
 
-function repertoireLinesFromText(text = "") {
-  const genericHeadings = new Set(["repertorio", "setlist", "playlist", "musicas", "musica", "evento", "cerimonia", "recepcao", "entrada", "saida", "coquetel", "festa", "noivos", "noivo", "noiva", "data", "local", "observacoes", "primeiro bloco", "segundo bloco", "terceiro bloco"]);
-  const rawLines = String(text).replace(/\r/g, "\n").replace(/[;]+/g, "\n").split(/\n+/);
-  const unique = new Set();
-  return rawLines.map(line => line
+function cleanRepertoireLine(value = "") {
+  let line = String(value)
     .replace(/^\s*(?:\d{1,3}\s*[.)\-:]|[-–—•●▪◦*✓]+)\s*/, "")
     .replace(/\s+/g, " ")
-    .trim())
+    .trim();
+  const cue = line.match(/^(?:m[uú]sica|can[cç][aã]o|entrada\s+(?:da\s+noiva|do\s+noivo|dos\s+padrinhos|das\s+alian[cç]as|das\s+damas)|sa[ií]da\s+dos\s+noivos|assinatura|cumprimentos|abertura|primeira\s+dan[cç]a)\s*[:\-–—]\s*(.+)$/i);
+  if (cue?.[1]) line = cue[1].trim();
+  return line;
+}
+
+function repertoireLinesFromText(text = "") {
+  const rawLines = String(text).replace(/\r/g, "\n").replace(/[;]+/g, "\n").split(/\n+/);
+  const unique = new Set();
+  return rawLines.map(cleanRepertoireLine)
     .filter(line => line.length >= 2 && line.length <= 180)
     .filter(line => {
       const normalized = normalizeRepertoireText(line);
-      if (!normalized || genericHeadings.has(normalized) || /^pagina \d+$/.test(normalized)) return false;
+      if (!normalized) return false;
       if (unique.has(normalized)) return false;
       unique.add(normalized);
       return true;
     });
+}
+
+const REPERTOIRE_STOP_WORDS = new Set(["a", "o", "as", "os", "de", "da", "do", "das", "dos", "e", "em", "um", "uma", "para", "pra", "por", "no", "na", "nos", "nas"]);
+
+function repertoireContentTokens(value = "") {
+  return normalizeRepertoireText(value).split(" ").filter(token => token && !REPERTOIRE_STOP_WORDS.has(token));
+}
+
+function repertoireTextSimilarity(a, b) {
+  const first = normalizeRepertoireText(a);
+  const second = normalizeRepertoireText(b);
+  if (!first || !second) return 0;
+  if (first === second) return 1;
+  const editSimilarity = 1 - levenshteinDistance(first, second) / Math.max(first.length, second.length);
+  const firstTokens = repertoireContentTokens(first);
+  const secondTokens = repertoireContentTokens(second);
+  const firstSet = new Set(firstTokens);
+  const overlap = secondTokens.filter(token => firstSet.has(token)).length;
+  const recall = overlap / Math.max(1, secondTokens.length);
+  const precision = overlap / Math.max(1, firstTokens.length);
+  const lengthRatio = Math.min(first.length, second.length) / Math.max(first.length, second.length);
+  return Math.max(editSimilarity, recall * .62 + precision * .28 + lengthRatio * .1);
+}
+
+function repertoireSegments(line = "") {
+  return String(line).split(/\s*(?:[–—|]|-\s+|:\s+)\s*/).map(part => part.trim()).filter(Boolean);
+}
+
+function repertoireArtistMatchScore(value, song) {
+  return (song.artists || []).reduce((best, artist) => Math.max(best, repertoireTextSimilarity(value, artist)), 0);
+}
+
+function repertoireNoiseReason(line, songs) {
+  const normalized = normalizeRepertoireText(line);
+  const titleSet = new Set(songs.map(song => normalizeRepertoireText(song.title)));
+  const artistSet = new Set(songs.flatMap(song => song.artists || []).map(normalizeRepertoireText));
+  const isExactTitle = titleSet.has(normalized);
+  const headings = new Set([
+    "repertorio", "repertorio do evento", "repertorio casamento", "setlist", "playlist", "lista de musicas", "musicas", "musica",
+    "evento", "cerimonia", "recepcao", "entrada", "saida", "coquetel", "festa", "noivos", "noivo", "noiva", "dados do evento",
+    "observacoes", "informacoes gerais", "informacoes do evento", "detalhes do evento", "primeiro bloco", "segundo bloco", "terceiro bloco",
+    "bloco 1", "bloco 2", "bloco 3", "programacao", "cronograma"
+  ]);
+  if (headings.has(normalized) || /^(?:repertorio|setlist|playlist|lista de musicas)(?:\s+(?:do|da|de)\s+.+)?$/.test(normalized)) return "Cabeçalho da lista";
+  if (/^(?:pagina|pag)\s*\d+(?:\s*de\s*\d+)?$/.test(normalized)) return "Número da página";
+  if (/^(?:https?:\/\/|www\.|\S+@\S+\.\S+)/i.test(line) || /(?:instagram\.com|facebook\.com|youtube\.com|@\w{3,})/i.test(line)) return "Contato ou link";
+  if (/(?:^|\s)(?:r\$\s*\d|cep\s*:?\s*\d|pix\s*:)/i.test(line)) return "Informação administrativa";
+  if (!isExactTitle && /^(?:data|dia|hor[aá]rio|hora|local|endere[cç]o|cidade|evento|cliente|contratante|cerimonial|contato|telefone|celular|e-?mail|instagram|observa[cç][oõ]es?|obs|dura[cç][aã]o|forma[cç][aã]o|equipe|valor|pagamento|traje|passagem de som|soundcheck)(?:\s+\w+){0,2}\s*:/i.test(line)) return "Informação do evento";
+  if (/^(?:in[ií]cio|fim|intervalo|pausa|chegada|montagem|desmontagem)(?:\s|:|$)/i.test(line)) return "Informação do evento";
+  if (!isExactTitle && /^(?:casamento|anivers[aá]rio|formatura|ensaio|evento)\b/i.test(line)) return "Descrição do evento";
+  if (!isExactTitle && /^(?:buffet|espa[cç]o|sal[aã]o|igreja|capela|hotel|pousada|restaurante|rua|avenida|av\.?|rodovia|estrada|alameda|pra[cç]a)\b/i.test(line)) return "Local do evento";
+  if (!isExactTitle && /\b(?:buffet|espa[cç]o|sal[aã]o|igreja|capela|hotel|pousada|restaurante|recanto)\b.*\b(?:eventos?|festas?|cerim[oô]nias?)\b/i.test(line)) return "Local do evento";
+  if (!isExactTitle && /\d/.test(line) && /\b(?:segunda|ter[cç]a|quarta|quinta|sexta|s[aá]bado|domingo|janeiro|fevereiro|mar[cç]o|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\b/i.test(line)) return "Data do evento";
+  if (!isExactTitle && /^(?:segunda(?:-feira)?|ter[cç]a(?:-feira)?|quarta(?:-feira)?|quinta(?:-feira)?|sexta(?:-feira)?|s[aá]bado|domingo)$/i.test(line.trim())) return "Data do evento";
+  if (/^(?:\d{1,2}[\/:.-]\d{1,2}(?:[\/:.-]\d{2,4})?|\d{1,2}(?::|h)\d{2})(?:\s*(?:h|horas?))?$/.test(line.trim())) return "Data ou horário";
+  if (/^[\d\s.,:/()+-]+$/.test(line)) return "Linha numérica";
+  if (/\.(?:pdf|png|jpe?g|docx?|xlsx?)$/i.test(line.trim())) return "Nome de arquivo";
+  if (artistSet.has(normalized) && !titleSet.has(normalized)) return "Nome de artista sem música";
+  const wordCount = normalized.split(" ").filter(Boolean).length;
+  if (wordCount > 16 || (wordCount > 11 && /[.!?]$/.test(line))) return "Texto ou observação";
+  return "";
 }
 
 function levenshteinDistance(a, b) {
@@ -1010,25 +1077,36 @@ function repertoireMatchScore(line, song) {
   const title = normalizeRepertoireText(song.title);
   if (!query || !title) return 0;
   if (query === title) return 1;
-  if (title.length >= 4 && ` ${query} `.includes(` ${title} `)) return .99;
-  const segments = String(line).split(/\s+(?:-|–|—|\||:)\s+/).map(normalizeRepertoireText).filter(Boolean);
-  if (segments.includes(title)) return .98;
+  const rawSegments = repertoireSegments(line);
+  const segments = rawSegments.map(normalizeRepertoireText);
+  const exactTitleSegment = segments.findIndex(segment => segment === title);
+  if (exactTitleSegment >= 0) {
+    const possibleArtist = rawSegments[exactTitleSegment + 1];
+    const isKey = possibleArtist && /^(?:[a-g](?:#|b)?m?|tom\s+[a-g](?:#|b)?m?)$/i.test(possibleArtist.trim());
+    if (possibleArtist && !isKey && repertoireArtistMatchScore(possibleArtist, song) < .72) return .86;
+    return .99;
+  }
+  if (title.length >= 5 && ` ${query} `.includes(` ${title} `)) {
+    const hasCatalogArtist = (song.artists || []).some(artist => {
+      const normalizedArtist = normalizeRepertoireText(artist);
+      return normalizedArtist.length >= 4 && ` ${query} `.includes(` ${normalizedArtist} `);
+    });
+    const lengthRatio = title.length / query.length;
+    return hasCatalogArtist || lengthRatio >= .58 ? .96 : .82;
+  }
   const candidates = [query, ...segments].filter((value, index, list) => list.indexOf(value) === index && value.length >= 3);
   let best = 0;
   candidates.forEach(candidate => {
-    const editSimilarity = 1 - levenshteinDistance(candidate, title) / Math.max(candidate.length, title.length);
-    const titleTokens = title.split(" ");
-    const candidateTokens = new Set(candidate.split(" "));
-    const coverage = titleTokens.filter(token => candidateTokens.has(token)).length / titleTokens.length;
-    const lengthRatio = Math.min(candidate.length, title.length) / Math.max(candidate.length, title.length);
-    best = Math.max(best, editSimilarity, coverage * .78 + lengthRatio * .12);
+    best = Math.max(best, repertoireTextSimilarity(candidate, title));
   });
   return best;
 }
 
 function compareRepertoire(lines, songs) {
-  const result = { matched:[], possible:[], missing:[] };
+  const result = { matched:[], possible:[], missing:[], ignored:[] };
   lines.forEach(line => {
+    const ignoredReason = repertoireNoiseReason(line, songs);
+    if (ignoredReason) { result.ignored.push({ line, reason:ignoredReason }); return; }
     let bestSong = null;
     let bestScore = 0;
     songs.forEach(song => {
@@ -1037,29 +1115,32 @@ function compareRepertoire(lines, songs) {
       if (score > bestScore || (score === bestScore && longerTitle)) { bestSong = song; bestScore = score; }
     });
     const item = { line, song:bestSong, score:bestScore };
-    if (bestSong && bestScore >= .9) result.matched.push(item);
-    else if (bestSong && bestScore >= .7) result.possible.push(item);
+    if (bestSong && bestScore >= .92) result.matched.push(item);
+    else if (bestSong && bestScore >= .76) result.possible.push(item);
     else result.missing.push(item);
   });
-  return { ...result, total:lines.length };
+  return { ...result, total:result.matched.length + result.possible.length + result.missing.length, rawTotal:lines.length };
 }
 
 function repertoireResultRow(item, type) {
   if (type === "missing") return `<li><span class="repertoire-result-icon">${icons.plus}</span><div><strong>${esc(item.line)}</strong><small>Não encontrada no catálogo</small></div></li>`;
   const artists = (item.song.artists || []).slice(0, 3).join(" · ") || "Artista não informado";
   const keys = (item.song.keys || []).join(" · ");
-  return `<li><span class="repertoire-result-icon">${type === "matched" ? icons.check : icons.search}</span><div><strong>${esc(item.song.title)}</strong><span>Pedido: ${esc(item.line)}</span><small>${esc(artists)}${keys ? ` · Tons: ${esc(keys)}` : ""}${item.song.versions > 1 ? ` · ${item.song.versions} versões` : ""}</small></div></li>`;
+  const confidence = type === "possible" ? ` · ${Math.round(item.score * 100)}% de semelhança` : "";
+  return `<li><span class="repertoire-result-icon">${type === "matched" ? icons.check : icons.search}</span><div><strong>${esc(item.song.title)}</strong><span>Pedido: ${esc(item.line)}</span><small>${esc(artists)}${keys ? ` · Tons: ${esc(keys)}` : ""}${item.song.versions > 1 ? ` · ${item.song.versions} versões` : ""}${confidence}</small></div></li>`;
 }
 
 function repertoireResultsMarkup(analysis) {
-  const { matched, possible, missing, total } = analysis;
-  return `<div class="repertoire-results-head"><div><span class="eyebrow">02 / Resultado</span><h2>Conferência concluída</h2><p>${total} ${total === 1 ? "item analisado" : "itens analisados"} no repertório.</p></div>${missing.length ? `<button class="btn btn-outline" type="button" data-action="copy-missing-scores">${icons.download} Copiar músicas que faltam</button>` : ""}</div>
+  const { matched, possible, missing, total, ignored = [] } = analysis;
+  const ignoredText = ignored.length ? ` · ${ignored.length} ${ignored.length === 1 ? "linha informativa ignorada" : "linhas informativas ignoradas"}` : "";
+  return `<div class="repertoire-results-head"><div><span class="eyebrow">02 / Resultado</span><h2>Conferência concluída</h2><p>${total} ${total === 1 ? "música analisada" : "músicas analisadas"}${ignoredText}.</p></div>${missing.length ? `<button class="btn btn-outline" type="button" data-action="copy-missing-scores">${icons.download} Copiar músicas que faltam</button>` : ""}</div>
     <div class="repertoire-result-summary"><div class="is-found"><strong>${matched.length}</strong><span>Já tenho</span></div><div class="is-review"><strong>${possible.length}</strong><span>Revisar</span></div><div class="is-missing"><strong>${missing.length}</strong><span>Preciso tirar</span></div></div>
     <div class="repertoire-result-grid">
       <section class="repertoire-result-group is-found"><header><span>${icons.check}</span><div><strong>Já tenho</strong><small>Correspondência segura no acervo</small></div><b>${matched.length}</b></header><ul>${matched.length ? matched.map(item => repertoireResultRow(item, "matched")).join("") : `<li class="repertoire-group-empty">Nenhuma correspondência segura.</li>`}</ul></section>
       <section class="repertoire-result-group is-review"><header><span>${icons.search}</span><div><strong>Revisar</strong><small>Nomes parecidos que pedem confirmação</small></div><b>${possible.length}</b></header><ul>${possible.length ? possible.map(item => repertoireResultRow(item, "possible")).join("") : `<li class="repertoire-group-empty">Nenhuma dúvida encontrada.</li>`}</ul></section>
       <section class="repertoire-result-group is-missing"><header><span>${icons.plus}</span><div><strong>Preciso tirar</strong><small>Não encontradas no catálogo</small></div><b>${missing.length}</b></header><ul>${missing.length ? missing.map(item => repertoireResultRow(item, "missing")).join("") : `<li class="repertoire-group-empty">Você já tem todas as partituras.</li>`}</ul></section>
-    </div>`;
+    </div>
+    ${ignored.length ? `<details class="repertoire-ignored"><summary><span>${icons.search}</span><strong>${ignored.length} ${ignored.length === 1 ? "linha não musical ignorada" : "linhas não musicais ignoradas"}</strong><small>Verifique o que a ferramenta retirou da conferência</small></summary><ul>${ignored.map(item => `<li><span>${esc(item.line)}</span><small>${esc(item.reason)}</small></li>`).join("")}</ul></details>` : ""}`;
 }
 
 function loadBrowserScript(src, globalName) {
