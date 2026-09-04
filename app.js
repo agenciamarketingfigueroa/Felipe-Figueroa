@@ -414,8 +414,6 @@ function publicPage() {
         </div>
       </section>
 
-      ${publicAgendaSection()}
-
       <section class="public-section" id="curso">
         <div class="container">
           <div class="courses-list">
@@ -441,6 +439,22 @@ function publicPage() {
         </div></div><footer class="site-footer"><span>© ${new Date().getFullYear()} Felipe Figueroa</span><span>Guitarrista · Sideman · Professor · Belo Horizonte, BR</span><a href="#login/aluno">Acesso do aluno</a></footer></div>
       </section>
     </main>`;
+}
+
+function agendaPublicaPage() {
+  return `
+    <header class="site-nav">
+      <div class="container site-nav-inner">
+        <a class="brand" href="#home"><span class="brand-mark" aria-label="Felipe Figueroa"></span><strong>Felipe Figueroa</strong><span>/ guitar</span></a>
+        <nav class="nav-links" aria-label="Navegação principal">
+          <a href="#sobre">Sobre</a><a href="#trabalhos">Trabalhos</a><a href="#agenda-publica" aria-current="page">Agenda</a><a href="#curso">Curso</a><a href="#contato">Contato</a>
+          <span class="nav-access"><a class="btn btn-outline" href="#login/aluno">Aluno</a><a class="btn btn-primary" href="#login/professor">Professor ${icons.arrow}</a></span>
+        </nav>
+        <div class="nav-mobile-access"><a class="icon-btn" href="#home" aria-label="Voltar ao início" title="Início">${icons.home}</a><a class="icon-btn" href="#login/aluno" aria-label="Acesso do aluno" title="Aluno">${icons.book}</a><a class="icon-btn" href="#login/professor" aria-label="Acesso do professor" title="Professor">${icons.users}</a></div>
+      </div>
+    </header>
+    <main class="public-agenda-page">${publicAgendaSection()}</main>
+    <footer class="agenda-page-footer"><div class="container site-footer"><span>© ${new Date().getFullYear()} Felipe Figueroa</span><span>Guitarrista · Sideman · Professor · Belo Horizonte, BR</span><a href="#home">Voltar ao início</a></div></footer>`;
 }
 
 function dfvPage() {
@@ -1038,7 +1052,7 @@ function render() {
   const hash = location.hash.replace(/^#/, "") || (cleanSalesPath ? "aulas" : cleanDfvPath ? "dfv" : cleanPartiturasPath ? "partituras" : "home");
   const [route, id, detailId] = hash.split("/");
   const app = document.querySelector("#app");
-  document.title = route === "aulas" ? "Aulas de Guitarra e Violão — Felipe Figueroa" : route === "dfv" ? "De Férias com o Violão | Felipe Figueroa" : route === "partituras" ? "Cifras em Partitura | Felipe Figueroa" : "Felipe Figueroa — Guitarrista & Professor";
+  document.title = route === "aulas" ? "Aulas de Guitarra e Violão — Felipe Figueroa" : route === "dfv" ? "De Férias com o Violão | Felipe Figueroa" : route === "partituras" ? "Cifras em Partitura | Felipe Figueroa" : route === "agenda-publica" ? "Agenda de Eventos — Felipe Figueroa" : "Felipe Figueroa — Guitarrista & Professor";
   const professorRoute = ["admin", "dashboard", "agenda", "alunos", "atualizar", "materiais", "pagamentos", "eventos"].includes(route);
   if (route === "login") app.innerHTML = loginPage(id === "professor" ? "professor" : "aluno");
   else if (route === "aulas") app.innerHTML = salesPage();
@@ -1052,6 +1066,7 @@ function render() {
   else if (route === "materiais") app.innerHTML = materialsPage();
   else if (route === "pagamentos") app.innerHTML = paymentsPage();
   else if (route === "eventos") app.innerHTML = cashPage();
+  else if (route === "agenda-publica") app.innerHTML = agendaPublicaPage();
   else if (route === "aluno" && (isProfessorAuthenticated() || authenticatedStudentId() === id)) app.innerHTML = studentPortal(id);
   else if (route === "aluno") app.innerHTML = loginPage("aluno");
   else app.innerHTML = publicPage();

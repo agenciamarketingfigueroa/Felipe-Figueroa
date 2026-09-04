@@ -71,7 +71,7 @@ Na lista de alunos, o botão com o ícone do WhatsApp abre uma proposta pronta. 
 
 ## Agenda pública
 
-A seção `#agenda-publica` exibe data, tipo, parceria musical e local quando essa informação estiver disponível. Os filtros mostram os totais de casamentos, festas/recepções e shows realizados. As próximas oito datas aparecem abertas e as demais ficam em um controle “ver mais”. O histórico é agrupado por ano e permanece fechado até o visitante escolher um período. A base histórica em `assets/data/agenda-eventos.json` foi consolidada a partir do Google Agenda com exclusão de ensaios, reuniões, gravações, passagens de som e shows identificados como participação do público. Eventos futuros vêm da planilha financeira sincronizada, mas nenhum valor, cliente ou observação financeira é mostrado na página pública.
+A página independente `#agenda-publica` exibe data, tipo, parceria musical e local quando essa informação estiver disponível. Os filtros mostram os totais de casamentos, festas/recepções e shows realizados. A agenda futura e o histórico aparecem verticalmente, um abaixo do outro. As próximas oito datas aparecem abertas e as demais ficam em um controle “ver mais”; o histórico é agrupado por ano e permanece fechado até o visitante escolher um período. A base histórica em `assets/data/agenda-eventos.json` foi consolidada a partir do Google Agenda com exclusão de ensaios, reuniões, gravações, passagens de som e eventos confirmados como participação do público. Eventos futuros vêm da planilha financeira sincronizada, mas nenhum valor, cliente ou observação financeira é mostrado na página pública.
 
 ## Caixa de eventos
 

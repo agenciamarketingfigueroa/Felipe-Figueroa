@@ -187,6 +187,11 @@ img { display: block; max-width: 100%; }
 .artist-note { margin: 18px 0 0; color: #74736e; font-size: 12px; }
 
 .public-agenda-section { position: relative; overflow: hidden; background: radial-gradient(circle at 88% 8%, rgba(95,124,255,.13), transparent 26%), #0b0b0b; }
+.public-agenda-page { min-height: 100vh; background: #0b0b0b; }
+.public-agenda-page .public-agenda-section { padding-top: 148px; }
+.agenda-page-footer { padding: 0 0 36px; background: #0b0b0b; }
+.agenda-page-footer .site-footer { padding-top: 28px; border-top: 1px solid var(--line); }
+.nav-links a[aria-current="page"] { color: #aebcff; }
 .public-agenda-section::before { content: "LIVE"; position: absolute; right: -2vw; top: 80px; color: rgba(255,255,255,.018); font: 700 clamp(120px,20vw,280px)/1 var(--font-display); pointer-events: none; }
 .public-agenda-summary { position: relative; display: grid; grid-template-columns: auto auto minmax(260px,1fr); align-items: end; gap: 38px; padding: 26px 0; margin-bottom: 28px; border-block: 1px solid var(--line); }
 .public-agenda-summary > div strong { display: block; color: #8299ff; font: 500 clamp(46px,5vw,68px)/.85 var(--font-display); }
@@ -199,7 +204,7 @@ img { display: block; max-width: 100%; }
 .public-agenda-filter strong { color: #eceae3; font: 500 25px/1 var(--font-display); }
 .public-agenda-filter:hover, .public-agenda-filter.active { border-color: rgba(130,153,255,.65); background: rgba(95,124,255,.14); color: #c9d1ff; }
 .public-agenda-filter:focus-visible { outline: 2px solid #8299ff; outline-offset: 2px; }
-.public-agenda-columns { position: relative; display: grid; grid-template-columns: minmax(0,1.05fr) minmax(340px,.95fr); gap: 18px; align-items: start; }
+.public-agenda-columns { position: relative; display: grid; grid-template-columns: 1fr; gap: 28px; align-items: start; }
 .public-agenda-block { border: 1px solid var(--line); background: rgba(16,16,16,.88); }
 .public-agenda-block > header { padding: 28px 30px 24px; border-bottom: 1px solid var(--line); }
 .public-agenda-block > header h3 { margin: 10px 0 0; font: 500 clamp(30px,3.2vw,44px)/1 var(--font-display); text-transform: uppercase; }

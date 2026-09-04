@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "asOf": "2026-09-03",
-  "completedCount": 251,
+  "asOf": "2026-09-04",
+  "completedCount": 254,
   "events": [
     {
       "date": "2017-06-10",
@@ -214,6 +214,12 @@
       "location": "Cine Theatro Brasil Vallourec"
     },
     {
+      "date": "2018-11-10",
+      "type": "Casamento",
+      "partner": "Equipe musical",
+      "location": ""
+    },
+    {
       "date": "2018-11-11",
       "type": "Show",
       "partner": "Green Line Band",
@@ -356,6 +362,12 @@
       "type": "Show",
       "partner": "Green Line Band",
       "location": "São Paulo"
+    },
+    {
+      "date": "2019-11-07",
+      "type": "Show",
+      "partner": "Rogério Henrique",
+      "location": "Santa Cruz"
     },
     {
       "date": "2019-11-16",
@@ -818,6 +830,12 @@
       "type": "Casamento",
       "partner": "Pamela",
       "location": "Confins"
+    },
+    {
+      "date": "2023-04-15",
+      "type": "Casamento",
+      "partner": "Equipe musical",
+      "location": "Paróquia Nossa Senhora de Guadalupe, Rua Castelo de Alcázar, 80 - Castelo, Belo Horizonte - MG, 31330-310, Brasil"
     },
     {
       "date": "2023-04-21",
@@ -1510,5 +1528,5 @@
       "location": "Imperial EventosBH, R. Luzia Salomão, 210 - Mantiqueira, Belo Horizonte - MG, 31660-040, Brasil"
     }
   ],
-  "locationsCount": 180
+  "locationsCount": 182
 }
