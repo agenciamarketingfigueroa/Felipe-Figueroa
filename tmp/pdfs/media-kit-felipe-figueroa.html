@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Media Kit 2026 - Felipe Figueroa</title>
+  <style>
+    @page { size: A4 landscape; margin: 0; }
+    * { box-sizing: border-box; }
+    :root {
+      --ink: #08111f;
+      --navy: #0b1427;
+      --blue: #315bff;
+      --violet: #7357ff;
+      --gold: #f2d765;
+      --paper: #f4f0e9;
+      --white: #ffffff;
+      --muted: #9fa9bc;
+      --line: rgba(255,255,255,.14);
+    }
+    html, body { margin: 0; padding: 0; background: #222; font-family: "Segoe UI", Arial, sans-serif; color: var(--white); }
+    .page { width: 297mm; height: 210mm; position: relative; overflow: hidden; page-break-after: always; background: var(--ink); }
+    .page:last-child { page-break-after: auto; }
+    .pad { padding: 16mm 18mm 14mm; }
+    .eyebrow { font-size: 8.5pt; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); }
+    h1,h2,h3,p { margin: 0; }
+    h1 { font-size: 46pt; line-height: .95; letter-spacing: -.045em; }
+    h2 { font-size: 27pt; line-height: 1.02; letter-spacing: -.035em; }
+    h3 { font-size: 12pt; line-height: 1.18; }
+    p { font-size: 10.2pt; line-height: 1.45; color: #d7dce6; }
+    .muted { color: var(--muted); }
+    .gold { color: var(--gold); }
+    .blue { color: #7f9aff; }
+    .rule { height: 1px; background: var(--line); }
+    .topline { position: absolute; left: 18mm; right: 18mm; top: 10mm; display: flex; align-items: center; justify-content: space-between; z-index: 10; }
+    .topline .brand { font-size: 8pt; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+    .topline .page-no { font-size: 8pt; color: var(--muted); }
+    .footer { position: absolute; left: 18mm; right: 18mm; bottom: 7mm; display: flex; justify-content: space-between; align-items: center; font-size: 7pt; color: #7e899f; }
+    .footer a { color: #9eabc3; text-decoration: none; }
+    .pill { display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,.2); border-radius: 999px; padding: 6px 10px; font-size: 8pt; color: #e5e8ef; }
+    .pill i { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); display: inline-block; }
+
+    /* cover */
+    .cover { background: #030611 url('../../assets/hero-felipe.jpg') center center / cover no-repeat; }
+    .cover:after { content:""; position:absolute; inset:0; background: linear-gradient(90deg, rgba(3,6,17,.98) 0%, rgba(3,6,17,.87) 36%, rgba(3,6,17,.25) 68%, rgba(3,6,17,.2) 100%), linear-gradient(0deg, rgba(3,6,17,.72), transparent 47%); }
+    .cover .content { position:absolute; z-index:2; left:18mm; top:47mm; width:132mm; }
+    .cover .tag { margin-top: 8mm; display:flex; gap: 8px; flex-wrap: wrap; }
+    .cover .claim { margin-top: 9mm; max-width: 115mm; font-size: 15pt; line-height: 1.35; color:#eef1f7; }
+    .cover .year { position:absolute; z-index:2; right:18mm; bottom:14mm; text-align:right; }
+    .cover .year strong { font-size: 24pt; letter-spacing: -.04em; }
+    .cover .year span { display:block; font-size: 8pt; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
+    .logo { width: 20mm; height: 20mm; object-fit: cover; border-radius: 50%; mix-blend-mode: screen; }
+
+    /* page 2 */
+    .intro-grid { position:absolute; left:18mm; right:18mm; top:32mm; bottom:18mm; display:grid; grid-template-columns: 1.12fr .88fr; gap:13mm; }
+    .intro-copy { display:flex; flex-direction:column; justify-content:space-between; }
+    .intro-copy h2 { max-width:128mm; font-size:35pt; }
+    .intro-copy .lead { margin-top:8mm; font-size:13pt; line-height:1.5; max-width:129mm; color:#e7eaf1; }
+    .quote { border-left: 3px solid var(--gold); padding-left: 6mm; font-size:15pt; line-height:1.35; color:#fff; max-width:126mm; }
+    .portrait-card { position:relative; border-radius:7mm; overflow:hidden; min-height:100%; background:url('../../assets/hero-felipe.jpg') 70% center/cover no-repeat; }
+    .portrait-card:after { content:""; position:absolute; inset:0; background:linear-gradient(0deg,rgba(8,17,31,.96),rgba(8,17,31,.05) 67%); }
+    .portrait-card .facts { position:absolute; z-index:2; left:9mm; right:9mm; bottom:9mm; display:grid; grid-template-columns:1fr 1fr; gap:4mm 7mm; }
+    .fact strong { display:block; font-size:20pt; letter-spacing:-.04em; color:var(--gold); }
+    .fact span { display:block; margin-top:1mm; font-size:8pt; line-height:1.35; color:#d7dce6; }
+
+    /* stats */
+    .stats-head { position:absolute; left:18mm; top:31mm; width:130mm; }
+    .stats-head h2 { font-size:37pt; }
+    .stats-head p { display:none; }
+    .stats-grid { position:absolute; left:18mm; right:18mm; top:92mm; bottom:20mm; display:grid; grid-template-columns:repeat(4,1fr); gap:5mm; }
+    .stat { border:1px solid var(--line); border-radius:5mm; padding:7mm; background:linear-gradient(145deg,rgba(49,91,255,.14),rgba(255,255,255,.025)); display:flex; flex-direction:column; justify-content:space-between; }
+    .stat:nth-child(2),.stat:nth-child(6) { background:linear-gradient(145deg,rgba(115,87,255,.16),rgba(255,255,255,.025)); }
+    .stat:nth-child(3),.stat:nth-child(7) { background:linear-gradient(145deg,rgba(242,215,101,.10),rgba(255,255,255,.025)); }
+    .stat .num { font-size:31pt; font-weight:800; letter-spacing:-.055em; }
+    .stat .label { font-size:9pt; line-height:1.25; color:#cbd2df; }
+    .stat .source { margin-top:3mm; font-size:6.5pt; color:#758096; }
+    .halo { position:absolute; width:100mm; height:100mm; border-radius:50%; filter:blur(35px); opacity:.18; background:var(--violet); right:-25mm; top:-25mm; }
+
+    /* trajectory */
+    .trajectory { background:linear-gradient(125deg,#07101e 0%,#0c1833 54%,#0a0d17 100%); }
+    .artists-layout { position:absolute; left:18mm; right:18mm; top:34mm; bottom:18mm; display:grid; grid-template-columns:92mm 1fr; gap:10mm; }
+    .artist-hero { border-radius:6mm; overflow:hidden; position:relative; background:url('../../assets/artists/ramon-e-rafael.jpg') center/cover no-repeat; }
+    .artist-hero:after {content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(6,11,22,.96),rgba(6,11,22,.08));}
+    .artist-hero .caption { position:absolute; z-index:2; left:8mm; right:8mm; bottom:8mm; }
+    .artist-hero .caption strong { font-size:19pt; display:block; }
+    .artist-hero .caption span { font-size:8pt; color:#c8ceda; display:block; margin-top:2mm; }
+    .artists-copy h2 { font-size:31pt; max-width:140mm; }
+    .artist-list { margin-top:8mm; display:grid; grid-template-columns:repeat(2,1fr); gap:3.3mm 8mm; }
+    .artist-item { font-size:9.2pt; border-bottom:1px solid var(--line); padding-bottom:2.4mm; color:#e4e8ef; }
+    .artist-item span { color:var(--gold); margin-right:3mm; font-size:7pt; }
+    .artist-note { margin-top:7mm; font-size:8.4pt; color:#9ea9bc; max-width:145mm; }
+
+    /* education */
+    .education { background:var(--paper); color:var(--ink); }
+    .education .topline, .education .footer { color:#59647a; }
+    .edu-layout { position:absolute; left:18mm; right:18mm; top:32mm; bottom:18mm; display:grid; grid-template-columns:1fr 1fr; gap:11mm; }
+    .edu-copy h2 { font-size:35pt; }
+    .edu-copy > p { color:#49566b; margin-top:7mm; font-size:11.2pt; max-width:123mm; }
+    .product-row { margin-top:9mm; display:grid; grid-template-columns:1fr 1fr; gap:5mm; }
+    .product { border:1px solid #d3d6dd; border-radius:5mm; padding:6mm; background:rgba(255,255,255,.62); }
+    .product b { display:block; font-size:12pt; }
+    .product .big { font-size:26pt; font-weight:800; letter-spacing:-.05em; color:var(--blue); margin-top:4mm; }
+    .product p { color:#5c6677; font-size:8.3pt; margin-top:2mm; }
+    .guitar-card { border-radius:7mm; overflow:hidden; position:relative; background:url('../../assets/hero-guitar.png') center/cover no-repeat; }
+    .guitar-card:after {content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(8,17,31,.94),rgba(8,17,31,.05) 64%);}
+    .guitar-card .channel { position:absolute; left:8mm; right:8mm; bottom:8mm; z-index:2; color:white; }
+    .channel-grid { margin-top:5mm; display:grid; grid-template-columns:repeat(3,1fr); gap:4mm; }
+    .channel-grid strong { display:block; font-size:17pt; color:var(--gold); }
+    .channel-grid span { font-size:7.5pt; color:#d5dbe6; }
+
+    /* fit */
+    .fit-layout { position:absolute; left:18mm; right:18mm; top:34mm; bottom:18mm; display:grid; grid-template-columns:94mm 1fr; gap:12mm; }
+    .fit-left h2 { font-size:35pt; }
+    .fit-left p { margin-top:7mm; font-size:11pt; }
+    .fit-left .mini { margin-top:10mm; padding:6mm; border-radius:5mm; background:rgba(242,215,101,.08); border:1px solid rgba(242,215,101,.26); font-size:9.2pt; line-height:1.45; color:#e9e5cd; }
+    .fit-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:5mm; }
+    .fit-card { border:1px solid var(--line); border-radius:5mm; padding:6mm; background:rgba(255,255,255,.025); }
+    .fit-card .n { color:var(--gold); font-size:8pt; font-weight:800; letter-spacing:.12em; }
+    .fit-card h3 { margin-top:3mm; font-size:12.5pt; }
+    .fit-card p { margin-top:2mm; font-size:8.4pt; line-height:1.38; color:#aeb7c7; }
+
+    /* activations */
+    .activations { background:linear-gradient(135deg,#f5f1ea,#e9edf7); color:var(--ink); }
+    .activations .topline,.activations .footer {color:#697386;}
+    .act-head { position:absolute; left:18mm; top:31mm; right:18mm; display:flex; justify-content:space-between; align-items:flex-end; }
+    .act-head h2 { font-size:34pt; max-width:150mm; }
+    .act-head p { color:#5a6678; width:85mm; font-size:9.5pt; }
+    .act-grid { position:absolute; left:18mm; right:18mm; top:80mm; bottom:20mm; display:grid; grid-template-columns:repeat(3,1fr); gap:5mm; }
+    .act { border-radius:5mm; padding:6mm; background:#fff; box-shadow:0 8px 28px rgba(22,31,50,.08); }
+    .act .icon { width:9mm; height:9mm; border-radius:3mm; display:grid; place-items:center; background:var(--ink); color:var(--gold); font-weight:800; }
+    .act h3 { margin-top:4mm; font-size:11.5pt; }
+    .act p { margin-top:2mm; font-size:8.3pt; color:#5e697a; line-height:1.35; }
+
+    /* pilot */
+    .pilot { background:#070b15; }
+    .pilot-layout { position:absolute; inset:31mm 18mm 18mm; display:grid; grid-template-columns:1fr 1fr; gap:12mm; }
+    .pilot-copy h2 { font-size:37pt; }
+    .pilot-copy > p { margin-top:7mm; font-size:11pt; max-width:120mm; }
+    .model-list { margin-top:9mm; display:flex; gap:3mm; flex-wrap:wrap; }
+    .model-list span { border:1px solid rgba(255,255,255,.18); border-radius:999px; padding:3mm 4mm; font-size:8pt; }
+    .pilot-box { border-radius:7mm; padding:8mm; background:linear-gradient(145deg,rgba(49,91,255,.25),rgba(115,87,255,.13)); border:1px solid rgba(126,151,255,.3); }
+    .pilot-box h3 { font-size:17pt; }
+    .timeline { margin-top:7mm; display:grid; gap:4mm; }
+    .time-row { display:grid; grid-template-columns:22mm 1fr; gap:5mm; align-items:start; }
+    .time-row strong { color:var(--gold); font-size:8pt; letter-spacing:.1em; text-transform:uppercase; }
+    .time-row p { font-size:8.7pt; line-height:1.38; }
+    .pilot-box .disclaimer { margin-top:6mm; padding-top:4mm; border-top:1px solid rgba(255,255,255,.15); font-size:7.3pt; color:#9ea8bb; }
+
+    /* contact */
+    .contact { background:#050812 url('../../assets/hero-felipe.jpg') center/cover no-repeat; }
+    .contact:after { content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,8,18,.96),rgba(5,8,18,.82) 50%,rgba(5,8,18,.38)); }
+    .contact-inner { position:absolute; z-index:2; left:18mm; top:30mm; bottom:16mm; width:148mm; display:flex; flex-direction:column; justify-content:space-between; }
+    .contact h2 { font-size:41pt; }
+    .contact .lead { margin-top:6mm; font-size:13pt; max-width:125mm; }
+    .contacts { display:grid; grid-template-columns:1fr 1fr; gap:4mm 8mm; margin-top:8mm; }
+    .contact-item { padding:4mm 0; border-bottom:1px solid var(--line); }
+    .contact-item span { display:block; font-size:7pt; letter-spacing:.13em; color:var(--gold); text-transform:uppercase; }
+    .contact-item a { display:block; margin-top:1mm; color:#fff; text-decoration:none; font-size:10.5pt; }
+    .sources { color:#8d98ab; font-size:6.2pt; line-height:1.42; max-width:142mm; }
+    .sources b { color:#c8d0de; }
+  </style>
+</head>
+<body>
+
+  <section class="page cover">
+    <div class="topline">
+      <div class="brand">Felipe Figueroa</div>
+      <img class="logo" src="../../assets/Logo%20Azul%20Felipe.png" alt="Marca Felipe Figueroa">
+    </div>
+    <div class="content">
+      <div class="eyebrow">Media kit | Parcerias e patrocínios</div>
+      <h1>FELIPE<br><span class="gold">FIGUEROA</span></h1>
+      <div class="tag">
+        <span class="pill"><i></i> Guitarrista</span>
+        <span class="pill"><i></i> Sideman</span>
+        <span class="pill"><i></i> Educador</span>
+        <span class="pill"><i></i> Criador</span>
+      </div>
+      <p class="claim">Música, palco e educação conectando marcas a quem vive o instrumento.</p>
+    </div>
+    <div class="year"><strong>2026</strong><span>Belo Horizonte - Brasil</span></div>
+  </section>
+
+  <section class="page pad">
+    <div class="topline"><div class="brand">Perfil artístico</div><div class="page-no">02</div></div>
+    <div class="intro-grid">
+      <div class="intro-copy">
+        <div>
+          <div class="eyebrow">Trajetória e posicionamento</div>
+          <h2>Instrumento, repertório e experiência <span class="blue">em movimento.</span></h2>
+          <p class="lead">Felipe Figueroa é guitarrista, sideman e professor. Desde 2010, constrói uma trajetória que atravessa shows, casamentos, recepções, gravações e sala de aula - conectando técnica, sensibilidade musical e comunicação prática.</p>
+        </div>
+        <div class="quote">“Música feita com intenção - no palco, no estúdio e na sala de aula.”</div>
+      </div>
+      <div class="portrait-card">
+        <div class="facts">
+          <div class="fact"><strong>2010</strong><span>início da atuação profissional e docente</span></div>
+          <div class="fact"><strong>500+</strong><span>alunos no Brasil e no exterior</span></div>
+          <div class="fact"><strong>20+</strong><span>artistas e bandas acompanhados</span></div>
+          <div class="fact"><strong>BH</strong><span>base profissional, com disponibilidade para projetos</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Felipe Figueroa - Media Kit 2026</span><span>Dados de trajetória: acervo e site oficial</span></div>
+  </section>
+
+  <section class="page pad">
+    <div class="halo"></div>
+    <div class="topline"><div class="brand">Impacto em números</div><div class="page-no">03</div></div>
+    <div class="stats-head">
+      <div class="eyebrow">Prova de atuação</div>
+      <h2>Uma presença construída entre <span class="gold">palco, conteúdo e ensino.</span></h2>
+      <p>Números organizados a partir do histórico profissional e dos canais públicos. Recorte atualizado em 04/09/2026.</p>
+    </div>
+    <div class="stats-grid">
+      <div class="stat"><div class="num">254</div><div class="label">eventos profissionais realizados</div><div class="source">Histórico de agenda</div></div>
+      <div class="stat"><div class="num">144</div><div class="label">casamentos realizados</div><div class="source">Histórico de agenda</div></div>
+      <div class="stat"><div class="num">95</div><div class="label">shows realizados</div><div class="source">Histórico de agenda</div></div>
+      <div class="stat"><div class="num">15</div><div class="label">festas e recepções</div><div class="source">Histórico de agenda</div></div>
+      <div class="stat"><div class="num">4,72 mil</div><div class="label">inscritos no YouTube</div><div class="source">Canal público</div></div>
+      <div class="stat"><div class="num">492 mil</div><div class="label">visualizações no YouTube</div><div class="source">Canal público</div></div>
+      <div class="stat"><div class="num">98</div><div class="label">vídeos publicados no canal</div><div class="source">Canal público</div></div>
+      <div class="stat"><div class="num">676</div><div class="label">seguidores no Instagram</div><div class="source">Perfil público</div></div>
+    </div>
+    <div class="footer"><span>Alcance com contexto: músicos, alunos e público de apresentações | Recorte: 04/09/2026</span><span>03</span></div>
+  </section>
+
+  <section class="page trajectory pad">
+    <div class="topline"><div class="brand">Trajetória ao vivo</div><div class="page-no">04</div></div>
+    <div class="artists-layout">
+      <div class="artist-hero">
+        <div class="caption"><strong>Palco compartilhado</strong><span>Experiência de repertório, direção, adaptação e entrega ao vivo.</span></div>
+      </div>
+      <div class="artists-copy">
+        <div class="eyebrow">Artistas e projetos</div>
+        <h2>Conexões musicais que ampliam <span class="gold">alcance e credibilidade.</span></h2>
+        <div class="artist-list">
+          <div class="artist-item"><span>01</span>Ramon e Rafael</div>
+          <div class="artist-item"><span>02</span>Flávio Vitor Jr.</div>
+          <div class="artist-item"><span>03</span>Junho Chu</div>
+          <div class="artist-item"><span>04</span>Juninho Cassimiro</div>
+          <div class="artist-item"><span>05</span>Davidson Silva</div>
+          <div class="artist-item"><span>06</span>Diego Fernandes</div>
+          <div class="artist-item"><span>07</span>Celina Borges</div>
+          <div class="artist-item"><span>08</span>GBA Worship</div>
+          <div class="artist-item"><span>09</span>Suely Façanha</div>
+          <div class="artist-item"><span>10</span>Nandah</div>
+          <div class="artist-item"><span>11</span>Lucimare Nascimento</div>
+          <div class="artist-item"><span>12</span>Rogério Henrique</div>
+          <div class="artist-item"><span>13</span>Ministério Jeito Ágape</div>
+          <div class="artist-item"><span>14</span>Green Line Band</div>
+        </div>
+        <p class="artist-note">Seleção de trabalhos apresentados no portfólio oficial. Ao longo da carreira, Felipe registra colaboração com mais de 20 artistas e bandas.</p>
+      </div>
+    </div>
+    <div class="footer"><span>Felipe Figueroa - Media Kit 2026</span><span>04</span></div>
+  </section>
+
+  <section class="page education pad">
+    <div class="topline"><div class="brand">Educação e conteúdo</div><div class="page-no">05</div></div>
+    <div class="edu-layout">
+      <div class="edu-copy">
+        <div class="eyebrow" style="color:#315bff">Autoridade que ensina</div>
+        <h2>O instrumento não aparece só no palco. Ele vira <span class="blue">conteúdo útil.</span></h2>
+        <p>Felipe transforma experiência prática em aulas, repertório e materiais que acompanham o músico no estudo e na performance.</p>
+        <div class="product-row">
+          <div class="product"><b>Descomplicando o DADGAD</b><div class="big">~40</div><p>aulas on-line, com comunidade e aplicação prática.</p></div>
+          <div class="product"><b>Pack de Partituras</b><div class="big">358</div><p>arranjos de 249 músicas, com aulas e comunidade.</p></div>
+        </div>
+      </div>
+      <div class="guitar-card">
+        <div class="channel">
+          <div class="eyebrow">Canal Felipe Figueroa GT</div>
+          <div class="channel-grid">
+            <div><strong>4,72 mil</strong><span>inscritos</span></div>
+            <div><strong>492 mil</strong><span>visualizações</span></div>
+            <div><strong>98</strong><span>vídeos</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer"><span>Conteúdo especializado cria lembrança de marca e utilidade duradoura</span><span>05</span></div>
+  </section>
+
+  <section class="page pad">
+    <div class="topline"><div class="brand">Felipe + marcas de instrumentos</div><div class="page-no">06</div></div>
+    <div class="fit-layout">
+      <div class="fit-left">
+        <div class="eyebrow">Por que faz sentido</div>
+        <h2>Marca inserida no <span class="gold">uso real.</span></h2>
+        <p>A parceria ganha força quando o produto acompanha o artista nos contextos em que a decisão de compra acontece: estudo, aula, gravação, ensaio e palco.</p>
+        <div class="mini">Felipe reúne três papéis complementares: profissional que usa, educador que explica e criador que demonstra.</div>
+      </div>
+      <div class="fit-grid">
+        <div class="fit-card"><div class="n">01 / PALCO</div><h3>Uso recorrente e visível</h3><p>Presença do equipamento em shows, casamentos, recepções, ensaios e gravações.</p></div>
+        <div class="fit-card"><div class="n">02 / CONTEÚDO</div><h3>Demonstração com contexto</h3><p>Vídeos e posts que mostram timbre, aplicação, recursos e escolhas musicais.</p></div>
+        <div class="fit-card"><div class="n">03 / EDUCAÇÃO</div><h3>Influência qualificada</h3><p>Contato direto com alunos e músicos em momento de aprendizado e decisão.</p></div>
+        <div class="fit-card"><div class="n">04 / REPERTÓRIO</div><h3>Versatilidade comprovada</h3><p>Experiência em diferentes formações e demandas, do acompanhamento à performance.</p></div>
+        <div class="fit-card"><div class="n">05 / FEEDBACK</div><h3>Teste de quem trabalha</h3><p>Percepção prática sobre ergonomia, confiabilidade, timbre e fluxo profissional.</p></div>
+        <div class="fit-card"><div class="n">06 / RELACIONAMENTO</div><h3>Construção de longo prazo</h3><p>Comunicação autêntica, frequência e afinidade real com produtos que façam sentido.</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>Proposta baseada em afinidade, utilidade e benefício mútuo</span><span>06</span></div>
+  </section>
+
+  <section class="page activations pad">
+    <div class="topline"><div class="brand">Possibilidades de ativação</div><div class="page-no">07</div></div>
+    <div class="act-head">
+      <h2>Parcerias que podem virar <span class="blue">história, demonstração e experiência.</span></h2>
+      <p>Escopo, frequência, direitos de uso e contrapartidas são definidos em conjunto para cada campanha.</p>
+    </div>
+    <div class="act-grid">
+      <div class="act"><div class="icon">01</div><h3>Conteúdo de produto</h3><p>Demos, reviews, comparativos, dicas de uso, Reels, Shorts e vídeos longos.</p></div>
+      <div class="act"><div class="icon">02</div><h3>Integração ao vivo</h3><p>Equipamento em palco, bastidores, soundcheck, repertório e registros de eventos.</p></div>
+      <div class="act"><div class="icon">03</div><h3>Educação patrocinada</h3><p>Aulas, clínicas, workshops, lives e séries temáticas com aplicação musical.</p></div>
+      <div class="act"><div class="icon">04</div><h3>Lançamentos</h3><p>Apresentação de novidades, unboxing, campanha de lançamento e experiências guiadas.</p></div>
+      <div class="act"><div class="icon">05</div><h3>Comunidade</h3><p>Benefícios para alunos, cupons, afiliados, desafios e ações de experimentação.</p></div>
+      <div class="act"><div class="icon">06</div><h3>Pesquisa e feedback</h3><p>Teste profissional, relato técnico e retorno estruturado para produto e comunicação.</p></div>
+    </div>
+    <div class="footer"><span>Formatos disponíveis para apoio, campanha, embaixadoria e relacionamento artístico</span><span>07</span></div>
+  </section>
+
+  <section class="page pilot pad">
+    <div class="topline"><div class="brand">Próximo passo</div><div class="page-no">08</div></div>
+    <div class="pilot-layout">
+      <div class="pilot-copy">
+        <div class="eyebrow">Começar com clareza</div>
+        <h2>Uma parceria boa começa por um <span class="gold">piloto mensurável.</span></h2>
+        <p>A proposta pode nascer pequena, provar aderência e crescer com base em qualidade de conteúdo, resposta da comunidade e consistência de uso.</p>
+        <div class="model-list"><span>Apoio de equipamento</span><span>Artist pricing</span><span>Campanha</span><span>Embaixadoria</span><span>Clínica / workshop</span><span>Afiliados</span></div>
+      </div>
+      <div class="pilot-box">
+        <div class="eyebrow">Exemplo de piloto - 90 dias</div>
+        <h3>Produto em contexto, conteúdo e aprendizado.</h3>
+        <div class="timeline">
+          <div class="time-row"><strong>Mês 1</strong><p>Onboarding, estudo do produto, definição de mensagens e primeiros registros de uso.</p></div>
+          <div class="time-row"><strong>Mês 2</strong><p>Conteúdo principal + cortes sociais + integração orgânica em aula, ensaio ou palco.</p></div>
+          <div class="time-row"><strong>Mês 3</strong><p>Conteúdo de aprofundamento, ação com a comunidade e relatório de aprendizados.</p></div>
+        </div>
+        <div class="disclaimer">Modelo ilustrativo. Entregas, investimento, exclusividade, aprovação e direitos de uso são negociados por projeto.</div>
+      </div>
+    </div>
+    <div class="footer"><span>Felipe Figueroa - Media Kit 2026</span><span>08</span></div>
+  </section>
+
+  <section class="page contact">
+    <div class="topline" style="z-index:3"><div class="brand">Contato</div><div class="page-no">09</div></div>
+    <div class="contact-inner">
+      <div>
+        <div class="eyebrow">Vamos conversar?</div>
+        <h2>Que história sua marca quer <span class="gold">colocar em movimento?</span></h2>
+        <p class="lead">Aberto a conversas com fabricantes, distribuidores, lojas, escolas, estúdios e marcas ligadas à música.</p>
+        <div class="contacts">
+          <div class="contact-item"><span>WhatsApp</span><a href="https://wa.me/5531999427901">+55 31 99942-7901</a></div>
+          <div class="contact-item"><span>E-mail</span><a href="mailto:contato@felipefigueroa.com.br">contato@felipefigueroa.com.br</a></div>
+          <div class="contact-item"><span>Instagram</span><a href="https://instagram.com/felipefigueroagt">@felipefigueroagt</a></div>
+          <div class="contact-item"><span>YouTube</span><a href="https://youtube.com/@FelipeFigueroaGT">@FelipeFigueroaGT</a></div>
+          <div class="contact-item"><span>Site</span><a href="https://felipefigueroa.com.br">felipefigueroa.com.br</a></div>
+          <div class="contact-item"><span>Base</span><a>Belo Horizonte - MG</a></div>
+        </div>
+      </div>
+      <div class="sources"><b>Notas e fontes:</b> números de eventos calculados a partir do histórico profissional publicado no site; alunos e artistas conforme portfólio oficial. YouTube: canal público @FelipeFigueroaGT. Instagram: perfil público @felipefigueroagt. Referências de estrutura: Apple Music for Artists, Shopify, Later, Fender, Paiste, Zildjian, Strandberg e Izzo Musical. Dados sociais consultados em 04/09/2026 e sujeitos a variação.</div>
+    </div>
+  </section>
+
+</body>
+</html>
