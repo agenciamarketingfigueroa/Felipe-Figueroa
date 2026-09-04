@@ -434,6 +434,7 @@ function publicPage() {
       <section class="contact-section" id="contato">
         <div class="container"><div class="contact-big"><div><span class="eyebrow">Agenda aberta</span><h2>Vamos fazer<br><span>música?</span></h2></div><div class="contact-links">
           <a class="contact-link" href="mailto:contato@felipefigueroa.com.br"><span>E-mail</span>${icons.arrow}</a>
+          <a class="contact-link" target="_blank" rel="noopener" href="https://wa.me/5531999427901" aria-label="Conversar com Felipe Figueroa pelo WhatsApp"><span>WhatsApp · (31) 99942-7901</span>${icons.whatsapp}</a>
           <a class="contact-link" target="_blank" rel="noopener" href="https://instagram.com/felipefigueroagt"><span>@felipefigueroagt</span>${icons.external}</a>
           <a class="contact-link" href="#login/professor"><span>Área do professor</span>${icons.arrow}</a>
           <a class="contact-link" href="#login/aluno"><span>Área do aluno</span>${icons.arrow}</a>
