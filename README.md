@@ -23,6 +23,7 @@ Depois acesse `http://localhost:4173`.
 - `#admin` — visão geral do professor, protegida por sessão
 - `#agenda` — agenda e links das aulas
 - `#agenda-eventos` — agenda profissional com próximos eventos e histórico de datas
+- `#repertorio` — conferência de repertório por texto, imagem ou PDF contra o catálogo de partituras
 - `#alunos` — cadastro e edição dos alunos
 - `#atualizar/{id}` — atualização pedagógica com resumo, exercícios e materiais do aluno
 - `#materiais` — biblioteca didática e mapa da apostila
@@ -61,6 +62,10 @@ Para atualizar o catálogo depois de adicionar ou renomear partituras, execute:
 ```bash
 deno run --allow-read="<diretorio-das-partituras>" --allow-write="assets/partituras-catalog.js" scripts/build-partituras-catalog.ts "<diretorio-das-partituras>" "assets/partituras-catalog.js"
 ```
+
+## Conferência de repertório
+
+A rota interna `#repertorio` aceita texto colado, imagens, PDFs, TXT e CSV. A lista extraída é comparada com os títulos de `assets/partituras-catalog.js` e separada entre partituras disponíveis, correspondências que precisam de revisão e músicas ainda ausentes. PDFs com texto usam PDF.js; imagens e PDFs escaneados usam Tesseract.js para OCR em português. Essas bibliotecas são carregadas sob demanda e o documento permanece no navegador do usuário.
 
 ## Finalização da aula
 

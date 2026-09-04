@@ -5,6 +5,10 @@ const WORKBOOK_URL = "assets/materials/apostila-facilitando-o-violao.pdf";
 const EVENT_SOURCE_URL = "https://drive.google.com/file/d/1W0algsCcY671wriIHv7XLCmq-xt2Iuqk/view";
 const EVENT_SYNC_URL = "assets/data/eventos.json";
 const PUBLIC_AGENDA_URL = "assets/data/agenda-eventos.json";
+const SCORES_CATALOG_URL = "assets/partituras-catalog.js?v=4";
+const PDFJS_MODULE_URL = "https://cdn.jsdelivr.net/npm/pdfjs-dist@5.7.284/build/pdf.min.mjs";
+const PDFJS_WORKER_URL = "https://cdn.jsdelivr.net/npm/pdfjs-dist@5.7.284/build/pdf.worker.min.mjs";
+const TESSERACT_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/tesseract.min.js";
 const DFV_OFFER = { regularPrice: 67, launchPrice: 47 };
 // TODO(DFV): insira aqui a URL definitiva do checkout. Todos os CTAs usam este único valor.
 const DFV_CHECKOUT_URL = "";
@@ -150,6 +154,8 @@ let eventSyncInProgress = false;
 let publicAgendaHistory = [];
 let publicAgendaStatus = "loading";
 let publicAgendaFilter = "all";
+let repertoireSelectedFile = null;
+let repertoireLastAnalysis = null;
 const cashFilters = {
   mode: "month",
   year: String(new Date().getFullYear()),
@@ -803,7 +809,7 @@ function salesPage() {
 
 function sidebar(active) {
   const items = [
-    ["dashboard", "Visão geral", icons.home], ["agenda", "Agenda", icons.calendar], ["agenda-eventos", "Eventos", icons.calendar], ["eventos", "Caixa de eventos", icons.money], ["alunos", "Alunos", icons.users], ["materiais", "Materiais", icons.book], ["pagamentos", "Pagamentos", icons.money]
+    ["dashboard", "Visão geral", icons.home], ["agenda", "Agenda", icons.calendar], ["agenda-eventos", "Eventos", icons.calendar], ["repertorio", "Conferir repertório", icons.music], ["eventos", "Caixa de eventos", icons.money], ["alunos", "Alunos", icons.users], ["materiais", "Materiais", icons.book], ["pagamentos", "Pagamentos", icons.money]
   ];
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -823,6 +829,8 @@ function sidebar(active) {
 function appShell(active, title, content) {
   const primaryAction = active === "agenda-eventos"
     ? `<button class="btn btn-primary" data-action="sync-events">${icons.calendar}<span>Atualizar eventos</span></button>`
+    : active === "repertorio"
+    ? `<button class="btn btn-primary" data-action="clear-repertoire">${icons.plus}<span>Nova conferência</span></button>`
     : active === "eventos"
     ? `<a class="btn btn-primary" href="${EVENT_SOURCE_URL}" target="_blank" rel="noopener">${icons.external}<span>Editar planilha</span></a>`
     : `<button class="btn btn-primary" data-action="new-lesson">${icons.plus}<span>Nova aula</span></button>`;
@@ -926,6 +934,290 @@ function eventSchedulePage() {
       <section class="panel event-schedule-panel"><div class="panel-head"><div><span class="eyebrow">Arquivo</span><h3>Eventos passados</h3><p>${publicAgendaStatus === "loading" ? "Carregando histórico..." : `${past.length} ${past.length === 1 ? "data no histórico" : "datas no histórico"}`}</p></div></div><div class="event-schedule-list event-history-list">${past.length ? past.map(event => eventScheduleRow(event, true)).join("") : `<div class="empty">${publicAgendaStatus === "loading" ? "Carregando eventos passados..." : "O histórico ainda está vazio."}</div>`}</div></section>
     </div>
   `);
+}
+
+function repertoireToolPage() {
+  const catalogTotal = globalThis.PARTITURAS_CATALOG_META?.songs || 249;
+  const previousText = repertoireLastAnalysis?.sourceText || "";
+  const fileName = repertoireSelectedFile?.name || "Nenhum arquivo selecionado";
+  return appShell("repertorio", "Conferir repertório", `
+    <div class="greeting"><div><span class="eyebrow">Ferramenta de preparação</span><h2>Conferir repertório</h2><p>Envie um print, PDF ou cole a lista para descobrir o que já existe no seu acervo.</p></div><span class="date-chip" data-repertoire-catalog-status>${globalThis.PARTITURAS_SONGS?.length ? `${globalThis.PARTITURAS_SONGS.length} títulos prontos para comparar` : "Carregando catálogo..."}</span></div>
+    <section class="repertoire-workspace">
+      <div class="panel repertoire-input-panel">
+        <div class="panel-head"><div><span class="eyebrow">01 / Entrada</span><h3>Repertório do evento</h3><p>Você pode combinar um arquivo com observações digitadas.</p></div><span class="tag lime">${catalogTotal} títulos no acervo</span></div>
+        <div class="repertoire-input-body">
+          <label class="repertoire-upload" for="repertoire-file">
+            <input id="repertoire-file" type="file" accept="image/*,.pdf,.txt,.csv,text/plain,application/pdf" data-repertoire-file>
+            <span class="repertoire-upload-icon">${icons.upload}</span>
+            <strong>Enviar print, PDF ou arquivo de texto</strong>
+            <small>PNG, JPG, PDF, TXT ou CSV · até 20 MB</small>
+            <b data-repertoire-file-name>${esc(fileName)}</b>
+          </label>
+          <div class="repertoire-divider"><span>ou cole abaixo</span></div>
+          <label class="repertoire-text-label"><span>Lista de músicas</span><textarea class="field" id="repertoire-text" placeholder="Exemplo:\n1. Perfect — Ed Sheeran\n2. A Thousand Years — Christina Perri\n3. Pra Sonhar — Marcelo Jeneci">${esc(previousText)}</textarea></label>
+          <button class="btn btn-primary repertoire-analyze-button" type="button" data-action="analyze-repertoire">${icons.search} Conferir partituras</button>
+          <div class="repertoire-progress" data-repertoire-progress hidden><span></span><div><strong data-repertoire-progress-title>Preparando análise...</strong><small data-repertoire-progress-detail>Isso pode levar alguns segundos.</small></div></div>
+          <p class="repertoire-privacy">${icons.check}<span>O arquivo é analisado no seu aparelho e não é enviado para o site.</span></p>
+        </div>
+      </div>
+      <aside class="panel repertoire-help-panel">
+        <div class="panel-head"><div><span class="eyebrow">Como funciona</span><h3>Do repertório à preparação</h3></div></div>
+        <ol><li><span>1</span><div><strong>Envie ou cole</strong><small>Fotos e PDFs escaneados passam por leitura de texto.</small></div></li><li><span>2</span><div><strong>Revise a leitura</strong><small>O texto extraído aparece no campo e pode ser corrigido.</small></div></li><li><span>3</span><div><strong>Confira o resultado</strong><small>A ferramenta separa o que existe e o que precisa ser tirado.</small></div></li></ol>
+        <div class="repertoire-help-note"><strong>Correspondência segura</strong><p>Nomes parecidos ficam em “revisar” para evitar que uma partitura seja marcada como disponível por engano.</p></div>
+      </aside>
+    </section>
+    <section class="repertoire-results" data-repertoire-results>${repertoireLastAnalysis ? repertoireResultsMarkup(repertoireLastAnalysis) : `<div class="repertoire-results-empty">${icons.music}<strong>O resultado aparecerá aqui</strong><span>Faça a primeira conferência para organizar a preparação do evento.</span></div>`}</section>
+  `);
+}
+
+function normalizeRepertoireText(value = "") {
+  return String(value).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[’']/g, "").replace(/&/g, " e ").replace(/[^a-z0-9]+/g, " ").trim().replace(/\s+/g, " ");
+}
+
+function repertoireLinesFromText(text = "") {
+  const genericHeadings = new Set(["repertorio", "setlist", "playlist", "musicas", "musica", "evento", "cerimonia", "recepcao", "entrada", "saida", "coquetel", "festa", "noivos", "noivo", "noiva", "data", "local", "observacoes", "primeiro bloco", "segundo bloco", "terceiro bloco"]);
+  const rawLines = String(text).replace(/\r/g, "\n").replace(/[;]+/g, "\n").split(/\n+/);
+  const unique = new Set();
+  return rawLines.map(line => line
+    .replace(/^\s*(?:\d{1,3}\s*[.)\-:]|[-–—•●▪◦*✓]+)\s*/, "")
+    .replace(/\s+/g, " ")
+    .trim())
+    .filter(line => line.length >= 2 && line.length <= 180)
+    .filter(line => {
+      const normalized = normalizeRepertoireText(line);
+      if (!normalized || genericHeadings.has(normalized) || /^pagina \d+$/.test(normalized)) return false;
+      if (unique.has(normalized)) return false;
+      unique.add(normalized);
+      return true;
+    });
+}
+
+function levenshteinDistance(a, b) {
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  let previous = Array.from({ length:b.length + 1 }, (_, index) => index);
+  for (let i = 1; i <= a.length; i += 1) {
+    const current = [i];
+    for (let j = 1; j <= b.length; j += 1) current[j] = Math.min(current[j - 1] + 1, previous[j] + 1, previous[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    previous = current;
+  }
+  return previous[b.length];
+}
+
+function repertoireMatchScore(line, song) {
+  const query = normalizeRepertoireText(line);
+  const title = normalizeRepertoireText(song.title);
+  if (!query || !title) return 0;
+  if (query === title) return 1;
+  if (title.length >= 4 && ` ${query} `.includes(` ${title} `)) return .99;
+  const segments = String(line).split(/\s+(?:-|–|—|\||:)\s+/).map(normalizeRepertoireText).filter(Boolean);
+  if (segments.includes(title)) return .98;
+  const candidates = [query, ...segments].filter((value, index, list) => list.indexOf(value) === index && value.length >= 3);
+  let best = 0;
+  candidates.forEach(candidate => {
+    const editSimilarity = 1 - levenshteinDistance(candidate, title) / Math.max(candidate.length, title.length);
+    const titleTokens = title.split(" ");
+    const candidateTokens = new Set(candidate.split(" "));
+    const coverage = titleTokens.filter(token => candidateTokens.has(token)).length / titleTokens.length;
+    const lengthRatio = Math.min(candidate.length, title.length) / Math.max(candidate.length, title.length);
+    best = Math.max(best, editSimilarity, coverage * .78 + lengthRatio * .12);
+  });
+  return best;
+}
+
+function compareRepertoire(lines, songs) {
+  const result = { matched:[], possible:[], missing:[] };
+  lines.forEach(line => {
+    let bestSong = null;
+    let bestScore = 0;
+    songs.forEach(song => {
+      const score = repertoireMatchScore(line, song);
+      const longerTitle = bestSong && normalizeRepertoireText(song.title).length > normalizeRepertoireText(bestSong.title).length;
+      if (score > bestScore || (score === bestScore && longerTitle)) { bestSong = song; bestScore = score; }
+    });
+    const item = { line, song:bestSong, score:bestScore };
+    if (bestSong && bestScore >= .9) result.matched.push(item);
+    else if (bestSong && bestScore >= .7) result.possible.push(item);
+    else result.missing.push(item);
+  });
+  return { ...result, total:lines.length };
+}
+
+function repertoireResultRow(item, type) {
+  if (type === "missing") return `<li><span class="repertoire-result-icon">${icons.plus}</span><div><strong>${esc(item.line)}</strong><small>Não encontrada no catálogo</small></div></li>`;
+  const artists = (item.song.artists || []).slice(0, 3).join(" · ") || "Artista não informado";
+  const keys = (item.song.keys || []).join(" · ");
+  return `<li><span class="repertoire-result-icon">${type === "matched" ? icons.check : icons.search}</span><div><strong>${esc(item.song.title)}</strong><span>Pedido: ${esc(item.line)}</span><small>${esc(artists)}${keys ? ` · Tons: ${esc(keys)}` : ""}${item.song.versions > 1 ? ` · ${item.song.versions} versões` : ""}</small></div></li>`;
+}
+
+function repertoireResultsMarkup(analysis) {
+  const { matched, possible, missing, total } = analysis;
+  return `<div class="repertoire-results-head"><div><span class="eyebrow">02 / Resultado</span><h2>Conferência concluída</h2><p>${total} ${total === 1 ? "item analisado" : "itens analisados"} no repertório.</p></div>${missing.length ? `<button class="btn btn-outline" type="button" data-action="copy-missing-scores">${icons.download} Copiar músicas que faltam</button>` : ""}</div>
+    <div class="repertoire-result-summary"><div class="is-found"><strong>${matched.length}</strong><span>Já tenho</span></div><div class="is-review"><strong>${possible.length}</strong><span>Revisar</span></div><div class="is-missing"><strong>${missing.length}</strong><span>Preciso tirar</span></div></div>
+    <div class="repertoire-result-grid">
+      <section class="repertoire-result-group is-found"><header><span>${icons.check}</span><div><strong>Já tenho</strong><small>Correspondência segura no acervo</small></div><b>${matched.length}</b></header><ul>${matched.length ? matched.map(item => repertoireResultRow(item, "matched")).join("") : `<li class="repertoire-group-empty">Nenhuma correspondência segura.</li>`}</ul></section>
+      <section class="repertoire-result-group is-review"><header><span>${icons.search}</span><div><strong>Revisar</strong><small>Nomes parecidos que pedem confirmação</small></div><b>${possible.length}</b></header><ul>${possible.length ? possible.map(item => repertoireResultRow(item, "possible")).join("") : `<li class="repertoire-group-empty">Nenhuma dúvida encontrada.</li>`}</ul></section>
+      <section class="repertoire-result-group is-missing"><header><span>${icons.plus}</span><div><strong>Preciso tirar</strong><small>Não encontradas no catálogo</small></div><b>${missing.length}</b></header><ul>${missing.length ? missing.map(item => repertoireResultRow(item, "missing")).join("") : `<li class="repertoire-group-empty">Você já tem todas as partituras.</li>`}</ul></section>
+    </div>`;
+}
+
+function loadBrowserScript(src, globalName) {
+  if (globalThis[globalName]) return Promise.resolve(globalThis[globalName]);
+  return new Promise((resolve, reject) => {
+    const existing = document.querySelector(`script[data-loader="${globalName}"]`);
+    if (existing) { existing.addEventListener("load", () => resolve(globalThis[globalName]), { once:true }); existing.addEventListener("error", reject, { once:true }); return; }
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.dataset.loader = globalName;
+    script.onload = () => resolve(globalThis[globalName]);
+    script.onerror = () => { script.remove(); reject(new Error(`Não foi possível carregar ${globalName}.`)); };
+    document.head.appendChild(script);
+  });
+}
+
+async function ensureScoresCatalog() {
+  if (!globalThis.PARTITURAS_SONGS) await loadBrowserScript(SCORES_CATALOG_URL, "PARTITURAS_SONGS");
+  return globalThis.PARTITURAS_SONGS || [];
+}
+
+function updateRepertoireProgress(title, detail = "", progress = null) {
+  const box = document.querySelector("[data-repertoire-progress]");
+  if (!box) return;
+  box.hidden = false;
+  box.querySelector("[data-repertoire-progress-title]").textContent = title;
+  box.querySelector("[data-repertoire-progress-detail]").textContent = detail;
+  box.style.setProperty("--progress", `${Math.max(4, Math.min(100, Number(progress) || 8))}%`);
+}
+
+async function createRepertoireOcrWorker(onProgress) {
+  await loadBrowserScript(TESSERACT_URL, "Tesseract");
+  return globalThis.Tesseract.createWorker("por", 1, { logger: message => {
+    if (message.status === "recognizing text") onProgress?.(Math.round((message.progress || 0) * 100));
+  }});
+}
+
+async function extractImageRepertoire(file) {
+  updateRepertoireProgress("Lendo o print...", "A primeira leitura pode demorar um pouco.", 10);
+  const worker = await createRepertoireOcrWorker(progress => updateRepertoireProgress("Reconhecendo as músicas...", `${progress}% concluído`, progress));
+  try {
+    const result = await worker.recognize(file);
+    return result.data.text || "";
+  } finally {
+    await worker.terminate();
+  }
+}
+
+async function extractPdfRepertoire(file) {
+  updateRepertoireProgress("Abrindo o PDF...", "Procurando texto no documento.", 8);
+  const pdfjs = await import(PDFJS_MODULE_URL);
+  pdfjs.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_URL;
+  const pdf = await pdfjs.getDocument({ data:await file.arrayBuffer() }).promise;
+  if (pdf.numPages > 15) throw new Error("O PDF possui mais de 15 páginas. Envie apenas as páginas do repertório.");
+  const pages = [];
+  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+    updateRepertoireProgress("Lendo o PDF...", `Página ${pageNumber} de ${pdf.numPages}`, Math.round(pageNumber / pdf.numPages * 55));
+    const page = await pdf.getPage(pageNumber);
+    const content = await page.getTextContent();
+    pages.push(content.items.map(item => `${item.str}${item.hasEOL ? "\n" : " "}`).join("").trim());
+  }
+  const extracted = pages.join("\n").trim();
+  if (normalizeRepertoireText(extracted).length >= 20) return extracted;
+  updateRepertoireProgress("PDF escaneado detectado", "Iniciando leitura visual das páginas.", 12);
+  const worker = await createRepertoireOcrWorker(progress => updateRepertoireProgress("Reconhecendo o PDF...", `${progress}% da página atual`, progress));
+  const ocrPages = [];
+  try {
+    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+      const page = await pdf.getPage(pageNumber);
+      const viewport = page.getViewport({ scale:1.6 });
+      const canvas = document.createElement("canvas");
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      await page.render({ canvasContext:canvas.getContext("2d"), viewport }).promise;
+      updateRepertoireProgress("Lendo PDF escaneado...", `Página ${pageNumber} de ${pdf.numPages}`, Math.round((pageNumber - 1) / pdf.numPages * 100));
+      const result = await worker.recognize(canvas);
+      ocrPages.push(result.data.text || "");
+    }
+  } finally {
+    await worker.terminate();
+  }
+  return ocrPages.join("\n");
+}
+
+async function extractRepertoireFile(file) {
+  if (!file) return "";
+  if (file.size > 20 * 1024 * 1024) throw new Error("O arquivo ultrapassa o limite de 20 MB.");
+  const extension = file.name.split(".").pop().toLowerCase();
+  if (file.type.startsWith("image/")) return extractImageRepertoire(file);
+  if (file.type === "application/pdf" || extension === "pdf") return extractPdfRepertoire(file);
+  if (file.type.startsWith("text/") || ["txt","csv"].includes(extension)) return file.text();
+  throw new Error("Formato não reconhecido. Use PNG, JPG, PDF, TXT ou CSV.");
+}
+
+async function prepareRepertoireTool() {
+  const status = document.querySelector("[data-repertoire-catalog-status]");
+  try {
+    const songs = await ensureScoresCatalog();
+    if (status) status.textContent = `${songs.length} títulos prontos para comparar`;
+  } catch (_) {
+    if (status) status.textContent = "Catálogo indisponível";
+  }
+}
+
+async function analyzeRepertoire() {
+  const button = document.querySelector('[data-action="analyze-repertoire"]');
+  const textarea = document.querySelector("#repertoire-text");
+  const results = document.querySelector("[data-repertoire-results]");
+  if (!textarea || !results) return;
+  const typedText = textarea.value.trim();
+  if (!typedText && !repertoireSelectedFile) { toast("Cole uma lista ou selecione um arquivo"); textarea.focus(); return; }
+  if (button) button.disabled = true;
+  try {
+    const songs = await ensureScoresCatalog();
+    updateRepertoireProgress("Preparando o repertório...", "Comparando com o catálogo de partituras.", 8);
+    const fileText = repertoireSelectedFile ? await extractRepertoireFile(repertoireSelectedFile) : "";
+    const sourceText = [fileText, typedText].filter(Boolean).join("\n").trim();
+    if (!sourceText) throw new Error("Não consegui encontrar texto no arquivo. Tente outro print ou cole a lista manualmente.");
+    textarea.value = sourceText;
+    const lines = repertoireLinesFromText(sourceText);
+    if (!lines.length) throw new Error("Não encontrei nomes de músicas para comparar.");
+    updateRepertoireProgress("Comparando com o acervo...", `${lines.length} itens encontrados`, 92);
+    repertoireLastAnalysis = { ...compareRepertoire(lines, songs), sourceText };
+    results.innerHTML = repertoireResultsMarkup(repertoireLastAnalysis);
+    if (repertoireSelectedFile) {
+      const processedName = repertoireSelectedFile.name;
+      repertoireSelectedFile = null;
+      const fileInput = document.querySelector("[data-repertoire-file]");
+      const fileLabel = document.querySelector("[data-repertoire-file-name]");
+      if (fileInput) fileInput.value = "";
+      if (fileLabel) fileLabel.textContent = `Processado: ${processedName}`;
+    }
+    updateRepertoireProgress("Conferência concluída", `${repertoireLastAnalysis.matched.length} partituras encontradas no acervo.`, 100);
+    results.scrollIntoView({ behavior:"smooth", block:"start" });
+  } catch (error) {
+    updateRepertoireProgress("Não foi possível concluir", error.message || "Tente novamente.", 100);
+    toast(error.message || "Não foi possível analisar o repertório");
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+function clearRepertoireTool() {
+  repertoireSelectedFile = null;
+  repertoireLastAnalysis = null;
+  render();
+}
+
+async function copyMissingScores() {
+  const missing = repertoireLastAnalysis?.missing || [];
+  if (!missing.length) return;
+  try {
+    await navigator.clipboard.writeText(missing.map((item, index) => `${index + 1}. ${item.line}`).join("\n"));
+    toast("Lista de músicas que faltam copiada");
+  } catch (_) {
+    toast("Não foi possível copiar automaticamente");
+  }
 }
 
 function studentsPage(filter = "") {
@@ -1130,7 +1422,7 @@ function render() {
   const [route, id, detailId] = hash.split("/");
   const app = document.querySelector("#app");
   document.title = route === "aulas" ? "Aulas de Guitarra e Violão — Felipe Figueroa" : route === "dfv" ? "De Férias com o Violão | Felipe Figueroa" : route === "partituras" ? "Cifras em Partitura | Felipe Figueroa" : route === "agenda-publica" ? "Agenda de Eventos — Felipe Figueroa" : "Felipe Figueroa — Guitarrista & Professor";
-  const professorRoute = ["admin", "dashboard", "agenda", "agenda-eventos", "alunos", "atualizar", "materiais", "pagamentos", "eventos"].includes(route);
+  const professorRoute = ["admin", "dashboard", "agenda", "agenda-eventos", "repertorio", "alunos", "atualizar", "materiais", "pagamentos", "eventos"].includes(route);
   if (route === "login") app.innerHTML = loginPage(id === "professor" ? "professor" : "aluno");
   else if (route === "aulas") app.innerHTML = salesPage();
   else if (route === "dfv") app.innerHTML = dfvPage();
@@ -1139,6 +1431,7 @@ function render() {
   else if (route === "admin" || route === "dashboard") app.innerHTML = dashboardPage();
   else if (route === "agenda") app.innerHTML = agendaPage();
   else if (route === "agenda-eventos") app.innerHTML = eventSchedulePage();
+  else if (route === "repertorio") app.innerHTML = repertoireToolPage();
   else if (route === "alunos") app.innerHTML = studentsPage();
   else if (route === "atualizar") app.innerHTML = updateStudentPage(id, detailId);
   else if (route === "materiais") app.innerHTML = materialsPage();
@@ -1150,6 +1443,7 @@ function render() {
   else app.innerHTML = publicPage();
   requestAnimationFrame(() => {
     if (route === "partituras") { partiturasCatalogLimit = 18; updatePartiturasCatalog(); }
+    if (route === "repertorio" && isProfessorAuthenticated()) prepareRepertoireTool();
     const targetId = route === "aulas" && id ? `aulas-${id}` : route === "dfv" && id ? `dfv-${id}` : route === "partituras" && id ? `partituras-${id}` : route;
     const target = document.getElementById(targetId);
     if (target) target.scrollIntoView();
@@ -1376,6 +1670,9 @@ document.addEventListener("click", e => {
   else if (action === "edit-student") studentModal(target.dataset.student);
   else if (action === "new-event") eventModal();
   else if (action === "sync-events") syncEventCash(true);
+  else if (action === "analyze-repertoire") analyzeRepertoire();
+  else if (action === "clear-repertoire") clearRepertoireTool();
+  else if (action === "copy-missing-scores") copyMissingScores();
   else if (action === "edit-event") eventModal(target.dataset.event);
   else if (action === "receive-event") receiveEventModal(target.dataset.event);
   else if (action === "delete-event") deleteEventModal(target.dataset.event);
@@ -1545,6 +1842,12 @@ document.addEventListener("input", e => {
   else if (quoteForm && e.target.matches('[name="finalPrice"], [name="mode"]')) updateQuotePreview(quoteForm);
 });
 document.addEventListener("change", e => {
+  if (e.target.matches("[data-repertoire-file]")) {
+    repertoireSelectedFile = e.target.files?.[0] || null;
+    repertoireLastAnalysis = null;
+    const label = document.querySelector("[data-repertoire-file-name]");
+    if (label) label.textContent = repertoireSelectedFile?.name || "Nenhum arquivo selecionado";
+  }
   if (e.target.matches("[data-catalog-artist], [data-catalog-key], [data-catalog-feature]")) updatePartiturasCatalog(true);
   const filterMap = { "cash-mode":"mode", "cash-year":"year", "cash-month":"month", "cash-semester":"semester", "cash-status":"status" };
   if (filterMap[e.target.id]) { cashFilters[filterMap[e.target.id]]=e.target.value; render(); }
