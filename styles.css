@@ -744,6 +744,37 @@ select.field { appearance: none; }
 .row-actions { display: flex; justify-content: flex-end; gap: 4px; }
 .empty { padding: 50px 20px; text-align: center; color: #77756f; font-size: 12px; }
 
+/* Event schedule */
+.event-schedule-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
+.event-schedule-summary > div { min-width: 0; padding: 20px; background: #141414; border: 1px solid var(--line); border-radius: 13px; }
+.event-schedule-summary span, .event-schedule-summary small { display: block; }
+.event-schedule-summary span { color: #77756f; font: 500 8px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
+.event-schedule-summary strong { display: block; margin: 10px 0 7px; overflow: hidden; color: #eceae3; font: 500 34px/1 var(--font-display); text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.event-schedule-summary small { overflow: hidden; color: #77756f; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.event-schedule-summary > div:first-child strong, .event-next-summary strong { color: #8299ff; }
+.event-schedule-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 16px; align-items: start; }
+.event-schedule-panel { overflow: hidden; }
+.event-schedule-panel .panel-head h3 { margin-top: 7px; }
+.event-schedule-list { display: grid; }
+.event-history-list { max-height: 720px; overflow-y: auto; }
+.event-schedule-row { display: grid; grid-template-columns: 82px minmax(0, 1fr) auto; align-items: center; gap: 16px; min-height: 104px; padding: 15px 18px; border-bottom: 1px solid var(--line); }
+.event-schedule-row:last-child { border-bottom: 0; }
+.event-schedule-row:hover { background: rgba(255,255,255,.018); }
+.event-schedule-row.is-past { opacity: .7; }
+.event-schedule-row.is-past:hover { opacity: 1; }
+.event-schedule-row time { align-self: stretch; display: flex; flex-direction: column; justify-content: center; padding-right: 14px; border-right: 1px solid var(--line); }
+.event-schedule-row time strong, .event-schedule-row time span, .event-schedule-row time small { display: block; }
+.event-schedule-row time strong { color: #8299ff; font: 500 34px/.9 var(--font-display); }
+.event-schedule-row time span { margin-top: 6px; color: #aaa8a1; font: 500 8px/1.2 var(--font-mono); text-transform: uppercase; }
+.event-schedule-row time small { margin-top: 5px; color: #62605b; font: 400 8px/1 var(--font-mono); }
+.event-schedule-info { min-width: 0; }
+.event-schedule-info > strong { display: block; overflow: hidden; color: #eceae3; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.event-schedule-info > span { display: block; margin-top: 5px; overflow: hidden; color: #898780; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.event-schedule-info > small { display: flex; align-items: flex-start; gap: 6px; margin-top: 8px; color: #62605b; font-size: 9px; line-height: 1.4; }
+.event-schedule-info > small .icon { flex: 0 0 auto; width: 12px; margin-top: 1px; }
+.event-schedule-actions { display: flex; align-items: center; justify-content: flex-end; gap: 7px; }
+.event-schedule-actions .icon-btn { flex: 0 0 auto; width: 34px; height: 34px; }
+
 /* Event cash flow */
 .cash-source-link { display: inline-flex; align-items: center; gap: 7px; }
 .cash-source-link:hover { color: #9aafff; }
@@ -1044,6 +1075,8 @@ select.field { appearance: none; }
   .public-agenda-summary { grid-template-columns: auto auto 1fr; gap: 24px; }
   .public-agenda-filter-wrap { grid-template-columns: 1fr; gap: 16px; }
   .metrics { grid-template-columns: repeat(2, 1fr); }
+  .event-schedule-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .event-schedule-grid { grid-template-columns: 1fr; }
   .cash-filters { grid-template-columns: repeat(3, 1fr); }
   .cash-search { grid-column: span 2; }
   .dashboard-grid { grid-template-columns: 1fr; }
@@ -1124,6 +1157,12 @@ select.field { appearance: none; }
   .app-content { padding: 23px 15px 45px; }
   .greeting { align-items: flex-start; flex-direction: column; gap: 13px; }
   .metrics { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .event-schedule-summary { gap: 8px; }
+  .event-schedule-summary > div { padding: 16px; }
+  .event-schedule-summary strong { font-size: 28px; }
+  .event-schedule-row { grid-template-columns: 66px minmax(0, 1fr); gap: 12px; padding: 14px; }
+  .event-schedule-actions { grid-column: 2; justify-content: flex-start; }
+  .event-schedule-info > strong, .event-schedule-info > span { white-space: normal; }
   .cash-filters { grid-template-columns: 1fr 1fr; padding: 12px; }
   .cash-search { grid-column: 1 / -1; }
   .cash-period-heading { align-items: flex-start; flex-direction: column; gap: 5px; }

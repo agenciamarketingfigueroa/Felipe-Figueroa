@@ -22,6 +22,7 @@ Depois acesse `http://localhost:4173`.
 - `#login/aluno` — login do aluno
 - `#admin` — visão geral do professor, protegida por sessão
 - `#agenda` — agenda e links das aulas
+- `#agenda-eventos` — agenda profissional com próximos eventos e histórico de datas
 - `#alunos` — cadastro e edição dos alunos
 - `#atualizar/{id}` — atualização pedagógica com resumo, exercícios e materiais do aluno
 - `#materiais` — biblioteca didática e mapa da apostila

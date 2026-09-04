@@ -205,7 +205,7 @@ async function syncEventCash(showFeedback = false) {
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
     const currentRoute = location.hash.replace(/^#/, "").split("/")[0] || "home";
-    if ((currentRoute === "eventos" && isProfessorAuthenticated()) || ["home","sobre","trabalhos","agenda-publica","curso","contato"].includes(currentRoute)) render();
+    if ((["agenda-eventos","eventos"].includes(currentRoute) && isProfessorAuthenticated()) || ["home","sobre","trabalhos","agenda-publica","curso","contato"].includes(currentRoute)) render();
     if (showFeedback) toast(`${incoming.length} eventos carregados da planilha`);
   } catch (_) {
     db.eventSync = { ...(db.eventSync || {}), status:"error" };
@@ -233,7 +233,7 @@ async function loadPublicAgendaHistory() {
     publicAgendaStatus = "error";
   }
   const currentRoute = location.hash.replace(/^#/, "").split("/")[0] || "home";
-  if (["home","sobre","trabalhos","agenda-publica","curso","contato"].includes(currentRoute)) render();
+  if (["home","sobre","trabalhos","agenda-publica","agenda-eventos","curso","contato"].includes(currentRoute)) render();
 }
 
 function publicAgendaDate(date) {
@@ -803,18 +803,27 @@ function salesPage() {
 
 function sidebar(active) {
   const items = [
-    ["eventos", "Caixa de eventos", icons.money],
-    ["dashboard", "Visão geral", icons.home], ["agenda", "Agenda", icons.calendar], ["alunos", "Alunos", icons.users], ["materiais", "Materiais", icons.book], ["pagamentos", "Pagamentos", icons.money]
+    ["dashboard", "Visão geral", icons.home], ["agenda", "Agenda", icons.calendar], ["agenda-eventos", "Eventos", icons.calendar], ["eventos", "Caixa de eventos", icons.money], ["alunos", "Alunos", icons.users], ["materiais", "Materiais", icons.book], ["pagamentos", "Pagamentos", icons.money]
   ];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const upcomingEvents = db.events.filter(event => {
+    const date = new Date(event.date);
+    if (Number.isNaN(date.getTime())) return false;
+    date.setHours(0, 0, 0, 0);
+    return date >= today && slugify(event.scheduleStatus || "") !== "cancelado";
+  }).length;
   return `<aside class="sidebar" id="sidebar"><a class="brand" href="#home"><span class="brand-mark" aria-label="Felipe Figueroa"></span><strong>Studio</strong></a>
-    <span class="side-label">Gestão</span><nav class="side-nav">${items.map(i => `<button class="side-link ${active === i[0] ? "active" : ""}" data-route="${i[0]}">${i[2]}<span>${i[1]}</span>${i[0] === "agenda" ? `<b class="side-badge">${db.lessons.filter(l => l.status === "scheduled").length}</b>` : ""}</button>`).join("")}</nav>
+    <span class="side-label">Gestão</span><nav class="side-nav">${items.map(i => `<button class="side-link ${active === i[0] ? "active" : ""}" data-route="${i[0]}">${i[2]}<span>${i[1]}</span>${i[0] === "agenda" ? `<b class="side-badge">${db.lessons.filter(l => l.status === "scheduled").length}</b>` : i[0] === "agenda-eventos" ? `<b class="side-badge">${upcomingEvents}</b>` : ""}</button>`).join("")}</nav>
     <span class="side-label">Site</span><nav class="side-nav"><a class="side-link" href="#home">${icons.external}<span>Ver site público</span></a><button class="side-link" data-action="export">${icons.download}<span>Exportar dados</span></button><button class="side-link" data-action="import">${icons.upload}<span>Importar backup</span></button></nav>
     <div class="sidebar-bottom"><div class="backup-note"><strong>Backup local</strong><span>${db.lastBackup ? `Último: ${fmtDate(db.lastBackup, {day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit"})}` : "Nenhum backup exportado"}</span></div><div class="user-chip"><span class="avatar professor-avatar" aria-label="Felipe Figueroa"></span><div><strong>Felipe Figueroa</strong><span>Professor · Administrador</span></div><button class="icon-btn logout-button" data-action="logout-professor" title="Sair" aria-label="Sair da área do professor">${icons.arrow}</button></div></div>
   </aside>`;
 }
 
 function appShell(active, title, content) {
-  const primaryAction = active === "eventos"
+  const primaryAction = active === "agenda-eventos"
+    ? `<button class="btn btn-primary" data-action="sync-events">${icons.calendar}<span>Atualizar eventos</span></button>`
+    : active === "eventos"
     ? `<a class="btn btn-primary" href="${EVENT_SOURCE_URL}" target="_blank" rel="noopener">${icons.external}<span>Editar planilha</span></a>`
     : `<button class="btn btn-primary" data-action="new-lesson">${icons.plus}<span>Nova aula</span></button>`;
   return `<div class="app-shell">${sidebar(active)}<main class="app-main"><header class="app-topbar"><div style="display:flex;align-items:center;gap:12px"><button class="icon-btn mobile-menu" data-action="toggle-sidebar" aria-label="Menu">${icons.menu}</button><h1>${title}</h1></div><div class="top-actions"><button class="btn btn-ghost" data-action="export">${icons.download}<span>Backup</span></button>${primaryAction}</div></header><div class="app-content">${content}</div></main></div>`;
@@ -851,6 +860,72 @@ function agendaRow(lesson) {
 function agendaPage() {
   const lessons = [...db.lessons].sort((a,b)=>new Date(a.date)-new Date(b.date));
   return appShell("agenda", "Agenda", `<div class="greeting"><div><span class="eyebrow">Organização</span><h2>Próximas aulas</h2><p>Agenda completa com links, modalidade e lembretes.</p></div></div><section class="panel"><div class="panel-head"><div><h3>${lessons.length} aulas cadastradas</h3><p>Horários exibidos no fuso deste dispositivo.</p></div><button class="btn btn-primary" data-action="new-lesson">${icons.plus} Agendar aula</button></div><div class="agenda-list">${lessons.length ? lessons.map(agendaRow).join("") : `<div class="empty">Sua agenda está livre.</div>`}</div></section>`);
+}
+
+function eventScheduleStatusTag(status = "") {
+  const normalized = slugify(status);
+  if (normalized === "cancelado") return `<span class="tag danger"><i class="dot"></i>Cancelado</span>`;
+  if (normalized.includes("pendente")) return `<span class="tag warning"><i class="dot"></i>Pendente</span>`;
+  if (normalized === "confirmado" || normalized === "aceito") return `<span class="tag success"><i class="dot"></i>${esc(status)}</span>`;
+  return status ? `<span class="tag"><i class="dot"></i>${esc(status)}</span>` : "";
+}
+
+function eventScheduleRow(event, isPast = false) {
+  const date = new Date(event.date);
+  const title = event.title || event.partner || event.type || "Evento";
+  const counterpart = event.group || event.client || event.partner || "";
+  const details = [event.type !== title ? event.type : "", counterpart !== title ? counterpart : ""].filter(Boolean).join(" · ");
+  const location = event.venue || event.location || "";
+  return `<article class="event-schedule-row ${isPast ? "is-past" : ""}">
+    <time datetime="${esc(event.date)}"><strong>${fmtDate(date,{day:"2-digit"})}</strong><span>${fmtDate(date,{month:"short",year:"numeric"})}</span><small>${event.allDay ? "Data registrada" : fmtDate(date,{hour:"2-digit",minute:"2-digit"})}</small></time>
+    <div class="event-schedule-info"><strong>${esc(title)}</strong>${details ? `<span>${esc(details)}</span>` : ""}${location ? `<small>${icons.calendar}${esc(location)}</small>` : ""}</div>
+    <div class="event-schedule-actions">${eventScheduleStatusTag(event.scheduleStatus)}${event.calendarUrl ? `<a class="icon-btn" href="${safeHref(event.calendarUrl)}" target="_blank" rel="noopener" title="Abrir no Google Agenda" aria-label="Abrir ${esc(title)} no Google Agenda">${icons.external}</a>` : ""}</div>
+  </article>`;
+}
+
+function eventSchedulePage() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const historicalEvents = publicAgendaHistory.map((event, index) => ({
+    id: `history-${index}`,
+    date: `${event.date}T12:00:00`,
+    type: event.type,
+    partner: event.partner,
+    title: event.partner || event.type,
+    location: event.location,
+    allDay: true,
+    source: "history",
+  }));
+  const validEvents = [...db.events, ...historicalEvents].filter(event => !Number.isNaN(new Date(event.date).getTime()));
+  const upcoming = validEvents.filter(event => {
+    const date = new Date(event.date);
+    date.setHours(0, 0, 0, 0);
+    return date >= today;
+  }).sort((a,b) => new Date(a.date) - new Date(b.date));
+  const past = validEvents.filter(event => {
+    const date = new Date(event.date);
+    date.setHours(0, 0, 0, 0);
+    return date < today;
+  }).sort((a,b) => new Date(b.date) - new Date(a.date));
+  const confirmedUpcoming = upcoming.filter(event => slugify(event.scheduleStatus || "") !== "cancelado");
+  const nextEvent = confirmedUpcoming[0];
+  const thisMonth = confirmedUpcoming.filter(event => {
+    const date = new Date(event.date);
+    return date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
+  }).length;
+  return appShell("agenda-eventos", "Eventos", `
+    <div class="greeting"><div><span class="eyebrow">Agenda profissional</span><h2>Datas dos eventos</h2><p>Acompanhe o que ainda vai acontecer e consulte rapidamente o histórico.</p></div><div class="cash-sync-summary"><span class="date-chip">${db.eventSync?.status === "error" ? "Última atualização indisponível" : db.eventSync?.syncedAt ? `Atualizado em ${fmtDate(db.eventSync.syncedAt,{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}` : "Carregando eventos..."}</span><button class="btn btn-ghost" data-action="sync-events">${icons.calendar} Atualizar agora</button></div></div>
+    <section class="event-schedule-summary">
+      <div><span>Próximos</span><strong>${confirmedUpcoming.length}</strong><small>eventos agendados</small></div>
+      <div><span>Neste mês</span><strong>${thisMonth}</strong><small>datas confirmadas</small></div>
+      <div class="event-next-summary"><span>Próxima data</span><strong>${nextEvent ? fmtDate(nextEvent.date,{day:"2-digit",month:"long"}) : "Agenda livre"}</strong><small>${nextEvent ? esc(nextEvent.title || nextEvent.type || "Evento") : "Nenhum evento futuro"}</small></div>
+      <div><span>Histórico</span><strong>${past.length}</strong><small>eventos passados</small></div>
+    </section>
+    <div class="event-schedule-grid">
+      <section class="panel event-schedule-panel"><div class="panel-head"><div><span class="eyebrow">A seguir</span><h3>Próximos eventos</h3><p>${upcoming.length} ${upcoming.length === 1 ? "data cadastrada" : "datas cadastradas"}</p></div></div><div class="event-schedule-list">${upcoming.length ? upcoming.map(event => eventScheduleRow(event)).join("") : `<div class="empty">Nenhum próximo evento cadastrado.</div>`}</div></section>
+      <section class="panel event-schedule-panel"><div class="panel-head"><div><span class="eyebrow">Arquivo</span><h3>Eventos passados</h3><p>${publicAgendaStatus === "loading" ? "Carregando histórico..." : `${past.length} ${past.length === 1 ? "data no histórico" : "datas no histórico"}`}</p></div></div><div class="event-schedule-list event-history-list">${past.length ? past.map(event => eventScheduleRow(event, true)).join("") : `<div class="empty">${publicAgendaStatus === "loading" ? "Carregando eventos passados..." : "O histórico ainda está vazio."}</div>`}</div></section>
+    </div>
+  `);
 }
 
 function studentsPage(filter = "") {
@@ -1055,7 +1130,7 @@ function render() {
   const [route, id, detailId] = hash.split("/");
   const app = document.querySelector("#app");
   document.title = route === "aulas" ? "Aulas de Guitarra e Violão — Felipe Figueroa" : route === "dfv" ? "De Férias com o Violão | Felipe Figueroa" : route === "partituras" ? "Cifras em Partitura | Felipe Figueroa" : route === "agenda-publica" ? "Agenda de Eventos — Felipe Figueroa" : "Felipe Figueroa — Guitarrista & Professor";
-  const professorRoute = ["admin", "dashboard", "agenda", "alunos", "atualizar", "materiais", "pagamentos", "eventos"].includes(route);
+  const professorRoute = ["admin", "dashboard", "agenda", "agenda-eventos", "alunos", "atualizar", "materiais", "pagamentos", "eventos"].includes(route);
   if (route === "login") app.innerHTML = loginPage(id === "professor" ? "professor" : "aluno");
   else if (route === "aulas") app.innerHTML = salesPage();
   else if (route === "dfv") app.innerHTML = dfvPage();
@@ -1063,6 +1138,7 @@ function render() {
   else if (professorRoute && !isProfessorAuthenticated()) app.innerHTML = loginPage("professor");
   else if (route === "admin" || route === "dashboard") app.innerHTML = dashboardPage();
   else if (route === "agenda") app.innerHTML = agendaPage();
+  else if (route === "agenda-eventos") app.innerHTML = eventSchedulePage();
   else if (route === "alunos") app.innerHTML = studentsPage();
   else if (route === "atualizar") app.innerHTML = updateStudentPage(id, detailId);
   else if (route === "materiais") app.innerHTML = materialsPage();
