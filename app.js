@@ -416,6 +416,7 @@ function publicPage() {
 
       <section class="public-section" id="curso">
         <div class="container">
+          <div class="section-head"><span class="eyebrow">03 / Formação</span><div><h2>Cursos e materiais para tocar com mais liberdade.</h2><p>Conteúdos autorais que unem prática, repertório e orientação clara — para quem está começando, quer evoluir no instrumento ou precisa de mais segurança em aulas, ensaios e apresentações.</p></div></div>
           <div class="courses-list">
           <div class="course-card">
             <div class="course-visual dadgad-course-visual"><div class="dadgad-brand-lockup" aria-label="Descomplicando o DADGAD"><span>DAD<br>GAD</span></div></div>
