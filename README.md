@@ -18,6 +18,8 @@ Depois acesse `http://localhost:4173`.
 - `#agenda-publica` — agenda pública de casamentos, festas, recepções e shows
 - `/aulas/` — página não listada de vendas das aulas, formatos e planos
 - `/partituras/` — página de pré-lançamento do acervo de cifras em partitura
+- `/dfv/` — página de inscrição gratuita para o DFV de setembro de 2026
+- `/dfv/confirmacao/` — próximos passos após a inscrição no DFV
 - `#login/professor` — login do professor
 - `#login/aluno` — login do aluno
 - `#admin` — visão geral do professor, protegida por sessão
@@ -103,3 +105,12 @@ Para a rotina automática funcionar, o arquivo precisa estar compartilhado no Go
 Os botões de lembrete abrem o WhatsApp ou o aplicativo de e-mail com a mensagem preenchida. Envio automático em segundo plano, sincronização com o Google Drive e sincronização entre dispositivos exigem um backend ou um serviço externo de automação.
 
 O login incluído controla a navegação na interface, mas não é autenticação segura: em um site puramente estático, a senha e os dados existem no navegador e podem ser inspecionados. Para publicar dados pessoais ou financeiros reais na internet, use um backend com autenticação e banco de dados.
+
+## Integrações do DFV
+
+A landing page preserva `utm_source`, `utm_medium`, `utm_campaign`, `utm_content` e `utm_term` no envio. Antes de publicar a campanha, configure no início de `app.js`:
+
+- `DFV_SIGNUP_ENDPOINT` — endpoint HTTPS que recebe um `POST` JSON com nome, e-mail, WhatsApp, UTMs, URL de origem e data do envio;
+- `DFV_WHATSAPP_GROUP_URL` — link do grupo ou canal oficial exibido na página de confirmação.
+
+Enquanto o endpoint estiver vazio, a inscrição é guardada apenas no `localStorage` com a chave `dfv-signup-pending-integration`, para permitir a revisão completa do fluxo sem enviar dados reais.
