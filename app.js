@@ -10,15 +10,14 @@ const PDFJS_MODULE_URL = "https://cdn.jsdelivr.net/npm/pdfjs-dist@5.7.284/build/
 const PDFJS_WORKER_URL = "https://cdn.jsdelivr.net/npm/pdfjs-dist@5.7.284/build/pdf.worker.min.mjs";
 const TESSERACT_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/tesseract.min.js";
 const DFV_EVENT_START = "2026-09-21T21:00:00-03:00";
-<<<<<<< HEAD
 const DFV_SIGNUP_ENDPOINT = "";
 const DFV_WHATSAPP_GROUP_URL = "";
-=======
+/* Older branch version discarded while resolving the merge conflict.
 // Configure estes dois endereços antes de remover o noindex da página do DFV.
 const DFV_LEAD_ENDPOINT = "";
 const DFV_WHATSAPP_GROUP_URL = "";
 let dfvCountdownTimer = null;
->>>>>>> e40868c0ec97af180a853a165565282b090c0916
+*/
 // Altere para true somente quando o card do DFV puder aparecer na página inicial.
 const SHOW_DFV_COURSE = false;
 const LESSON_PLANS = [
@@ -352,8 +351,7 @@ function toDateTimeInput(value) {
   const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
   return local.toISOString().slice(0, 16);
 }
-<<<<<<< HEAD
-=======
+/* Older branch version discarded while resolving the merge conflict.
 function dfvGroupHref() {
   return DFV_WHATSAPP_GROUP_URL || `https://wa.me/5531999427901?text=${encodeURIComponent("Olá, Felipe! Fiz minha inscrição e quero entrar no grupo oficial do DFV.")}`;
 }
@@ -383,7 +381,7 @@ function dfvSignupForm() {
     <small>Seus dados serão usados apenas para a comunicação desta edição do DFV.</small>
   </form>`;
 }
->>>>>>> e40868c0ec97af180a853a165565282b090c0916
+*/
 function slugify(s) { return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
 function safeHref(value = "") {
   const href = String(value).trim();
@@ -545,7 +543,6 @@ function dfvIcsUrl() {
 
 function dfvPage() {
   const days = [
-<<<<<<< HEAD
     ["01", "Faça o violão obedecer", "Preparação, afinação, postura e os primeiros movimentos para começar a controlar as mãos.", "Eu consigo fazer isso."],
     ["02", "Seus primeiros acordes", "Vamos montar os primeiros acordes e resolver o clássico problema dos dedos que não querem ficar no lugar.", "Já consigo formar acordes."],
     ["03", "Faça os acordes conversarem", "Você começa a trocar acordes e tocar sequências que aparecem em inúmeras músicas.", "Isso já está soando familiar."],
@@ -563,7 +560,7 @@ function dfvPage() {
     ["“Meus dedos são duros.”", "Essa é uma das reclamações mais comuns de quem começa."],
     ["“Eu não entendo teoria.”", "Você não precisa de teoria avançada para começar o desafio."],
     ["“Meu violão está parado.”", "Está na hora de descobrir se ele ainda vai virar música."],
-=======
+/* Older branch version discarded while resolving the merge conflict.
     ["Dia 1", "Faça o violão obedecer", "Preparação, afinação, postura e primeiros movimentos para começar a controlar as mãos.", "Eu consigo fazer isso."],
     ["Dia 2", "Seus primeiros acordes", "Vamos montar os primeiros acordes e resolver o clássico problema dos dedos que não querem ficar no lugar.", "Já consigo formar acordes."],
     ["Dia 3", "Faça os acordes conversarem", "Você vai começar a trocar acordes e tocar sequências presentes em inúmeras músicas.", "Isso já está começando a soar familiar."],
@@ -581,33 +578,31 @@ function dfvPage() {
     ["Meus dedos são duros.", "Essa é uma das reclamações mais comuns de quem começa."],
     ["Eu não entendo teoria musical.", "Você não precisa de teoria avançada para começar o desafio."],
     ["Meu violão está parado há anos.", "Melhor ainda. Está na hora de descobrir se ele ainda vai virar música."],
->>>>>>> e40868c0ec97af180a853a165565282b090c0916
+*/
   ];
   const faq = [
     ["Eu nunca toquei absolutamente nada. Posso participar?", "Sim. Esse é justamente o principal ponto de partida do desafio."],
     ["Preciso ter um violão?", "O ideal é ter acesso a um durante os cinco dias. Pode ser seu ou emprestado."],
     ["Violão de nylon ou de aço?", "Os dois servem."],
     ["Tenho guitarra. Consigo acompanhar?", "Boa parte dos fundamentos pode ser executada na guitarra, embora o desafio tenha sido pensado para violão."],
-<<<<<<< HEAD
     ["Tenho dedos ou mãos pequenas. Isso atrapalha?", "Isso não deve impedir sua participação. Ajustes de posição e exercícios podem ser feitos conforme cada aluno."],
     ["Preciso saber ler partitura?", "Não."],
     ["Vou aprender teoria musical?", "Alguns conceitos podem aparecer quando forem necessários, mas o DFV não começa pela teoria. A prioridade é tocar."],
     ["E se eu perder uma aula ao vivo?", "A intenção é deixar o replay de cada encontro disponível temporariamente, somente até a aula seguinte."],
     ["Quanto custa?", "Nada. A participação no DFV é gratuita."],
     ["Quanto tempo dura cada encontro?", "Aproximadamente 60 a 75 minutos, com alguma variação conforme as dúvidas e a dinâmica da turma."],
-=======
+/* Older branch version discarded while resolving the merge conflict.
     ["Tenho dedos ou mãos pequenas. Isso atrapalha?", "Isso não deve impedir sua participação. Posição e exercício podem ser ajustados para cada pessoa."],
     ["Preciso saber ler partitura?", "Não."],
     ["Vou aprender teoria musical?", "Alguns conceitos aparecem quando forem necessários, mas a prioridade destes cinco dias é tocar."],
     ["E se eu perder uma aula ao vivo?", "A previsão é manter o replay de cada encontro disponível temporariamente, somente até a aula seguinte."],
     ["Quanto custa?", "Nada. A participação no DFV é gratuita."],
     ["Quanto tempo dura cada encontro?", "Aproximadamente 60 a 75 minutos, com pequena variação conforme as dúvidas e a dinâmica da turma."],
->>>>>>> e40868c0ec97af180a853a165565282b090c0916
+*/
   ];
   return `
     <header class="site-nav dfv-nav dfv-capture-nav">
       <div class="container site-nav-inner">
-<<<<<<< HEAD
         <a class="brand" href="dfv/" aria-label="Desafio De Férias com o Violão"><span class="brand-mark"></span><strong>Felipe Figueroa</strong><span>/ DFV</span></a>
         <div class="dfv-nav-date"><strong>21—25 SET</strong><span>21h · online</span></div>
         <a class="btn btn-primary dfv-nav-cta" href="dfv/#dfv/inscricao">Inscrição gratuita ${icons.arrow}</a>
@@ -768,7 +763,7 @@ async function submitDfvSignup(form) {
     feedback.textContent = "Não conseguimos concluir agora. Tente novamente em instantes.";
     feedback.classList.add("is-visible");
   }
-=======
+/* Older branch version discarded while resolving the merge conflict.
         <a class="brand" href="./"><span class="brand-mark" aria-label="Felipe Figueroa"></span><strong>Felipe Figueroa</strong><span>/ DFV</span></a>
         <span class="dfv-nav-date">21 a 25 de setembro · 21h</span>
         <a class="btn btn-primary" href="de-ferias-com-violao/#dfv/inscricao">Participar gratuitamente ${icons.arrow}</a>
@@ -878,7 +873,7 @@ function dfvConfirmationPage() {
       </div></section>
       <footer class="sales-footer"><div class="container"><span>© ${new Date().getFullYear()} Felipe Figueroa</span><span>DFV · 21 a 25 de setembro · 21h</span><a href="de-ferias-com-violao/">Voltar à página do desafio</a></div></footer>
     </main>`;
->>>>>>> e40868c0ec97af180a853a165565282b090c0916
+*/
 }
 
 function partiturasPage() {
