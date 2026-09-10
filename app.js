@@ -513,9 +513,9 @@ function dfvPage() {
     ["05", "Sua primeira música", "Acordes, trocas e ritmo se encontram em uma música completa — e na nossa formatura.", "Eu consegui."],
   ];
   const proof = [
-    ["Giovana", "Começou aos 13 anos dizendo que não sabia absolutamente nada. Ao final do desafio, estava tocando.", "Progresso"],
-    ["Sirlei", "Mesmo sabendo tocar, não tinha conseguido ensinar a filha Giovana. Para ela, a experiência mostrou que o desafio é da pessoa contra ela mesma.", "Dia 1 × último dia"],
-    ["Anne Caroline", "Tinha um violão havia cerca de seis anos e via o instrumento como um “bicho de sete cabeças”. Participou e conseguiu tocar.", "O violão deixou de assustar"],
+    ["Anne Caroline", "Tinha um violão havia cerca de seis anos e via o instrumento como um “bicho de sete cabeças”. Participou e conseguiu tocar.", "O violão deixou de assustar", "yE2H_zgiVFk"],
+    ["Giovana", "Começou aos 13 anos dizendo que não sabia absolutamente nada. Ao final do desafio, estava tocando.", "Progresso", "8Xmx8Jb73ao"],
+    ["Giovana e Sirlei", "Mesmo sabendo tocar, Sirlei não tinha conseguido ensinar a filha Giovana. Para ela, a experiência mostrou que o desafio é da pessoa contra ela mesma.", "Dia 1 × último dia", "d2IwlZ0C0ZU"],
   ];
   const audience = [
     ["“Eu nunca toquei nada.”", "Perfeito. Vamos começar do começo."],
@@ -579,7 +579,7 @@ function dfvPage() {
       <section class="sales-section dfv-proof-section">
         <div class="container"><div class="dfv-section-head"><span class="eyebrow">Histórias de quem começou</span><h2>Parece rápido demais?<br>Eu entenderia se você pensasse isso.</h2><p>O DFV já teve outras edições, e pessoas que começaram do zero conseguiram tocar.</p></div>
           <p class="dfv-proof-disclaimer">Resultados de participantes das edições anteriores do DFV, realizadas no formato de 7 dias.</p>
-          <div class="dfv-proof-grid">${proof.map((item, index) => `<article><div class="dfv-video-slot" aria-label="Espaço reservado para o vídeo real de ${item[0]}"><span>${icons.music}</span><small>Vídeo original da edição anterior</small></div><div><span>${String(index + 1).padStart(2, "0")} · participante DFV</span><h3>${item[0]}</h3><p>${item[1]}</p><blockquote>“${item[2]}”</blockquote></div></article>`).join("")}</div>
+          <div class="dfv-proof-grid">${proof.map((item, index) => `<article><div class="dfv-video-slot"><iframe src="https://www.youtube-nocookie.com/embed/${item[3]}" title="Depoimento de ${item[0]} sobre o DFV" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div><div><span>${String(index + 1).padStart(2, "0")} · participante DFV</span><h3>${item[0]}</h3><p>${item[1]}</p><blockquote>“${item[2]}”</blockquote></div></article>`).join("")}</div>
         </div>
       </section>
 
@@ -588,7 +588,7 @@ function dfvPage() {
       </section>
 
       <section class="sales-section dfv-teacher-section">
-        <div class="container dfv-teacher-grid"><figure><img src="assets/hero-felipe.jpg" alt="Felipe Figueroa tocando no palco" width="2560" height="1080" loading="lazy" decoding="async"><figcaption>Felipe Figueroa · músico e professor desde 2007</figcaption></figure><div><span class="eyebrow">Quem vai tocar com você</span><h2>Ele sabe muito. E sabe explicar para quem ainda não sabe nada.</h2><p>Meu nome é Felipe Figueroa. Sou violonista, guitarrista, professor e produtor musical e trabalho profissionalmente com música desde 2007.</p><p>Mas existe uma coisa que aprendi dando aula: o iniciante não precisa de alguém mostrando o quanto sabe. Precisa de alguém capaz de pegar aquilo que parece complicado e transformar em um próximo passo simples.</p><p>Foi dessa ideia que nasceu o DFV. Não quero que você termine esses cinco dias sabendo explicar tudo sobre música. Quero que termine olhando para o seu violão de uma forma diferente.</p><blockquote>Porque agora você consegue tocar.</blockquote></div></div>
+        <div class="container dfv-teacher-grid"><figure><img src="assets/hero-felipe.jpg" alt="Felipe Figueroa tocando no palco" width="2560" height="1080" loading="lazy" decoding="async"><figcaption>Felipe Figueroa · músico e professor desde 2007</figcaption></figure><div><span class="eyebrow">Quem vai tocar com você</span><h2>Um professor para te acompanhar desde o primeiro acorde.</h2><p>Meu nome é Felipe Figueroa. Sou violonista, guitarrista, professor e produtor musical e trabalho profissionalmente com música desde 2007.</p><p>Mas existe uma coisa que aprendi dando aula: o iniciante não precisa de alguém mostrando o quanto sabe. Precisa de alguém capaz de pegar aquilo que parece complicado e transformar em um próximo passo simples.</p><p>Foi dessa ideia que nasceu o DFV. Não quero que você termine esses cinco dias sabendo explicar tudo sobre música. Quero que termine olhando para o seu violão de uma forma diferente.</p><blockquote>Porque agora você consegue tocar.</blockquote></div></div>
       </section>
 
       <section class="sales-section dfv-how-section">
