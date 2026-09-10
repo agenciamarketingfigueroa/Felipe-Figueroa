@@ -10,7 +10,7 @@ const PDFJS_MODULE_URL = "https://cdn.jsdelivr.net/npm/pdfjs-dist@5.7.284/build/
 const PDFJS_WORKER_URL = "https://cdn.jsdelivr.net/npm/pdfjs-dist@5.7.284/build/pdf.worker.min.mjs";
 const TESSERACT_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/tesseract.min.js";
 const DFV_EVENT_START = "2026-09-21T21:00:00-03:00";
-const DFV_SIGNUP_ENDPOINT = "";
+const DFV_SIGNUP_ENDPOINT = "https://script.google.com/macros/s/AKfycbwaPyPhRBN8MqT8UIo7lIq7FKWeXBJm1Qx_xRwB8nHHx47PcwUigz3-pSUNqyF_3fwh/exec";
 const DFV_WHATSAPP_GROUP_URL = "";
 // Altere para true somente quando o card do DFV puder aparecer na página inicial.
 const SHOW_DFV_COURSE = false;

@@ -108,9 +108,9 @@ O login incluído controla a navegação na interface, mas não é autenticaçã
 
 ## Integrações do DFV
 
-A landing page preserva `utm_source`, `utm_medium`, `utm_campaign`, `utm_content` e `utm_term` no envio. Antes de publicar a campanha, configure no início de `app.js`:
+A landing page preserva `utm_source`, `utm_medium`, `utm_campaign`, `utm_content` e `utm_term` no envio. As inscrições do DFV são enviadas como formulário URL-encoded para um Google Apps Script e registradas na planilha `Leads DFV`, aba `Inscrições`. A cópia do receptor está em `integrations/dfv-google-sheets/Code.gs`.
 
-- `DFV_SIGNUP_ENDPOINT` — endpoint HTTPS que recebe um `POST` JSON com nome, e-mail, WhatsApp, UTMs, URL de origem e data do envio;
+- `DFV_SIGNUP_ENDPOINT` — URL `/exec` da implantação ativa do Google Apps Script;
 - `DFV_WHATSAPP_GROUP_URL` — link do grupo ou canal oficial exibido na página de confirmação.
 
-Enquanto o endpoint estiver vazio, a inscrição é guardada apenas no `localStorage` com a chave `dfv-signup-pending-integration`, para permitir a revisão completa do fluxo sem enviar dados reais.
+Se o endpoint for temporariamente removido, a inscrição volta a ser guardada apenas no `localStorage` com a chave `dfv-signup-pending-integration`.
