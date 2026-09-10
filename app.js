@@ -473,6 +473,8 @@ function dfvSignupForm(locationLabel = "hero") {
     <label><span>WhatsApp com DDD</span><input required type="tel" name="whatsapp" autocomplete="tel" inputmode="tel" minlength="10" placeholder="(31) 99999-9999"></label>
     ${dfvTrackingFields()}
     <input type="hidden" name="event" value="dfv-setembro-2026">
+    <input type="hidden" name="consent" value="Aceite do aviso de comunicações exibido no formulário">
+    <label class="dfv-honeypot" aria-hidden="true"><span>Não preencha este campo</span><input name="website" tabindex="-1" autocomplete="off"></label>
     <button class="btn btn-primary dfv-form-submit" type="submit">Garantir minha inscrição gratuita ${icons.arrow}</button>
     <p class="dfv-form-feedback" data-dfv-form-feedback aria-live="polite"></p>
     <small>Ao se inscrever, você concorda em receber comunicações sobre o DFV. Seus dados não serão vendidos ou compartilhados.</small>
@@ -683,12 +685,12 @@ async function submitDfvSignup(form) {
   feedback.classList.remove("is-visible");
   try {
     if (DFV_SIGNUP_ENDPOINT) {
-      const response = await fetch(DFV_SIGNUP_ENDPOINT, {
+      await fetch(DFV_SIGNUP_ENDPOINT, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        mode: "no-cors",
+        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+        body: new URLSearchParams(payload),
       });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
     } else {
       localStorage.setItem("dfv-signup-pending-integration", JSON.stringify(payload));
     }

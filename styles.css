@@ -1509,6 +1509,7 @@ select.field { appearance: none; }
 .dfv-form-head h2 { margin: 18px 0 9px; font: 500 clamp(31px, 3.2vw, 42px)/1.02 var(--font-display); text-transform: uppercase; }
 .dfv-form-head p { margin: 0 0 25px; color: #888680; font-size: 11px; line-height: 1.65; }
 .dfv-signup-form > label { display: block; margin-top: 13px; }
+.dfv-signup-form > .dfv-honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 .dfv-signup-form > label > span { display: block; margin-bottom: 7px; color: #8d8b85; font: 500 8px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
 .dfv-signup-form input { width: 100%; height: 50px; padding: 0 15px; outline: 0; border: 1px solid var(--line); border-radius: 8px; color: #f0eee7; background: #0b0b0c; font-size: 12px; transition: border-color .2s, box-shadow .2s; }
 .dfv-signup-form input:focus { border-color: #7892ff; box-shadow: 0 0 0 3px rgba(95,124,255,.12); }
