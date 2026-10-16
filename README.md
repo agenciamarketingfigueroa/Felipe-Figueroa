@@ -17,6 +17,7 @@ Depois acesse `http://localhost:4173`.
 - `#home` — site institucional e mídia kit
 - `#agenda-publica` — agenda pública de casamentos, festas, recepções e shows
 - `/aulas/` — página não listada de vendas das aulas, formatos e planos
+- `/consultoria/` — página de vendas da Consultoria Figueroa; o botão `#botao-compra` usa WhatsApp até receber o link do checkout da Hotmart
 - `/partituras/` — página de pré-lançamento do acervo de cifras em partitura
 - `/dfv/` — página de inscrição gratuita para o DFV de setembro de 2026
 - `/dfv/confirmacao/` — próximos passos após a inscrição no DFV
